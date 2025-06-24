@@ -1,0 +1,13 @@
+/Users/aegis92/workspace/easy-vulkan/./output/lib/lib-easy-vulkan.1.0.0.dylib
+/Users/aegis92/workspace/easy-vulkan/./output/lib/lib-easy-vulkan.1.dylib
+/Users/aegis92/workspace/easy-vulkan/./output/lib/lib-easy-vulkan.dylib
+/Users/aegis92/workspace/easy-vulkan/./output/include/easy-vulkan.h
+/Users/aegis92/workspace/easy-vulkan/./output/include/initializer/ev-initializer.h
+/Users/aegis92/workspace/easy-vulkan/./output/include/ev-core.h
+/Users/aegis92/workspace/easy-vulkan/./output/include/ev-pdevice.h
+/Users/aegis92/workspace/easy-vulkan/./output/include/ev-swapchain.h
+/Users/aegis92/workspace/easy-vulkan/./output/include/ev-logger.h
+/Users/aegis92/workspace/easy-vulkan/./output/include/ev-utility.h
+/Users/aegis92/workspace/easy-vulkan/./output/include/ev-device.h
+/Users/aegis92/workspace/easy-vulkan/./output/include/debugger/ev-debug-messenger.h
+/Users/aegis92/workspace/easy-vulkan/./output/include/ev-instance.h

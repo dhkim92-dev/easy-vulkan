@@ -1,0 +1,32 @@
+[
+{
+  "directory": "/Users/aegis92/workspace/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/aegis92/workspace/easy-vulkan/easy-vulkan/include -isystem /Users/aegis92/VulkanSDK/1.4.313.1/macOS/include -O3 -DNDEBUG -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o -c /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-device.cpp",
+  "file": "/Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-device.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o"
+},
+{
+  "directory": "/Users/aegis92/workspace/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/aegis92/workspace/easy-vulkan/easy-vulkan/include -isystem /Users/aegis92/VulkanSDK/1.4.313.1/macOS/include -O3 -DNDEBUG -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.o -c /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-instance.cpp",
+  "file": "/Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-instance.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.o"
+},
+{
+  "directory": "/Users/aegis92/workspace/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/aegis92/workspace/easy-vulkan/easy-vulkan/include -isystem /Users/aegis92/VulkanSDK/1.4.313.1/macOS/include -O3 -DNDEBUG -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o -c /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-pdevice.cpp",
+  "file": "/Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-pdevice.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o"
+},
+{
+  "directory": "/Users/aegis92/workspace/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/aegis92/workspace/easy-vulkan/easy-vulkan/include -isystem /Users/aegis92/VulkanSDK/1.4.313.1/macOS/include -O3 -DNDEBUG -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.o -c /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-swapchain.cpp",
+  "file": "/Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-swapchain.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.o"
+},
+{
+  "directory": "/Users/aegis92/workspace/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/aegis92/workspace/easy-vulkan/easy-vulkan/include -isystem /Users/aegis92/VulkanSDK/1.4.313.1/macOS/include -O3 -DNDEBUG -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.o -c /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-utility.cpp",
+  "file": "/Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-utility.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.o"
+}
+]

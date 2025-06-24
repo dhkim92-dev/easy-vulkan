@@ -1,6 +1,9 @@
 #include "ev-swapchain.h"
+#include "ev-logger.h"
 
+using namespace std;
 using namespace ev;
+using namespace ev::logger;
 
 Swapchain::Swapchain(
     std::shared_ptr<Instance> instance,
@@ -31,10 +34,12 @@ void Swapchain::create_swapchain(
 
     VkSurfaceFormatKHR surface_format;
     std::vector<VkSurfaceFormatKHR> formats;
-    vkGetPhysicalDeviceSurfaceFormatsKHR(*pdevice, surface, &formats);
+    
+    auto vkGetPhysicalDeviceSurfaceFormatsKHR = 
+        (PFN_vkGetPhysicalDeviceSurfaceFormatsKHR)vkGetInstanceProcAddr(*instance, "vkGetPhysicalDeviceSurfaceFormatsKHR");
     
     if (formats.empty()) {
-        throw std::runtime_error("No supported surface formats found.");
+        exit(EXIT_FAILURE);
     }
 
     // Choose the first format that matches the desired color space
@@ -48,11 +53,22 @@ void Swapchain::create_swapchain(
     image_format = surface_format.format;
     color_space = surface_format.colorSpace;
 
-    VkPresentModeKHR present_mode = VK_PRESENT_MODE_FIFO_KHR; // Default to FIFO
+    VkPresentModeKHR present_mode = VK_PRESENT_MODE_FIFO_KHR;
+    std::vector<VkPresentModeKHR> present_modes;
+    uint32_t present_mode_count = 0;
+    vkGetPhysicalDeviceSurfacePresentModesKHR(*pdevice, surface, &present_mode_count, nullptr);
+    
+    if (present_mode <= 0) {
+        exit(EXIT_FAILURE);
+    }
+
+
     if (enable_vsync) {
-        present_mode = VK_PRESENT_MODE_FIFO_KHR; // VSync enabled
+        // vsync 활성화 시 FIFO 모드를 이용해야한다.
+        // 1. FIFO 모드 사용이 가능한지 확인한다.
+
     } else {
-        present_mode = VK_PRESENT_MODE_IMMEDIATE_KHR; // VSync disabled
+
     }
 
     VkExtent2D extent = {width, height};
@@ -79,7 +95,7 @@ void Swapchain::create_swapchain(
         swapchain_ci.pQueueFamilyIndices = queue_family_indices;
     }
     swapchain_ci.preTransform = capabilities.currentTransform;
-    swapchain_ci.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR
+    swapchain_ci.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     swapchain_ci.presentMode = present_mode;
     swapchain_ci.clipped = VK_TRUE;
     swapchain_ci.oldSwapchain = VK_NULL_HANDLE;

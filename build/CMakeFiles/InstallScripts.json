@@ -1,0 +1,8 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/aegis92/workspace/easy-vulkan/build/cmake_install.cmake",
+		"/Users/aegis92/workspace/easy-vulkan/build/easy-vulkan/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

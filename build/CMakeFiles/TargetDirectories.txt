@@ -1,0 +1,13 @@
+/Users/aegis92/workspace/easy-vulkan/build/CMakeFiles/edit_cache.dir
+/Users/aegis92/workspace/easy-vulkan/build/CMakeFiles/rebuild_cache.dir
+/Users/aegis92/workspace/easy-vulkan/build/CMakeFiles/list_install_components.dir
+/Users/aegis92/workspace/easy-vulkan/build/CMakeFiles/install.dir
+/Users/aegis92/workspace/easy-vulkan/build/CMakeFiles/install/local.dir
+/Users/aegis92/workspace/easy-vulkan/build/CMakeFiles/install/strip.dir
+/Users/aegis92/workspace/easy-vulkan/build/easy-vulkan/CMakeFiles/easy-vulkan.dir
+/Users/aegis92/workspace/easy-vulkan/build/easy-vulkan/CMakeFiles/edit_cache.dir
+/Users/aegis92/workspace/easy-vulkan/build/easy-vulkan/CMakeFiles/rebuild_cache.dir
+/Users/aegis92/workspace/easy-vulkan/build/easy-vulkan/CMakeFiles/list_install_components.dir
+/Users/aegis92/workspace/easy-vulkan/build/easy-vulkan/CMakeFiles/install.dir
+/Users/aegis92/workspace/easy-vulkan/build/easy-vulkan/CMakeFiles/install/local.dir
+/Users/aegis92/workspace/easy-vulkan/build/easy-vulkan/CMakeFiles/install/strip.dir
