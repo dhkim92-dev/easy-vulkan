@@ -16,6 +16,7 @@ Buffer::Buffer(
         Logger::getInstance().error("Invalid device provided for Buffer creation.");
         exit(EXIT_FAILURE);
     }
+    VkResult result = create_buffer(size, usage_flags);
     Logger::getInstance().debug("Buffer created successfully.");
 }
 
@@ -36,13 +37,20 @@ VkResult Buffer::create_buffer(
     return vkCreateBuffer(*device, &buffer_ci, nullptr, &buffer);
 }
 
-VkResult Buffer::bind_memory(VkDeviceMemory memory, VkDeviceSize offset) {
-    Logger::getInstance().debug("Binding memory to buffer...");
-    if (buffer == VK_NULL_HANDLE) {
-        Logger::getInstance().error("Buffer is not created yet.");
-        return VK_ERROR_INITIALIZATION_FAILED;
-    }
-    return vkBindBufferMemory(*device, buffer, memory, offset);
+VkResult Buffer::bind_memory(shared_ptr<ev::Memory> memory, VkDeviceSize offset) {
+    Logger::getInstance().debug("Binding buffer memory...");
+    VkBindBufferMemoryInfo bind_info = {};
+    bind_info.sType = VK_STRUCTURE_TYPE_BIND_BUFFER_MEMORY_INFO;
+    bind_info.buffer = buffer;
+    bind_info.memory = *memory;
+    bind_info.memoryOffset = offset;
+    bind_info.pNext = nullptr;
+    VkResult result = vkBindBufferMemory(*device, buffer, *memory, offset);
+    if (result == VK_SUCCESS) {
+        this->memory = *memory;
+        Logger::getInstance().debug("Buffer memory bound successfully.");
+    }  
+    return result;
 }
 
 /**

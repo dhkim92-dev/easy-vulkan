@@ -40,8 +40,8 @@ protected:
 
 TEST_F(MemoryTest, CreateMemory) {
     VkMemoryRequirements memory_requirements = {};
-    memory_requirements.size = 1024;
-    memory_requirements.memoryTypeBits = 0xFFFFFFFF; // Assume all types are available for simplicity
+    shared_ptr<ev::Buffer> buffer = make_shared<ev::Buffer>(device, 1024, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+    vkGetBufferMemoryRequirements(*device, *buffer, &memory_requirements);
     ev::Memory memory(device, 1024, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, memory_requirements);
     ASSERT_TRUE(memory.get_size() == 1024);
     ASSERT_TRUE(memory.get_memory_property_flags() & (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));

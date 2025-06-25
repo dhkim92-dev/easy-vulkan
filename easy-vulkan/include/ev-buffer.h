@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include "ev-device.h"
+#include "ev-memory.h"
 
 using namespace std;
 
@@ -40,7 +41,7 @@ public:
         // VkMemoryPropertyFlags memory_flags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
     );
     ~Buffer();
-    VkResult bind_memory( VkDeviceMemory memory, VkDeviceSize offset);
+    VkResult bind_memory(shared_ptr<ev::Memory> memory, VkDeviceSize offset);
     VkResult map(VkDeviceSize offset = 0, VkDeviceSize size = VK_WHOLE_SIZE);
     VkResult unmap();
     VkResult flush(VkDeviceSize offset = 0, VkDeviceSize size = VK_WHOLE_SIZE);

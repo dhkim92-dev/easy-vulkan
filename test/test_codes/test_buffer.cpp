@@ -48,3 +48,38 @@ TEST_F(BufferTest, CreateBuffer) {
     ASSERT_TRUE( (buffer.get_usage_flags() | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT) == VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 }
 
+TEST_F(BufferTest, BindMemory) {
+    shared_ptr<ev::Buffer> buffer = make_shared<ev::Buffer>(device, 1024, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+    VkMemoryRequirements memory_requirements = buffer->get_memory_requirements();
+    shared_ptr<ev::Memory> memory = make_shared<ev::Memory>(device, 1024, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, memory_requirements, nullptr);
+    VkResult result = buffer->bind_memory(memory, 0);
+    ASSERT_EQ(result, VK_SUCCESS);
+    ASSERT_TRUE(buffer->get_size() == 1024);
+}
+
+TEST_F(BufferTest, MapUnmapBuffer) {
+    shared_ptr<ev::Buffer> buffer = make_shared<ev::Buffer>(device, 1024, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+    VkMemoryRequirements memory_requirements = buffer->get_memory_requirements();
+    shared_ptr<ev::Memory> memory = make_shared<ev::Memory>(device,
+        1024, 
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 
+        memory_requirements, 
+        nullptr
+    );
+    VkResult result = buffer->bind_memory(memory, 0);
+    ASSERT_EQ(result, VK_SUCCESS);
+
+    char sample_data[] = "Hello, Vulkan!";
+    void *ptr = sample_data;
+    result = buffer->map(0, 1024);
+    ASSERT_EQ(result, VK_SUCCESS);
+    buffer->write(ptr, sizeof(sample_data));
+    ASSERT_TRUE(buffer->get_mapped_ptr() != nullptr);
+    char *read_data = new char[sizeof(sample_data)];
+    result = buffer->read(read_data, sizeof(sample_data));
+    ASSERT_EQ(result, VK_SUCCESS);
+    ASSERT_STREQ(read_data, sample_data);
+    delete [] read_data;
+    result = buffer->unmap();
+    ASSERT_EQ(result, VK_SUCCESS);
+}   
