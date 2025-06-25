@@ -4,6 +4,7 @@
 #include <vector>
 #include "ev-instance.h"
 #include "ev-pdevice.h"
+#include "ev-macro.h"
 #include "ev-logger.h"
 #include "ev-utility.h"
 
@@ -41,10 +42,16 @@ class Device {
     ~Device();
 
     uint32_t get_queue_index(VkQueueFlags flags) const;
+    uint32_t get_memory_type_index(
+        uint32_t type_bits,
+        VkMemoryPropertyFlags memory_property_flags,
+        VkBool32 *found
+    ) const;
 
     VkFormat get_supported_depth_format(
         bool check_sampling_support = false
     ) const;
+
 
     operator VkDevice() const {
         return device;
@@ -60,6 +67,10 @@ class Device {
 
     const std::vector<const char*> get_enabled_extensions() const {
         return enabled_extensions;
+    }
+
+    const std::vector<VkQueueFamilyProperties>& get_queue_family_properties() const {
+        return queue_family_properties;
     }
 
     const VkPhysicalDeviceProperties get_properties() const {

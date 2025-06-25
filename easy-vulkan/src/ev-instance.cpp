@@ -1,5 +1,6 @@
 #include "ev-instance.h"
 #include "debugger/ev-debug-messenger.h"
+#include "ev-macro.h"
 
 using namespace ev;
 using namespace ev::logger;
@@ -76,15 +77,8 @@ ev::Instance::Instance(
     create_info.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
     #endif
 
-    VkResult result = vkCreateInstance(&create_info, nullptr, &instance);
-
-    if (result != VK_SUCCESS) {
-        Logger::getInstance().error("Failed to create Vulkan instance: " + std::to_string(result));
-        exit(EXIT_FAILURE);
-    }
-
+    CHECK_RESULT(vkCreateInstance(&create_info, nullptr, &instance));
     Logger::getInstance().info("Vulkan instance created successfully.");
-
     if ( enable_debug_messenger ) {
         create_debug_messenger();
     }

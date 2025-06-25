@@ -1,8 +1,13 @@
 {
 	"InstallScripts" : 
 	[
-		"/Users/aegis92/workspace/easy-vulkan/build/cmake_install.cmake",
-		"/Users/aegis92/workspace/easy-vulkan/build/easy-vulkan/cmake_install.cmake"
+		"/Users/aegis92/workspace/easy-vulkan-project/build/cmake_install.cmake",
+		"/Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan/cmake_install.cmake",
+		"/Users/aegis92/workspace/easy-vulkan-project/build/local/cmake_install.cmake",
+		"/Users/aegis92/workspace/easy-vulkan-project/build/test/cmake_install.cmake",
+		"/Users/aegis92/workspace/easy-vulkan-project/build/_deps/googletest-build/cmake_install.cmake",
+		"/Users/aegis92/workspace/easy-vulkan-project/build/_deps/googletest-build/googlemock/cmake_install.cmake",
+		"/Users/aegis92/workspace/easy-vulkan-project/build/_deps/googletest-build/googletest/cmake_install.cmake"
 	],
 	"Parallel" : false
 }

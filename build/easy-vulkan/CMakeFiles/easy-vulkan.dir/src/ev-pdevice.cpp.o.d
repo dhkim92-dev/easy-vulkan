@@ -1,6 +1,6 @@
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o: \
-  /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-pdevice.cpp \
-  /Users/aegis92/workspace/easy-vulkan/easy-vulkan/include/ev-pdevice.h \
+  /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-pdevice.cpp \
+  /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/include/ev-pdevice.h \
   /usr/local/include/vulkan/vulkan.h \
   /usr/local/include/vulkan/vk_platform.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/stddef.h \
@@ -394,7 +394,7 @@ easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__compare/compare_strong_order_fallback.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__compare/compare_weak_order_fallback.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__compare/is_eq.h \
-  /Users/aegis92/workspace/easy-vulkan/easy-vulkan/include/ev-instance.h \
+  /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/include/ev-instance.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/vector \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/equal.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/fill_n.h \
@@ -643,9 +643,9 @@ easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/move_iterator.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/move_sentinel.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_trivially_destructible.h \
-  /Users/aegis92/workspace/easy-vulkan/easy-vulkan/include/initializer/ev-initializer.h \
-  /Users/aegis92/workspace/easy-vulkan/easy-vulkan/include/ev-utility.h \
-  /Users/aegis92/workspace/easy-vulkan/easy-vulkan/include/ev-logger.h \
+  /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/include/initializer/ev-initializer.h \
+  /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/include/ev-utility.h \
+  /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/include/ev-logger.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/mutex \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__condition_variable/condition_variable.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__mutex/mutex.h \

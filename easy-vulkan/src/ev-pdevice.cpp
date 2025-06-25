@@ -19,6 +19,7 @@ PhysicalDevice::PhysicalDevice(std::shared_ptr<Instance> instance, VkPhysicalDev
     properties = ev::utility::list_device_properties(handle);
     features = ev::utility::list_device_features(handle);
     extensions = ev::utility::list_device_extensions(handle);
+    vkGetPhysicalDeviceMemoryProperties(handle, &memory_properties);
 }
 
 PhysicalDevice::~PhysicalDevice() {

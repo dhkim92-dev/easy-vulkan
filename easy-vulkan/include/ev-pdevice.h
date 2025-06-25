@@ -7,45 +7,50 @@ using namespace std;
 
 namespace ev {
     class PhysicalDevice {
-        std::shared_ptr<Instance> instance;;
+        std::shared_ptr<Instance> instance;
         VkPhysicalDevice handle = VK_NULL_HANDLE;
         VkPhysicalDeviceFeatures features;
         VkPhysicalDeviceProperties properties;
+        VkPhysicalDeviceMemoryProperties memory_properties;
         vector<VkExtensionProperties> extensions;
 
-        public: 
-            explicit PhysicalDevice(std::shared_ptr<Instance> instance, VkPhysicalDevice device);
-            PhysicalDevice& operator=(const PhysicalDevice&) = delete;
-            PhysicalDevice(const PhysicalDevice&) = delete;
+    public: 
+        explicit PhysicalDevice(std::shared_ptr<Instance> instance, VkPhysicalDevice device);
+        PhysicalDevice& operator=(const PhysicalDevice&) = delete;
+        PhysicalDevice(const PhysicalDevice&) = delete;
 
-            operator VkPhysicalDevice() const {
-                return handle;
-            }
+        operator VkPhysicalDevice() const {
+            return handle;
+        }
 
-            const VkPhysicalDeviceProperties& get_properties() const {
-                return properties;
-            }
+        VkPhysicalDeviceMemoryProperties get_memory_properties() const {
+            return memory_properties;
+        }
 
-            const VkPhysicalDeviceFeatures& get_features() const {
-                return features;
-            }
+        const VkPhysicalDeviceProperties& get_properties() const {
+            return properties;
+        }
 
-            const std::shared_ptr<Instance> get_instance() const {
-                return instance;
-            }
+        const VkPhysicalDeviceFeatures& get_features() const {
+            return features;
+        }
 
-            const vector<VkExtensionProperties>& get_extensions() const {
-                return extensions;
-            }
+        const std::shared_ptr<Instance> get_instance() const {
+            return instance;
+        }
 
-            operator VkPhysicalDeviceFeatures() const {
-                return features;
-            }
+        const vector<VkExtensionProperties>& get_extensions() const {
+            return extensions;
+        }
 
-            operator VkPhysicalDeviceProperties() const {
-                return properties;
-            }
+        operator VkPhysicalDeviceFeatures() const {
+            return features;
+        }
 
-            ~PhysicalDevice();
+        operator VkPhysicalDeviceProperties() const {
+            return properties;
+        }
+
+        ~PhysicalDevice();
     };
 }
