@@ -1,6 +1,6 @@
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o: \
-  /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-device.cpp \
-  /Users/aegis92/workspace/easy-vulkan/easy-vulkan/include/ev-device.h \
+  /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-device.cpp \
+  /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/include/ev-device.h \
   /usr/local/include/vulkan/vulkan.h \
   /usr/local/include/vulkan/vk_platform.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/stddef.h \
@@ -634,10 +634,10 @@ easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/move_iterator.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/move_sentinel.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_trivially_destructible.h \
-  /Users/aegis92/workspace/easy-vulkan/easy-vulkan/include/ev-instance.h \
-  /Users/aegis92/workspace/easy-vulkan/easy-vulkan/include/initializer/ev-initializer.h \
-  /Users/aegis92/workspace/easy-vulkan/easy-vulkan/include/ev-utility.h \
-  /Users/aegis92/workspace/easy-vulkan/easy-vulkan/include/ev-logger.h \
+  /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/include/ev-instance.h \
+  /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/include/initializer/ev-initializer.h \
+  /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/include/ev-utility.h \
+  /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/include/ev-logger.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/mutex \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__condition_variable/condition_variable.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__mutex/mutex.h \
@@ -645,7 +645,7 @@ easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__mutex/tag_types.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__mutex/lock_guard.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__thread/id.h \
-  /Users/aegis92/workspace/easy-vulkan/easy-vulkan/include/ev-pdevice.h \
+  /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/include/ev-pdevice.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/memory \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/align.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/assume_aligned.h \
@@ -653,4 +653,5 @@ easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/raw_storage_iterator.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/temporary_buffer.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/alignment_of.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/uses_allocator_construction.h
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/uses_allocator_construction.h \
+  /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/include/ev-macro.h

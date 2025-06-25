@@ -57,10 +57,10 @@ RM = /opt/homebrew/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/aegis92/workspace/easy-vulkan
+CMAKE_SOURCE_DIR = /Users/aegis92/workspace/easy-vulkan-project
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/aegis92/workspace/easy-vulkan/build
+CMAKE_BINARY_DIR = /Users/aegis92/workspace/easy-vulkan-project/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,7 +87,7 @@ rebuild_cache/fast: rebuild_cache
 
 # Special rule for the target list_install_components
 list_install_components:
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Available install components are: \"Unspecified\""
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Available install components are: \"Unspecified\" \"gmock\" \"gtest\""
 .PHONY : list_install_components
 
 # Special rule for the target list_install_components
@@ -132,14 +132,14 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/aegis92/workspace/easy-vulkan/build/CMakeFiles /Users/aegis92/workspace/easy-vulkan/build/easy-vulkan//CMakeFiles/progress.marks
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 easy-vulkan/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/aegis92/workspace/easy-vulkan/build/CMakeFiles 0
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/aegis92/workspace/easy-vulkan-project/build/CMakeFiles /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan//CMakeFiles/progress.marks
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 easy-vulkan/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/aegis92/workspace/easy-vulkan-project/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 easy-vulkan/clean
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 easy-vulkan/clean
 .PHONY : clean
 
 # The main clean target
@@ -148,22 +148,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 easy-vulkan/preinstall
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 easy-vulkan/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 easy-vulkan/preinstall
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 easy-vulkan/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 easy-vulkan/CMakeFiles/easy-vulkan.dir/rule:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 easy-vulkan/CMakeFiles/easy-vulkan.dir/rule
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 easy-vulkan/CMakeFiles/easy-vulkan.dir/rule
 .PHONY : easy-vulkan/CMakeFiles/easy-vulkan.dir/rule
 
 # Convenience name for target.
@@ -172,15 +172,39 @@ easy-vulkan: easy-vulkan/CMakeFiles/easy-vulkan.dir/rule
 
 # fast build rule for target.
 easy-vulkan/fast:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/build
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/build
 .PHONY : easy-vulkan/fast
+
+src/ev-buffer.o: src/ev-buffer.cpp.o
+.PHONY : src/ev-buffer.o
+
+# target to build an object file
+src/ev-buffer.cpp.o:
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-buffer.cpp.o
+.PHONY : src/ev-buffer.cpp.o
+
+src/ev-buffer.i: src/ev-buffer.cpp.i
+.PHONY : src/ev-buffer.i
+
+# target to preprocess a source file
+src/ev-buffer.cpp.i:
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-buffer.cpp.i
+.PHONY : src/ev-buffer.cpp.i
+
+src/ev-buffer.s: src/ev-buffer.cpp.s
+.PHONY : src/ev-buffer.s
+
+# target to generate assembly for a file
+src/ev-buffer.cpp.s:
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-buffer.cpp.s
+.PHONY : src/ev-buffer.cpp.s
 
 src/ev-device.o: src/ev-device.cpp.o
 .PHONY : src/ev-device.o
 
 # target to build an object file
 src/ev-device.cpp.o:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o
 .PHONY : src/ev-device.cpp.o
 
 src/ev-device.i: src/ev-device.cpp.i
@@ -188,7 +212,7 @@ src/ev-device.i: src/ev-device.cpp.i
 
 # target to preprocess a source file
 src/ev-device.cpp.i:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.i
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.i
 .PHONY : src/ev-device.cpp.i
 
 src/ev-device.s: src/ev-device.cpp.s
@@ -196,7 +220,7 @@ src/ev-device.s: src/ev-device.cpp.s
 
 # target to generate assembly for a file
 src/ev-device.cpp.s:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.s
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.s
 .PHONY : src/ev-device.cpp.s
 
 src/ev-instance.o: src/ev-instance.cpp.o
@@ -204,7 +228,7 @@ src/ev-instance.o: src/ev-instance.cpp.o
 
 # target to build an object file
 src/ev-instance.cpp.o:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.o
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.o
 .PHONY : src/ev-instance.cpp.o
 
 src/ev-instance.i: src/ev-instance.cpp.i
@@ -212,7 +236,7 @@ src/ev-instance.i: src/ev-instance.cpp.i
 
 # target to preprocess a source file
 src/ev-instance.cpp.i:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.i
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.i
 .PHONY : src/ev-instance.cpp.i
 
 src/ev-instance.s: src/ev-instance.cpp.s
@@ -220,15 +244,63 @@ src/ev-instance.s: src/ev-instance.cpp.s
 
 # target to generate assembly for a file
 src/ev-instance.cpp.s:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.s
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.s
 .PHONY : src/ev-instance.cpp.s
+
+src/ev-macro.o: src/ev-macro.cpp.o
+.PHONY : src/ev-macro.o
+
+# target to build an object file
+src/ev-macro.cpp.o:
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-macro.cpp.o
+.PHONY : src/ev-macro.cpp.o
+
+src/ev-macro.i: src/ev-macro.cpp.i
+.PHONY : src/ev-macro.i
+
+# target to preprocess a source file
+src/ev-macro.cpp.i:
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-macro.cpp.i
+.PHONY : src/ev-macro.cpp.i
+
+src/ev-macro.s: src/ev-macro.cpp.s
+.PHONY : src/ev-macro.s
+
+# target to generate assembly for a file
+src/ev-macro.cpp.s:
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-macro.cpp.s
+.PHONY : src/ev-macro.cpp.s
+
+src/ev-memory.o: src/ev-memory.cpp.o
+.PHONY : src/ev-memory.o
+
+# target to build an object file
+src/ev-memory.cpp.o:
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-memory.cpp.o
+.PHONY : src/ev-memory.cpp.o
+
+src/ev-memory.i: src/ev-memory.cpp.i
+.PHONY : src/ev-memory.i
+
+# target to preprocess a source file
+src/ev-memory.cpp.i:
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-memory.cpp.i
+.PHONY : src/ev-memory.cpp.i
+
+src/ev-memory.s: src/ev-memory.cpp.s
+.PHONY : src/ev-memory.s
+
+# target to generate assembly for a file
+src/ev-memory.cpp.s:
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-memory.cpp.s
+.PHONY : src/ev-memory.cpp.s
 
 src/ev-pdevice.o: src/ev-pdevice.cpp.o
 .PHONY : src/ev-pdevice.o
 
 # target to build an object file
 src/ev-pdevice.cpp.o:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o
 .PHONY : src/ev-pdevice.cpp.o
 
 src/ev-pdevice.i: src/ev-pdevice.cpp.i
@@ -236,7 +308,7 @@ src/ev-pdevice.i: src/ev-pdevice.cpp.i
 
 # target to preprocess a source file
 src/ev-pdevice.cpp.i:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.i
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.i
 .PHONY : src/ev-pdevice.cpp.i
 
 src/ev-pdevice.s: src/ev-pdevice.cpp.s
@@ -244,7 +316,7 @@ src/ev-pdevice.s: src/ev-pdevice.cpp.s
 
 # target to generate assembly for a file
 src/ev-pdevice.cpp.s:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.s
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.s
 .PHONY : src/ev-pdevice.cpp.s
 
 src/ev-swapchain.o: src/ev-swapchain.cpp.o
@@ -252,7 +324,7 @@ src/ev-swapchain.o: src/ev-swapchain.cpp.o
 
 # target to build an object file
 src/ev-swapchain.cpp.o:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.o
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.o
 .PHONY : src/ev-swapchain.cpp.o
 
 src/ev-swapchain.i: src/ev-swapchain.cpp.i
@@ -260,7 +332,7 @@ src/ev-swapchain.i: src/ev-swapchain.cpp.i
 
 # target to preprocess a source file
 src/ev-swapchain.cpp.i:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.i
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.i
 .PHONY : src/ev-swapchain.cpp.i
 
 src/ev-swapchain.s: src/ev-swapchain.cpp.s
@@ -268,7 +340,7 @@ src/ev-swapchain.s: src/ev-swapchain.cpp.s
 
 # target to generate assembly for a file
 src/ev-swapchain.cpp.s:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.s
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.s
 .PHONY : src/ev-swapchain.cpp.s
 
 src/ev-utility.o: src/ev-utility.cpp.o
@@ -276,7 +348,7 @@ src/ev-utility.o: src/ev-utility.cpp.o
 
 # target to build an object file
 src/ev-utility.cpp.o:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.o
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.o
 .PHONY : src/ev-utility.cpp.o
 
 src/ev-utility.i: src/ev-utility.cpp.i
@@ -284,7 +356,7 @@ src/ev-utility.i: src/ev-utility.cpp.i
 
 # target to preprocess a source file
 src/ev-utility.cpp.i:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.i
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.i
 .PHONY : src/ev-utility.cpp.i
 
 src/ev-utility.s: src/ev-utility.cpp.s
@@ -292,7 +364,7 @@ src/ev-utility.s: src/ev-utility.cpp.s
 
 # target to generate assembly for a file
 src/ev-utility.cpp.s:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.s
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.s
 .PHONY : src/ev-utility.cpp.s
 
 # Help Target
@@ -308,12 +380,21 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... easy-vulkan"
+	@echo "... src/ev-buffer.o"
+	@echo "... src/ev-buffer.i"
+	@echo "... src/ev-buffer.s"
 	@echo "... src/ev-device.o"
 	@echo "... src/ev-device.i"
 	@echo "... src/ev-device.s"
 	@echo "... src/ev-instance.o"
 	@echo "... src/ev-instance.i"
 	@echo "... src/ev-instance.s"
+	@echo "... src/ev-macro.o"
+	@echo "... src/ev-macro.i"
+	@echo "... src/ev-macro.s"
+	@echo "... src/ev-memory.o"
+	@echo "... src/ev-memory.i"
+	@echo "... src/ev-memory.s"
 	@echo "... src/ev-pdevice.o"
 	@echo "... src/ev-pdevice.i"
 	@echo "... src/ev-pdevice.s"
@@ -334,6 +415,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

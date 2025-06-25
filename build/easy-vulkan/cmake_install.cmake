@@ -1,4 +1,4 @@
-# Install script for directory: /Users/aegis92/workspace/easy-vulkan/easy-vulkan
+# Install script for directory: /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -39,8 +39,8 @@ endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY FILES
-    "/Users/aegis92/workspace/easy-vulkan/build/easy-vulkan/lib-easy-vulkan.1.0.0.dylib"
-    "/Users/aegis92/workspace/easy-vulkan/build/easy-vulkan/lib-easy-vulkan.1.dylib"
+    "/Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan/lib-easy-vulkan.1.0.0.dylib"
+    "/Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan/lib-easy-vulkan.1.dylib"
     )
   foreach(file
       "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/lib-easy-vulkan.1.0.0.dylib"
@@ -59,16 +59,16 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY FILES "/Users/aegis92/workspace/easy-vulkan/build/easy-vulkan/lib-easy-vulkan.dylib")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY FILES "/Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan/lib-easy-vulkan.dylib")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE DIRECTORY FILES "/Users/aegis92/workspace/easy-vulkan/easy-vulkan/include/")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE DIRECTORY FILES "/Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/include/")
 endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
 if(CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "/Users/aegis92/workspace/easy-vulkan/build/easy-vulkan/install_local_manifest.txt"
+  file(WRITE "/Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan/install_local_manifest.txt"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()

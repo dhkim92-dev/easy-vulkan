@@ -1,5 +1,5 @@
 #include "ev-device.h"
-
+#include <string>
 using namespace ev;
 using namespace ev::logger;
 
@@ -30,11 +30,7 @@ Device::Device(
     device_ci.enabledLayerCount = 0; // Layers are deprecated in Vulkan 1.2+
     device_ci.ppEnabledLayerNames = nullptr; // No layers enabled
     device_ci.pEnabledFeatures = &pdevice->get_features(); // Use physical device features
-    VkResult result = vkCreateDevice(*pdevice, &device_ci, nullptr, &device);
-    if (result != VK_SUCCESS) {
-        Logger::getInstance().error("Failed to create Vulkan device: " + std::to_string(result));
-        exit(EXIT_FAILURE);
-    }
+    CHECK_RESULT(vkCreateDevice(*pdevice, &device_ci, nullptr, &device));
     Logger::getInstance().info("Vulkan device created successfully.");
 }
 
@@ -88,6 +84,36 @@ uint32_t Device::get_queue_index(VkQueueFlags flags) const {
     exit(EXIT_FAILURE);
 }
 
+uint32_t Device::get_memory_type_index(
+    uint32_t type_bits,
+    VkMemoryPropertyFlags memory_property_flags,
+    VkBool32 *found
+) const {
+
+    auto memory_properties = pdevice->get_memory_properties();
+
+    for ( uint32_t i = 0 ; i < memory_properties.memoryTypeCount ; ++i ) {
+        if ( (type_bits & 1) == 1 ) {
+            if ( (memory_properties.memoryTypes[i].propertyFlags & memory_property_flags) == memory_property_flags ) {
+                if ( found ) {
+                    *found = VK_TRUE;
+                }
+                Logger::getInstance().debug("Memory type index found: " + std::to_string(static_cast<int>(i)));
+                return i;
+            }
+        }
+        type_bits >>= 1;
+    }
+
+    if (found) {
+        *found = VK_FALSE;
+        return 0;
+    }
+
+    Logger::getInstance().error("No suitable memory type index found for the requested size and property flags.");
+    exit(EXIT_FAILURE);
+}
+
 void Device::setup_queue_family_indices(VkQueueFlags flags) {
     queue_family_indices.graphics = get_queue_family_index(VK_QUEUE_GRAPHICS_BIT);
     queue_family_indices.transfer = get_queue_family_index(VK_QUEUE_TRANSFER_BIT);
@@ -133,6 +159,31 @@ void Device::check_required_extensions(vector<const char*>& required_extensions)
 
                 enabled_extensions.push_back(ext_name);
     }
+}
+
+VkFormat Device::get_supported_depth_format(bool check_sampling_support) const {
+    VkFormat depth_formats[] = {
+        VK_FORMAT_D32_SFLOAT,
+        VK_FORMAT_D32_SFLOAT_S8_UINT,
+        VK_FORMAT_D24_UNORM_S8_UINT,
+        VK_FORMAT_D16_UNORM,
+        VK_FORMAT_D16_UNORM_S8_UINT
+    };
+
+    for (const auto& format : depth_formats) {
+        VkFormatProperties props;
+        vkGetPhysicalDeviceFormatProperties(*pdevice, format, &props);
+        
+        if (props.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
+            if (!check_sampling_support || (props.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT)) {
+                Logger::getInstance().debug("Supported depth format found: " + std::to_string(format));
+                return format;
+            }
+        }
+    }
+
+    Logger::getInstance().error("No suitable depth format found.");
+    exit(EXIT_FAILURE);
 }
 
 Device::~Device() {

@@ -57,10 +57,10 @@ RM = /opt/homebrew/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/aegis92/workspace/easy-vulkan
+CMAKE_SOURCE_DIR = /Users/aegis92/workspace/easy-vulkan-project
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/aegis92/workspace/easy-vulkan/build
+CMAKE_BINARY_DIR = /Users/aegis92/workspace/easy-vulkan-project/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,7 +87,7 @@ rebuild_cache/fast: rebuild_cache
 
 # Special rule for the target list_install_components
 list_install_components:
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Available install components are: \"Unspecified\""
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Available install components are: \"Unspecified\" \"gmock\" \"gtest\""
 .PHONY : list_install_components
 
 # Special rule for the target list_install_components
@@ -132,9 +132,9 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/aegis92/workspace/easy-vulkan/build/CMakeFiles /Users/aegis92/workspace/easy-vulkan/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/aegis92/workspace/easy-vulkan-project/build/CMakeFiles /Users/aegis92/workspace/easy-vulkan-project/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/aegis92/workspace/easy-vulkan/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/aegis92/workspace/easy-vulkan-project/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -174,6 +174,84 @@ easy-vulkan/fast:
 	$(MAKE) $(MAKESILENT) -f easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make easy-vulkan/CMakeFiles/easy-vulkan.dir/build
 .PHONY : easy-vulkan/fast
 
+#=============================================================================
+# Target rules for targets named local_main
+
+# Build rule for target.
+local_main: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 local_main
+.PHONY : local_main
+
+# fast build rule for target.
+local_main/fast:
+	$(MAKE) $(MAKESILENT) -f local/CMakeFiles/local_main.dir/build.make local/CMakeFiles/local_main.dir/build
+.PHONY : local_main/fast
+
+#=============================================================================
+# Target rules for targets named test_main
+
+# Build rule for target.
+test_main: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_main
+.PHONY : test_main
+
+# fast build rule for target.
+test_main/fast:
+	$(MAKE) $(MAKESILENT) -f test/CMakeFiles/test_main.dir/build.make test/CMakeFiles/test_main.dir/build
+.PHONY : test_main/fast
+
+#=============================================================================
+# Target rules for targets named gmock
+
+# Build rule for target.
+gmock: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gmock
+.PHONY : gmock
+
+# fast build rule for target.
+gmock/fast:
+	$(MAKE) $(MAKESILENT) -f _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/build.make _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/build
+.PHONY : gmock/fast
+
+#=============================================================================
+# Target rules for targets named gmock_main
+
+# Build rule for target.
+gmock_main: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gmock_main
+.PHONY : gmock_main
+
+# fast build rule for target.
+gmock_main/fast:
+	$(MAKE) $(MAKESILENT) -f _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/build.make _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/build
+.PHONY : gmock_main/fast
+
+#=============================================================================
+# Target rules for targets named gtest
+
+# Build rule for target.
+gtest: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gtest
+.PHONY : gtest
+
+# fast build rule for target.
+gtest/fast:
+	$(MAKE) $(MAKESILENT) -f _deps/googletest-build/googletest/CMakeFiles/gtest.dir/build.make _deps/googletest-build/googletest/CMakeFiles/gtest.dir/build
+.PHONY : gtest/fast
+
+#=============================================================================
+# Target rules for targets named gtest_main
+
+# Build rule for target.
+gtest_main: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gtest_main
+.PHONY : gtest_main
+
+# fast build rule for target.
+gtest_main/fast:
+	$(MAKE) $(MAKESILENT) -f _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/build.make _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/build
+.PHONY : gtest_main/fast
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -187,6 +265,12 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... easy-vulkan"
+	@echo "... gmock"
+	@echo "... gmock_main"
+	@echo "... gtest"
+	@echo "... gtest_main"
+	@echo "... local_main"
+	@echo "... test_main"
 .PHONY : help
 
 

@@ -1,6 +1,6 @@
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.o: \
-  /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-utility.cpp \
-  /Users/aegis92/workspace/easy-vulkan/easy-vulkan/include/ev-utility.h \
+  /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-utility.cpp \
+  /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/include/ev-utility.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/cstdio \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__assert \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__assertion_handler \

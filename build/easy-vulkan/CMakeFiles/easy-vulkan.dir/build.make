@@ -53,10 +53,10 @@ RM = /opt/homebrew/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/aegis92/workspace/easy-vulkan
+CMAKE_SOURCE_DIR = /Users/aegis92/workspace/easy-vulkan-project
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/aegis92/workspace/easy-vulkan/build
+CMAKE_BINARY_DIR = /Users/aegis92/workspace/easy-vulkan-project/build
 
 # Include any dependencies generated for this target.
 include easy-vulkan/CMakeFiles/easy-vulkan.dir/depend.make
@@ -72,80 +72,125 @@ include easy-vulkan/CMakeFiles/easy-vulkan.dir/flags.make
 easy-vulkan/CMakeFiles/easy-vulkan.dir/codegen:
 .PHONY : easy-vulkan/CMakeFiles/easy-vulkan.dir/codegen
 
+easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-buffer.cpp.o: easy-vulkan/CMakeFiles/easy-vulkan.dir/flags.make
+easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-buffer.cpp.o: /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-buffer.cpp
+easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-buffer.cpp.o: easy-vulkan/CMakeFiles/easy-vulkan.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/aegis92/workspace/easy-vulkan-project/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-buffer.cpp.o"
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-buffer.cpp.o -MF CMakeFiles/easy-vulkan.dir/src/ev-buffer.cpp.o.d -o CMakeFiles/easy-vulkan.dir/src/ev-buffer.cpp.o -c /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-buffer.cpp
+
+easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-buffer.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/easy-vulkan.dir/src/ev-buffer.cpp.i"
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-buffer.cpp > CMakeFiles/easy-vulkan.dir/src/ev-buffer.cpp.i
+
+easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-buffer.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/easy-vulkan.dir/src/ev-buffer.cpp.s"
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-buffer.cpp -o CMakeFiles/easy-vulkan.dir/src/ev-buffer.cpp.s
+
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o: easy-vulkan/CMakeFiles/easy-vulkan.dir/flags.make
-easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o: /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-device.cpp
+easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o: /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-device.cpp
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o: easy-vulkan/CMakeFiles/easy-vulkan.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/aegis92/workspace/easy-vulkan/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o"
-	cd /Users/aegis92/workspace/easy-vulkan/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o -MF CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o.d -o CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o -c /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-device.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/aegis92/workspace/easy-vulkan-project/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o"
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o -MF CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o.d -o CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o -c /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-device.cpp
 
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.i"
-	cd /Users/aegis92/workspace/easy-vulkan/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-device.cpp > CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.i
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-device.cpp > CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.i
 
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.s"
-	cd /Users/aegis92/workspace/easy-vulkan/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-device.cpp -o CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.s
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-device.cpp -o CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.s
 
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.o: easy-vulkan/CMakeFiles/easy-vulkan.dir/flags.make
-easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.o: /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-instance.cpp
+easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.o: /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-instance.cpp
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.o: easy-vulkan/CMakeFiles/easy-vulkan.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/aegis92/workspace/easy-vulkan/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.o"
-	cd /Users/aegis92/workspace/easy-vulkan/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.o -MF CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.o.d -o CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.o -c /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-instance.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/aegis92/workspace/easy-vulkan-project/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.o"
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.o -MF CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.o.d -o CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.o -c /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-instance.cpp
 
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.i"
-	cd /Users/aegis92/workspace/easy-vulkan/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-instance.cpp > CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.i
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-instance.cpp > CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.i
 
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.s"
-	cd /Users/aegis92/workspace/easy-vulkan/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-instance.cpp -o CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.s
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-instance.cpp -o CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.s
+
+easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-macro.cpp.o: easy-vulkan/CMakeFiles/easy-vulkan.dir/flags.make
+easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-macro.cpp.o: /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-macro.cpp
+easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-macro.cpp.o: easy-vulkan/CMakeFiles/easy-vulkan.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/aegis92/workspace/easy-vulkan-project/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-macro.cpp.o"
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-macro.cpp.o -MF CMakeFiles/easy-vulkan.dir/src/ev-macro.cpp.o.d -o CMakeFiles/easy-vulkan.dir/src/ev-macro.cpp.o -c /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-macro.cpp
+
+easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-macro.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/easy-vulkan.dir/src/ev-macro.cpp.i"
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-macro.cpp > CMakeFiles/easy-vulkan.dir/src/ev-macro.cpp.i
+
+easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-macro.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/easy-vulkan.dir/src/ev-macro.cpp.s"
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-macro.cpp -o CMakeFiles/easy-vulkan.dir/src/ev-macro.cpp.s
+
+easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-memory.cpp.o: easy-vulkan/CMakeFiles/easy-vulkan.dir/flags.make
+easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-memory.cpp.o: /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-memory.cpp
+easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-memory.cpp.o: easy-vulkan/CMakeFiles/easy-vulkan.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/aegis92/workspace/easy-vulkan-project/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-memory.cpp.o"
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-memory.cpp.o -MF CMakeFiles/easy-vulkan.dir/src/ev-memory.cpp.o.d -o CMakeFiles/easy-vulkan.dir/src/ev-memory.cpp.o -c /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-memory.cpp
+
+easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-memory.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/easy-vulkan.dir/src/ev-memory.cpp.i"
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-memory.cpp > CMakeFiles/easy-vulkan.dir/src/ev-memory.cpp.i
+
+easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-memory.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/easy-vulkan.dir/src/ev-memory.cpp.s"
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-memory.cpp -o CMakeFiles/easy-vulkan.dir/src/ev-memory.cpp.s
 
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o: easy-vulkan/CMakeFiles/easy-vulkan.dir/flags.make
-easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o: /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-pdevice.cpp
+easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o: /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-pdevice.cpp
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o: easy-vulkan/CMakeFiles/easy-vulkan.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/aegis92/workspace/easy-vulkan/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o"
-	cd /Users/aegis92/workspace/easy-vulkan/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o -MF CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o.d -o CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o -c /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-pdevice.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/aegis92/workspace/easy-vulkan-project/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o"
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o -MF CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o.d -o CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o -c /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-pdevice.cpp
 
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.i"
-	cd /Users/aegis92/workspace/easy-vulkan/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-pdevice.cpp > CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.i
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-pdevice.cpp > CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.i
 
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.s"
-	cd /Users/aegis92/workspace/easy-vulkan/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-pdevice.cpp -o CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.s
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-pdevice.cpp -o CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.s
 
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.o: easy-vulkan/CMakeFiles/easy-vulkan.dir/flags.make
-easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.o: /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-swapchain.cpp
+easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.o: /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-swapchain.cpp
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.o: easy-vulkan/CMakeFiles/easy-vulkan.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/aegis92/workspace/easy-vulkan/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.o"
-	cd /Users/aegis92/workspace/easy-vulkan/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.o -MF CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.o.d -o CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.o -c /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-swapchain.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/aegis92/workspace/easy-vulkan-project/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.o"
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.o -MF CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.o.d -o CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.o -c /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-swapchain.cpp
 
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.i"
-	cd /Users/aegis92/workspace/easy-vulkan/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-swapchain.cpp > CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.i
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-swapchain.cpp > CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.i
 
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.s"
-	cd /Users/aegis92/workspace/easy-vulkan/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-swapchain.cpp -o CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.s
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-swapchain.cpp -o CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.s
 
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.o: easy-vulkan/CMakeFiles/easy-vulkan.dir/flags.make
-easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.o: /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-utility.cpp
+easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.o: /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-utility.cpp
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.o: easy-vulkan/CMakeFiles/easy-vulkan.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/aegis92/workspace/easy-vulkan/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.o"
-	cd /Users/aegis92/workspace/easy-vulkan/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.o -MF CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.o.d -o CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.o -c /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-utility.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/aegis92/workspace/easy-vulkan-project/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.o"
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.o -MF CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.o.d -o CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.o -c /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-utility.cpp
 
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.i"
-	cd /Users/aegis92/workspace/easy-vulkan/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-utility.cpp > CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.i
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-utility.cpp > CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.i
 
 easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.s"
-	cd /Users/aegis92/workspace/easy-vulkan/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/aegis92/workspace/easy-vulkan/easy-vulkan/src/ev-utility.cpp -o CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.s
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/src/ev-utility.cpp -o CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.s
 
 # Object files for target easy-vulkan
 easy__vulkan_OBJECTS = \
+"CMakeFiles/easy-vulkan.dir/src/ev-buffer.cpp.o" \
 "CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o" \
 "CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.o" \
+"CMakeFiles/easy-vulkan.dir/src/ev-macro.cpp.o" \
+"CMakeFiles/easy-vulkan.dir/src/ev-memory.cpp.o" \
 "CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o" \
 "CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.o" \
 "CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.o"
@@ -153,17 +198,20 @@ easy__vulkan_OBJECTS = \
 # External object files for target easy-vulkan
 easy__vulkan_EXTERNAL_OBJECTS =
 
+easy-vulkan/lib-easy-vulkan.1.0.0.dylib: easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-buffer.cpp.o
 easy-vulkan/lib-easy-vulkan.1.0.0.dylib: easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o
 easy-vulkan/lib-easy-vulkan.1.0.0.dylib: easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.o
+easy-vulkan/lib-easy-vulkan.1.0.0.dylib: easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-macro.cpp.o
+easy-vulkan/lib-easy-vulkan.1.0.0.dylib: easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-memory.cpp.o
 easy-vulkan/lib-easy-vulkan.1.0.0.dylib: easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o
 easy-vulkan/lib-easy-vulkan.1.0.0.dylib: easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.o
 easy-vulkan/lib-easy-vulkan.1.0.0.dylib: easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.o
 easy-vulkan/lib-easy-vulkan.1.0.0.dylib: easy-vulkan/CMakeFiles/easy-vulkan.dir/build.make
 easy-vulkan/lib-easy-vulkan.1.0.0.dylib: /Users/aegis92/VulkanSDK/1.4.313.1/macOS/lib/libvulkan.dylib
 easy-vulkan/lib-easy-vulkan.1.0.0.dylib: easy-vulkan/CMakeFiles/easy-vulkan.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/aegis92/workspace/easy-vulkan/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX shared library lib-easy-vulkan.dylib"
-	cd /Users/aegis92/workspace/easy-vulkan/build/easy-vulkan && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/easy-vulkan.dir/link.txt --verbose=$(VERBOSE)
-	cd /Users/aegis92/workspace/easy-vulkan/build/easy-vulkan && $(CMAKE_COMMAND) -E cmake_symlink_library lib-easy-vulkan.1.0.0.dylib lib-easy-vulkan.1.dylib lib-easy-vulkan.dylib
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/aegis92/workspace/easy-vulkan-project/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX shared library lib-easy-vulkan.dylib"
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/easy-vulkan.dir/link.txt --verbose=$(VERBOSE)
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && $(CMAKE_COMMAND) -E cmake_symlink_library lib-easy-vulkan.1.0.0.dylib lib-easy-vulkan.1.dylib lib-easy-vulkan.dylib
 
 easy-vulkan/lib-easy-vulkan.1.dylib: easy-vulkan/lib-easy-vulkan.1.0.0.dylib
 	@$(CMAKE_COMMAND) -E touch_nocreate easy-vulkan/lib-easy-vulkan.1.dylib
@@ -176,10 +224,10 @@ easy-vulkan/CMakeFiles/easy-vulkan.dir/build: easy-vulkan/lib-easy-vulkan.dylib
 .PHONY : easy-vulkan/CMakeFiles/easy-vulkan.dir/build
 
 easy-vulkan/CMakeFiles/easy-vulkan.dir/clean:
-	cd /Users/aegis92/workspace/easy-vulkan/build/easy-vulkan && $(CMAKE_COMMAND) -P CMakeFiles/easy-vulkan.dir/cmake_clean.cmake
+	cd /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan && $(CMAKE_COMMAND) -P CMakeFiles/easy-vulkan.dir/cmake_clean.cmake
 .PHONY : easy-vulkan/CMakeFiles/easy-vulkan.dir/clean
 
 easy-vulkan/CMakeFiles/easy-vulkan.dir/depend:
-	cd /Users/aegis92/workspace/easy-vulkan/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/aegis92/workspace/easy-vulkan /Users/aegis92/workspace/easy-vulkan/easy-vulkan /Users/aegis92/workspace/easy-vulkan/build /Users/aegis92/workspace/easy-vulkan/build/easy-vulkan /Users/aegis92/workspace/easy-vulkan/build/easy-vulkan/CMakeFiles/easy-vulkan.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /Users/aegis92/workspace/easy-vulkan-project/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/aegis92/workspace/easy-vulkan-project /Users/aegis92/workspace/easy-vulkan-project/easy-vulkan /Users/aegis92/workspace/easy-vulkan-project/build /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan /Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan/CMakeFiles/easy-vulkan.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : easy-vulkan/CMakeFiles/easy-vulkan.dir/depend
 

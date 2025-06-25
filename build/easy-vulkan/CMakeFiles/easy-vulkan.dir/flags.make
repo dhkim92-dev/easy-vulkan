@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = -Deasy_vulkan_EXPORTS
 
-CXX_INCLUDES = -I/Users/aegis92/workspace/easy-vulkan/easy-vulkan/include -isystem /Users/aegis92/VulkanSDK/1.4.313.1/macOS/include
+CXX_INCLUDES = -I/Users/aegis92/workspace/easy-vulkan-project/easy-vulkan/include -isystem /Users/aegis92/VulkanSDK/1.4.313.1/macOS/include
 
 CXX_FLAGSarm64 = -O3 -DNDEBUG -std=gnu++2b -arch arm64 -fPIC
 

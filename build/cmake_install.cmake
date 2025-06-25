@@ -1,4 +1,4 @@
-# Install script for directory: /Users/aegis92/workspace/easy-vulkan
+# Install script for directory: /Users/aegis92/workspace/easy-vulkan-project
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -39,13 +39,23 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/Users/aegis92/workspace/easy-vulkan/build/easy-vulkan/cmake_install.cmake")
+  include("/Users/aegis92/workspace/easy-vulkan-project/build/easy-vulkan/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("/Users/aegis92/workspace/easy-vulkan-project/build/local/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("/Users/aegis92/workspace/easy-vulkan-project/build/test/cmake_install.cmake")
 endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
 if(CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "/Users/aegis92/workspace/easy-vulkan/build/install_local_manifest.txt"
+  file(WRITE "/Users/aegis92/workspace/easy-vulkan-project/build/install_local_manifest.txt"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()
 if(CMAKE_INSTALL_COMPONENT)
@@ -61,6 +71,6 @@ else()
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "/Users/aegis92/workspace/easy-vulkan/build/${CMAKE_INSTALL_MANIFEST}"
+  file(WRITE "/Users/aegis92/workspace/easy-vulkan-project/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()
