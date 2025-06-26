@@ -35,7 +35,11 @@ Image::Image(
     sharing_mode(sharing_mode),
     queue_family_count(queue_family_count),
     queue_family_indices(queue_family_indices),
+    flags(flags),
     p_next(p_next) {
+    if( flags & VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT ) {
+        Logger::getInstance().info("VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT is set, ensure the image format is compatible with the view format.");
+    }
     VkImageCreateInfo ci = {};
     ci.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     ci.imageType = type; // 2D image
@@ -50,7 +54,7 @@ Image::Image(
     ci.usage = usage_flags; // Usage flags
     ci.sharingMode = sharing_mode;
     ci.initialLayout = layout; // Initial layout
-    ci.flags = 0; // No special flags
+    ci.flags = flags;// No special flags
     ci.pNext = p_next; // No additional structures
     CHECK_RESULT(vkCreateImage(*device, &ci, nullptr, &image));
     Logger::getInstance().debug("Image created successfully.");

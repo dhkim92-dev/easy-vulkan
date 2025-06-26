@@ -133,6 +133,10 @@ bool ev::Instance::is_support_layer(const char* layer_name) const {
     return false;
 }
 
+vector<VkPhysicalDevice> ev::Instance::get_physical_devices() const {
+    return ev::utility::list_physical_devices(instance);
+}
+
 Instance::~Instance() {
     if (!is_valid()) {
         return;

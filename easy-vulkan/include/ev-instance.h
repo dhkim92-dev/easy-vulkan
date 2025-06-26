@@ -48,6 +48,8 @@ public:
 
     ~Instance();
 
+    vector<VkPhysicalDevice> get_physical_devices() const;
+
     bool is_support_extension(const char* extension_name) const;
 
     bool is_support_layer(const char* layer_name) const;
