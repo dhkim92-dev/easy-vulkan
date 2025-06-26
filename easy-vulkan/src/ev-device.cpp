@@ -4,11 +4,11 @@ using namespace ev;
 using namespace ev::logger;
 
 Device::Device(
-    std::shared_ptr<Instance> instance,
-    std::shared_ptr<PhysicalDevice> pdevice,
+    std::shared_ptr<Instance> _instance,
+    std::shared_ptr<PhysicalDevice> _pdevice,
     vector<const char*> required_extensions,
     VkQueueFlags queue_flags
-) : instance(instance), pdevice(pdevice) {
+) : instance(std::move(_instance)), pdevice(std::move(_pdevice)) {
     Logger::getInstance().info("Creating Vulkan device...");
 
     check_required_extensions(required_extensions);

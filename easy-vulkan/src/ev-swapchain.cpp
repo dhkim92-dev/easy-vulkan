@@ -8,10 +8,10 @@ using namespace ev;
 using namespace ev::logger;
 
 Swapchain::Swapchain(
-    std::shared_ptr<Instance> instance,
-    std::shared_ptr<PhysicalDevice> pdevice,
-    std::shared_ptr<Device> device
-) : instance(instance), pdevice(pdevice), device(device) {
+    std::shared_ptr<Instance> _instance,
+    std::shared_ptr<PhysicalDevice> _pdevice,
+    std::shared_ptr<Device> _device
+) : instance(std::move(_instance)), pdevice(std::move(_pdevice)), device(std::move(_device)) {
     Logger::getInstance().debug("Creating Swapchain...");
     if (!instance || !pdevice || !device) {
         Logger::getInstance().error("Invalid instance, physical device, or device provided for Swapchain creation.");

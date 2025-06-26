@@ -83,4 +83,4 @@ TEST_F(BufferTest, MapUnmapBuffer) {
     delete [] read_data;
     result = buffer->unmap();
     ASSERT_EQ(result, VK_SUCCESS);
-}   
+}

@@ -5,7 +5,7 @@ using namespace ev;
 using namespace ev::logger;
 
 Image::Image(
-    shared_ptr<Device> device,
+    shared_ptr<Device> _device,
     VkImageType type,
     VkFormat format,
     uint32_t width,
@@ -22,7 +22,7 @@ Image::Image(
     uint32_t queue_family_count,
     const uint32_t* queue_family_indices,
     const void* p_next
-) : device(device), 
+) : device(std::move(_device)), 
     type(type),
     extent({width, height, depth}),
     format(format), 
