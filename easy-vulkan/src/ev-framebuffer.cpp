@@ -3,14 +3,14 @@
 using namespace ev;
 
 Framebuffer::Framebuffer(
-    std::shared_ptr<Device> device,
-    std::shared_ptr<RenderPass> render_pass,
+    std::shared_ptr<Device> _device,
+    std::shared_ptr<RenderPass> _render_pass,
     const std::vector<std::shared_ptr<ImageView>>& attachments,
     uint32_t width,
     uint32_t height,
     uint32_t layers
-) : device(std::move(device)), 
-    render_pass(std::move(render_pass)), 
+) : device(std::move(_device)), 
+    render_pass(std::move(_render_pass)), 
     attachments(attachments), 
     width(width), 
     height(height),
