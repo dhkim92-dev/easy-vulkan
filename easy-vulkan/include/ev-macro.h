@@ -5,9 +5,9 @@
 
 #define CHECK_RESULT(f) \
 { \
-    VkResult result = (f); \
-    if (result != VK_SUCCESS) { \
-        fprintf(stderr, "[ERROR][%s:%d]: Vulkan error (%s)\n", __FILE__, __LINE__, ev::macro::error_string(result).c_str()); \
+    VkResult __result = (f); \
+    if (__result != VK_SUCCESS) { \
+        fprintf(stdout, "[Vulkan ERROR][%s:%d]: Vulkan error (%s)\n", __FILE__, __LINE__, ev::macro::error_string(__result).c_str()); \
         exit(EXIT_FAILURE); \
     } \
 }

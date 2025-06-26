@@ -14,5 +14,7 @@
 #include "ev-shader.h"
 #include "ev-renderpass.h"
 #include "ev-framebuffer.h"
+#include "ev-commandpool.h"
+#include "ev-commandbuffer.h"
 #include "debugger/ev-debug-messenger.h"
 #include "initializer/ev-initializer.h"

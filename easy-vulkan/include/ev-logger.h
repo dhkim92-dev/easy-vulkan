@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <string>
 #include <mutex>
 
 namespace ev::logger {

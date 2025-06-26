@@ -62,7 +62,13 @@ ev::Instance::Instance(
         VK_MAKE_VERSION(1, 0, 0),
         "easy-vulkan-engine",
         VK_MAKE_VERSION(1, 0, 0),
+#if defined(VK_API_VERSION_1_4)
         VK_API_VERSION_1_4
+#elif defined(VK_API_VERSION_1_3)
+	VK_API_VERSION_1_3
+#else 
+	VK_API_VERSION_1_0
+#endif
     );
 
     VkInstanceCreateInfo create_info = ev::initializer::instance_create_info(

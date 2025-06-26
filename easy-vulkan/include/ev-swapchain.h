@@ -3,6 +3,7 @@
 #include <vulkan/vulkan.h>
 #include <memory>
 #include <vector>
+#include <algorithm>
 #include "ev-instance.h"
 #include "ev-logger.h"
 #include "ev-utility.h"

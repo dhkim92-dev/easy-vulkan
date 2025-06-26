@@ -2,6 +2,8 @@
 
 #include <vulkan/vulkan.h>
 #include <vector>
+#include <cstdlib>
+#include <cstring>
 #include "ev-instance.h"
 #include "ev-pdevice.h"
 #include "ev-macro.h"

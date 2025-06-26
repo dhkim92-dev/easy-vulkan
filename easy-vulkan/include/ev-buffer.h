@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+#include <cstring>
 #include "ev-device.h"
 #include "ev-memory.h"
 
