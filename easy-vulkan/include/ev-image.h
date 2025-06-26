@@ -42,6 +42,8 @@ private:
     VkSharingMode sharing_mode = VK_SHARING_MODE_EXCLUSIVE;
 
     uint32_t queue_family_count = 0;
+    
+    VkImageCreateFlags flags = 0;
 
     const uint32_t* queue_family_indices = nullptr;
 
@@ -79,7 +81,11 @@ public:
         return this->format;
     }
 
-    VkImageUsageFlags get_image_usage() {
+    VkImageType get_type() {
+        return this->type;
+    }
+
+    VkImageUsageFlags get_image_usage_flags() {
         return this->usage_flags;
     }
 
@@ -101,6 +107,10 @@ public:
 
     VkSampleCountFlagBits get_samples() {
         return samples;
+    }
+
+    VkImageCreateFlags get_flags() const {
+        return flags;
     }
 
     VkMemoryRequirements get_memory_requirements() const {
