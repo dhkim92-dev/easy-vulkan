@@ -12,5 +12,6 @@
 #include "ev-image-view.h"
 #include "ev-memory.h"
 #include "ev-shader.h"
+#include "ev-renderpass.h"
 #include "debugger/ev-debug-messenger.h"
 #include "initializer/ev-initializer.h"

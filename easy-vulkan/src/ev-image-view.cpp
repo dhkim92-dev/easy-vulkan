@@ -3,13 +3,13 @@
 using namespace ev;
 
 
-ImageView::ImageView(shared_ptr<Device> device, 
-    shared_ptr<Image> image, 
+ImageView::ImageView(shared_ptr<Device> _device, 
+    shared_ptr<Image> _image, 
     VkFormat view_format,
     VkImageViewType view_type,
     VkComponentMapping components,
     VkImageSubresourceRange subresource_range
-): device(device), image(image), view_format(view_format), view_type(view_type), components(components), subresource_range(subresource_range) {
+): device(std::move(_device)), image(std::move(_image)), view_format(view_format), view_type(view_type) {
     logger::Logger::getInstance().info("Creating image view...");
     CHECK_RESULT(check_format_compatibility());
     CHECK_RESULT(check_view_type_compatibility());

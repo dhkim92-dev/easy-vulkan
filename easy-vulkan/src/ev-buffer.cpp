@@ -6,10 +6,10 @@ using namespace ev;
 using namespace ev::logger;
 
 Buffer::Buffer(
-    std::shared_ptr<Device> device,
+    std::shared_ptr<Device> _device,
     VkDeviceSize size,
     VkBufferUsageFlags usage_flags
-) : device(device), size(size), usage_flags(usage_flags) {
+) : device(std::move(_device)), size(size), usage_flags(usage_flags) {
     Logger::getInstance().debug("Creating Buffer with size: " + std::to_string(size));
     alignment = device->get_properties().limits.minUniformBufferOffsetAlignment;
     if (!device) {

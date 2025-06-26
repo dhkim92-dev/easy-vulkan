@@ -3,8 +3,8 @@
 
 using namespace ev;
 
-PhysicalDevice::PhysicalDevice(std::shared_ptr<Instance> instance, VkPhysicalDevice device)
-    : instance(instance), handle(device) {
+PhysicalDevice::PhysicalDevice(std::shared_ptr<Instance> _instance, VkPhysicalDevice device)
+    : instance(std::move(_instance)), handle(device) {
     logger::Logger::getInstance().info("Creating PhysicalDevice...");
     if (!instance || !instance->is_valid()) {
         logger::Logger::getInstance().error("Invalid Vulkan instance provided.");

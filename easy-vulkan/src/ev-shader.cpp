@@ -4,8 +4,8 @@
 using namespace std;
 using namespace ev;
 
-Shader::Shader(shared_ptr<Device> device, VkShaderStageFlagBits stage, const vector<uint32_t>& code)
-    : device(device), stage(stage), code(code) {
+Shader::Shader(shared_ptr<Device> _device, VkShaderStageFlagBits stage, const vector<uint32_t>& code)
+    : device(std::move(_device)), stage(stage), code(code) {
     if (code.empty()) {
         throw runtime_error("Shader code cannot be empty.");
     }

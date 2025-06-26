@@ -5,12 +5,12 @@ using namespace ev;
 using namespace ev::logger;
 
 Memory::Memory(
-    std::shared_ptr<Device> device,
+    std::shared_ptr<Device> _device,
     VkDeviceSize size,
     VkMemoryPropertyFlags memory_property_flags,
     VkMemoryRequirements memory_requirements,
     VkMemoryAllocateFlagsInfoKHR* alloc_flags_info
-) : device(device), size(size), memory_property_flags(memory_property_flags) {
+) : device(std::move(_device)), size(size), memory_property_flags(memory_property_flags) {
     Logger::getInstance().debug("Creating Memory with size: " + std::to_string(size));
     if (!device) {
         Logger::getInstance().error("Invalid device provided for Memory creation");
