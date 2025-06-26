@@ -13,17 +13,25 @@ namespace ev {
  * @brief Buffer class for managing Vulkan buffers.
  */
 class Buffer {
+
 private:
+
     std::shared_ptr<Device> device;
+
     VkBuffer buffer = VK_NULL_HANDLE;
+
     VkDeviceMemory memory = VK_NULL_HANDLE;
+
     VkDeviceSize size = 0;
+
     VkDeviceSize alignment = 0;
+
     VkBufferUsageFlags usage_flags = 0;
-    // VkMemoryPropertyFlags memory_flags = 0;
+
     VkDescriptorBufferInfo descriptor = {};
     
     void *mapped;
+
     bool is_mapped = false;
 
     VkResult create_buffer(
@@ -40,14 +48,23 @@ public:
         VkBufferUsageFlags usage_flags = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT
         // VkMemoryPropertyFlags memory_flags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
     );
+
     ~Buffer();
+
     VkResult bind_memory(shared_ptr<ev::Memory> memory, VkDeviceSize offset);
+
     VkResult map(VkDeviceSize offset = 0, VkDeviceSize size = VK_WHOLE_SIZE);
+
     VkResult unmap();
+
     VkResult flush(VkDeviceSize offset = 0, VkDeviceSize size = VK_WHOLE_SIZE);
+
     VkResult invalidate(VkDeviceSize offset = 0, VkDeviceSize size = VK_WHOLE_SIZE);
+
     VkResult write(void* data, VkDeviceSize size);
+
     VkResult read(void* data, VkDeviceSize size);
+
     void destroy();
 
     VkDescriptorBufferInfo& get_descriptor() {

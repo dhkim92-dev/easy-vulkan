@@ -6,51 +6,64 @@
 using namespace std;
 
 namespace ev {
-    class PhysicalDevice {
-        std::shared_ptr<Instance> instance;
-        VkPhysicalDevice handle = VK_NULL_HANDLE;
-        VkPhysicalDeviceFeatures features;
-        VkPhysicalDeviceProperties properties;
-        VkPhysicalDeviceMemoryProperties memory_properties;
-        vector<VkExtensionProperties> extensions;
 
-    public: 
-        explicit PhysicalDevice(std::shared_ptr<Instance> instance, VkPhysicalDevice device);
-        PhysicalDevice& operator=(const PhysicalDevice&) = delete;
-        PhysicalDevice(const PhysicalDevice&) = delete;
+class PhysicalDevice {
+ 
+private: 
 
-        operator VkPhysicalDevice() const {
-            return handle;
-        }
+    std::shared_ptr<Instance> instance;
 
-        VkPhysicalDeviceMemoryProperties get_memory_properties() const {
-            return memory_properties;
-        }
+    VkPhysicalDevice handle = VK_NULL_HANDLE;
 
-        const VkPhysicalDeviceProperties& get_properties() const {
-            return properties;
-        }
+    VkPhysicalDeviceFeatures features;
 
-        const VkPhysicalDeviceFeatures& get_features() const {
-            return features;
-        }
+    VkPhysicalDeviceProperties properties;
 
-        const std::shared_ptr<Instance> get_instance() const {
-            return instance;
-        }
+    VkPhysicalDeviceMemoryProperties memory_properties;
 
-        const vector<VkExtensionProperties>& get_extensions() const {
-            return extensions;
-        }
+    vector<VkExtensionProperties> extensions;
 
-        operator VkPhysicalDeviceFeatures() const {
-            return features;
-        }
+public: 
 
-        operator VkPhysicalDeviceProperties() const {
-            return properties;
-        }
+    explicit PhysicalDevice(std::shared_ptr<Instance> instance, VkPhysicalDevice device);
 
-        ~PhysicalDevice();
-    };
+    PhysicalDevice& operator=(const PhysicalDevice&) = delete;
+
+    PhysicalDevice(const PhysicalDevice&) = delete;
+
+    operator VkPhysicalDevice() const {
+        return handle;
+    }
+
+    VkPhysicalDeviceMemoryProperties get_memory_properties() const {
+        return memory_properties;
+    }
+
+    const VkPhysicalDeviceProperties& get_properties() const {
+        return properties;
+    }
+
+    const VkPhysicalDeviceFeatures& get_features() const {
+        return features;
+    }
+
+    const std::shared_ptr<Instance> get_instance() const {
+        return instance;
+    }
+
+    const vector<VkExtensionProperties>& get_extensions() const {
+        return extensions;
+    }
+
+    operator VkPhysicalDeviceFeatures() const {
+        return features;
+    }
+
+    operator VkPhysicalDeviceProperties() const {
+        return properties;
+    }
+
+    ~PhysicalDevice();
+};
+
 }

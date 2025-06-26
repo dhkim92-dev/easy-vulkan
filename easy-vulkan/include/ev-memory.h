@@ -12,12 +12,19 @@ using namespace std;
 namespace ev {
 
 class Memory {
+
 private:
+
     std::shared_ptr<Device> device;
+
     VkDeviceMemory memory = VK_NULL_HANDLE;
+
     VkDeviceSize size = 0;
+
     VkMemoryPropertyFlags memory_property_flags = 0;
+
 public:
+
     explicit Memory(
         std::shared_ptr<Device> device,
         VkDeviceSize size,
@@ -25,10 +32,13 @@ public:
         VkMemoryRequirements memory_requirements,
         VkMemoryAllocateFlagsInfoKHR* alloc_flags_info = nullptr
     );
+
     ~Memory();
 
     Memory(const Memory&) = delete;
+
     Memory& operator=(const Memory&) = delete;
+
     void destroy();
 
     VkDeviceSize get_size() const {
