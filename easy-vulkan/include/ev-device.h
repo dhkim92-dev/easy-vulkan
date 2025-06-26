@@ -13,21 +13,34 @@
 namespace ev {
 
 class Device {
+
     private:
+
     std::shared_ptr<Instance> instance;
+
     std::shared_ptr<PhysicalDevice> pdevice;
+
     VkDevice device = VK_NULL_HANDLE;
+
     std::vector<const char*> enabled_extensions;
+
     std::vector<VkQueueFamilyProperties> queue_family_properties;
+
     struct QueueFamilyIndices {
+
         uint32_t graphics = UINT32_MAX;
+
         uint32_t transfer = UINT32_MAX;
+
         uint32_t compute = UINT32_MAX;
     } queue_family_indices;
 
     void check_required_extensions(std::vector<const char*>& required_extensions);
+
     void setup_queue_family_properties();
+
     void setup_queue_family_indices(VkQueueFlags flags);
+
     uint32_t get_queue_family_index(VkQueueFlags flags) const;
 
     public:
@@ -40,10 +53,13 @@ class Device {
     );
 
     Device& operator=(const Device&) = delete;
+
     Device(const Device&) = delete;
+
     ~Device();
 
     uint32_t get_queue_index(VkQueueFlags flags) const;
+
     uint32_t get_memory_type_index(
         uint32_t type_bits,
         VkMemoryPropertyFlags memory_property_flags,

@@ -16,5 +16,6 @@
 #include "ev-framebuffer.h"
 #include "ev-commandpool.h"
 #include "ev-commandbuffer.h"
+#include "ev-queue.h"
 #include "debugger/ev-debug-messenger.h"
 #include "initializer/ev-initializer.h"
