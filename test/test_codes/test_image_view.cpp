@@ -6,11 +6,17 @@ using namespace std;
 using namespace ev;
 
 class ImageViewTest : public ::testing::Test {
+
 protected:
+
     shared_ptr<Instance> instance;
+
     shared_ptr<PhysicalDevice> physical_device;
+
     shared_ptr<Device> device;
+
     shared_ptr<Image> image;
+
     shared_ptr<Memory> memory;
 
     void SetUp() override {

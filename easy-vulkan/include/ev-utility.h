@@ -28,5 +28,7 @@ namespace ev {
         VkPhysicalDeviceFeatures list_device_features(VkPhysicalDevice device);
 
         VkPhysicalDeviceProperties list_device_properties(VkPhysicalDevice device);
+
+        void read_spirv_shader_file(const char* filename, vector<uint32_t>& code);  
     }
 }

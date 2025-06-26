@@ -130,3 +130,24 @@ VkPhysicalDeviceProperties ev::utility::list_device_properties(VkPhysicalDevice 
     return properties;
 }
 
+void read_spirv_shader_file(const char* filename, vector<uint32_t>& code) {
+    if (!file_exists(filename)) {
+        fprintf(stderr, "Shader file does not exist: %s\n", filename);
+        return;
+    }
+
+    FILE* file = fopen(filename, "rb");
+    if (!file) {
+        fprintf(stderr, "Failed to open shader file: %s\n", filename);
+        return;
+    }
+
+    fseek(file, 0, SEEK_END);
+    size_t size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    code.resize(size / sizeof(uint32_t));
+    fread(code.data(), sizeof(uint32_t), code.size(), file);
+    fclose(file);
+}
+
