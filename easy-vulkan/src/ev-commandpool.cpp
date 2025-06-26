@@ -1,4 +1,5 @@
 #include "ev-commandpool.h"
+#include "ev-macro.h"
 
 using namespace ev;
 
@@ -40,21 +41,20 @@ vector<shared_ptr<CommandBuffer>> CommandPool::allocate(size_t nr_commands, VkCo
         return {};
     }
 
-    // vector<VkCommandBuffer> command_buffers(nr_commands);
-    VkCommandBuffer *buffers = new VkCommandBuffer[nr_commands];
+    vector<VkCommandBuffer> command_buffers(nr_commands);
     VkCommandBufferAllocateInfo alloc_info = {};
     alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     alloc_info.commandPool = command_pool;
     alloc_info.level = level;
     alloc_info.commandBufferCount = static_cast<uint32_t>(nr_commands);
     alloc_info.pNext = nullptr; // No additional structures
-    VkResult result = vkAllocateCommandBuffers(*device, &alloc_info, buffers);
+    VkResult result = vkAllocateCommandBuffers(*device, &alloc_info, command_buffers.data());
     CHECK_RESULT(result);
     vector<shared_ptr<CommandBuffer>> command_buffer_objects(nr_commands);
-    delete[] buffers;
-    return {};
-
-    // return command_buffer_objects;
+    for (size_t i = 0; i < nr_commands; ++i) {
+        command_buffer_objects[i] = make_shared<CommandBuffer>(device, command_pool, command_buffers[i]);
+    }
+    return command_buffer_objects;
 }
 
 void CommandPool::destroy() {

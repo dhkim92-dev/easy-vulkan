@@ -47,8 +47,4 @@ TEST_F(CommandPoolTest, AllocateMultipleCommandBuffers) {
     for (const auto& cmd_buffer : command_buffers) {
         EXPECT_NE(VkCommandBuffer(*cmd_buffer), VK_NULL_HANDLE);
     }
-    for (const auto& command_buffer : command_buffers) {
-        command_buffer->destroy();
-    }
-    command_pool.destroy();
 }
