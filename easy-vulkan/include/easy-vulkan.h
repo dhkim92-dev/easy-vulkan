@@ -8,6 +8,7 @@
 #include "ev-swapchain.h"
 #include "ev-macro.h"
 #include "ev-buffer.h"
+#include "ev-image.h"
 #include "ev-memory.h"
 #include "debugger/ev-debug-messenger.h"
 #include "initializer/ev-initializer.h"
