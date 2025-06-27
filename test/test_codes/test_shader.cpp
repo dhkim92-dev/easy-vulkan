@@ -22,6 +22,6 @@ protected:
 TEST_F(ShaderTest, CreateShaderModule) {
     vector<uint32_t> shader_code = {0x07230203, 0x00010000, 0x0008000a, 0x00000000}; // Minimal SPIR-V code
     Shader shader(device, VK_SHADER_STAGE_VERTEX_BIT, shader_code);
-    EXPECT_NE(shader.get_shader_module(), VK_NULL_HANDLE);
+    EXPECT_NE(VkShaderModule(shader), VK_NULL_HANDLE);
     EXPECT_EQ(shader.get_stage(), VK_SHADER_STAGE_VERTEX_BIT);
 }

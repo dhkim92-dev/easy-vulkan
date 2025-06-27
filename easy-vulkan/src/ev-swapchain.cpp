@@ -17,6 +17,17 @@ Swapchain::Swapchain(
         Logger::getInstance().error("Invalid instance, physical device, or device provided for Swapchain creation.");
         exit(EXIT_FAILURE);
     }
+
+    pfn.vkGetPhysicalDeviceSurfaceSupportKHR = (PFN_vkGetPhysicalDeviceSurfaceSupportKHR)vkGetInstanceProcAddr(*instance, "vkGetPhysicalDeviceSurfaceSupportKHR");
+    pfn.vkAcquireNextImageKHR = (PFN_vkAcquireNextImageKHR)vkGetDeviceProcAddr(*device, "vkAcquireNextImageKHR");
+    pfn.vkGetPhysicalDeviceSurfaceFormatsKHR = (PFN_vkGetPhysicalDeviceSurfaceFormatsKHR)vkGetInstanceProcAddr(*instance, "vkGetPhysicalDeviceSurfaceFormatsKHR");
+    pfn.vkGetPhysicalDeviceSurfaceCapabilitiesKHR = (PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR)vkGetInstanceProcAddr(*instance, "vkGetPhysicalDeviceSurfaceCapabilitiesKHR");
+    pfn.vkGetPhysicalDeviceSurfacePresentModesKHR = (PFN_vkGetPhysicalDeviceSurfacePresentModesKHR)vkGetInstanceProcAddr(*instance, "vkGetPhysicalDeviceSurfacePresentModesKHR");
+    pfn.vkGetSwapchainImagesKHR = (PFN_vkGetSwapchainImagesKHR)vkGetDeviceProcAddr(*device, "vkGetSwapchainImagesKHR");
+    pfn.vkAcquireNextImageKHR = (PFN_vkAcquireNextImageKHR)vkGetDeviceProcAddr(*device, "vkAcquireNextImageKHR");   
+    pfn.vkCreateSwapchainKHR = (PFN_vkCreateSwapchainKHR)vkGetDeviceProcAddr(*device, "vkCreateSwapchainKHR");
+    pfn.vkDestroySwapchainKHR = (PFN_vkDestroySwapchainKHR)vkGetDeviceProcAddr(*device, "vkDestroySwapchainKHR");
+
     Logger::getInstance().debug("Swapchain created successfully.");
 }
 
@@ -31,9 +42,9 @@ void Swapchain::find_present_queue() {
     }
 
     vector<VkBool32> support_presents(queue_count);
-    auto vkGetPhysicalDeviceSurfaceSupportKHR = (PFN_vkGetPhysicalDeviceSurfaceSupportKHR)vkGetInstanceProcAddr(*instance, "vkGetPhysicalDeviceSurfaceSupportKHR"); 
+    // auto vkGetPhysicalDeviceSurfaceSupportKHR = (PFN_vkGetPhysicalDeviceSurfaceSupportKHR)vkGetInstanceProcAddr(*instance, "vkGetPhysicalDeviceSurfaceSupportKHR"); 
     for (uint32_t i = 0 ; i < queue_count ; ++i ) {
-        vkGetPhysicalDeviceSurfaceSupportKHR(*pdevice, i, surface, &support_presents[i]);
+        pfn.vkGetPhysicalDeviceSurfaceSupportKHR(*pdevice, i, surface, &support_presents[i]);
     }
 
     // Find the graphics and present queue indices
@@ -79,9 +90,9 @@ void Swapchain::find_present_queue() {
 void Swapchain::find_color_format_and_space() {
     // 스왑체인에서 사용할 이미지 포맷과 색상 공간을 결정한다.
     Logger::getInstance().debug("Finding color format and color space for the surface...");
-    auto vkGetPhysicalDeviceSurfaceFormatsKHR = (PFN_vkGetPhysicalDeviceSurfaceFormatsKHR)vkGetInstanceProcAddr(*instance, "vkGetPhysicalDeviceSurfaceFormatsKHR");
+    // auto vkGetPhysicalDeviceSurfaceFormatsKHR = (PFN_vkGetPhysicalDeviceSurfaceFormatsKHR)vkGetInstanceProcAddr(*instance, "vkGetPhysicalDeviceSurfaceFormatsKHR");
     uint32_t format_count = 0;
-    CHECK_RESULT(vkGetPhysicalDeviceSurfaceFormatsKHR(*pdevice, surface, &format_count, nullptr));
+    CHECK_RESULT(pfn.vkGetPhysicalDeviceSurfaceFormatsKHR(*pdevice, surface, &format_count, nullptr));
     
     if (format_count == 0) {
         Logger::getInstance().error("No surface formats available for the physical device.");
@@ -89,7 +100,7 @@ void Swapchain::find_color_format_and_space() {
     }
 
     vector<VkSurfaceFormatKHR> surface_formats(format_count);
-    CHECK_RESULT(vkGetPhysicalDeviceSurfaceFormatsKHR(*pdevice, surface, &format_count, surface_formats.data()));
+    CHECK_RESULT(pfn.vkGetPhysicalDeviceSurfaceFormatsKHR(*pdevice, surface, &format_count, surface_formats.data()));
 
     vector<VkFormat> prefered_formats = {
         VK_FORMAT_B8G8R8A8_UNORM,
@@ -140,8 +151,8 @@ void Swapchain::create(
     VkSwapchainKHR old_swapchain = swapchain;
 
     VkSurfaceCapabilitiesKHR surface_capabilities;
-    auto vkGetPhysicalDeviceSurfaceCapabilitiesKHR = (PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR)vkGetInstanceProcAddr(*instance, "vkGetPhysicalDeviceSurfaceCapabilitiesKHR");
-    CHECK_RESULT(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(*pdevice, surface, &surface_capabilities));
+    // auto vkGetPhysicalDeviceSurfaceCapabilitiesKHR = (PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR)vkGetInstanceProcAddr(*instance, "vkGetPhysicalDeviceSurfaceCapabilitiesKHR");
+    CHECK_RESULT(pfn.vkGetPhysicalDeviceSurfaceCapabilitiesKHR(*pdevice, surface, &surface_capabilities));
     VkExtent2D resolution = {width, height};
     if ( surface_capabilities.currentExtent.width == 0xFFFFFFFF ) {
         resolution.height = width;
@@ -153,14 +164,14 @@ void Swapchain::create(
     }
 
     uint32_t present_mode_count = 0;
-    auto vkGetPhysicalDeviceSurfacePresentModesKHR = (PFN_vkGetPhysicalDeviceSurfacePresentModesKHR)vkGetInstanceProcAddr(*instance, "vkGetPhysicalDeviceSurfacePresentModesKHR");
-    CHECK_RESULT(vkGetPhysicalDeviceSurfacePresentModesKHR(*pdevice, surface, &present_mode_count, nullptr));
+    // auto vkGetPhysicalDeviceSurfacePresentModesKHR = (PFN_vkGetPhysicalDeviceSurfacePresentModesKHR)vkGetInstanceProcAddr(*instance, "vkGetPhysicalDeviceSurfacePresentModesKHR");
+    CHECK_RESULT(pfn.vkGetPhysicalDeviceSurfacePresentModesKHR(*pdevice, surface, &present_mode_count, nullptr));
     if (present_mode_count == 0) {
         Logger::getInstance().error("No present modes available for the surface.");
         exit(EXIT_FAILURE);
     }
     std::vector<VkPresentModeKHR> present_modes(present_mode_count);
-    CHECK_RESULT(vkGetPhysicalDeviceSurfacePresentModesKHR(*pdevice, surface, &present_mode_count, present_modes.data()));  
+    CHECK_RESULT(pfn.vkGetPhysicalDeviceSurfacePresentModesKHR(*pdevice, surface, &present_mode_count, present_modes.data()));  
 
     // Vsync가 활성화 된 경우 FIFO를 기본으로 이용, 없다면 MAIL_BOX -> IMMEDIATE 순으로 선택
     VkPresentModeKHR present_mode = VK_PRESENT_MODE_FIFO_KHR; // Default to FIFO
@@ -231,15 +242,15 @@ void Swapchain::create(
         swapchain_ci.imageUsage |= VK_IMAGE_USAGE_TRANSFER_DST_BIT; // Add transfer destination usage if supported
     }
 
-    CHECK_RESULT(vkCreateSwapchainKHR(*device, &swapchain_ci, nullptr, &swapchain));
+    CHECK_RESULT(pfn.vkCreateSwapchainKHR(*device, &swapchain_ci, nullptr, &swapchain));
 
     if ( old_swapchain != VK_NULL_HANDLE ) {
         destroy_swapchain(old_swapchain);
     }
 
     images.resize(image_count);
-    auto vkGetSwapchainImagesKHR = (PFN_vkGetSwapchainImagesKHR)vkGetInstanceProcAddr(*instance, "vkGetSwapchainImagesKHR");
-    CHECK_RESULT(vkGetSwapchainImagesKHR(*device, swapchain, &image_count, images.data()));
+    // auto vkGetSwapchainImagesKHR = (PFN_vkGetSwapchainImagesKHR)vkGetInstanceProcAddr(*instance, "vkGetSwapchainImagesKHR");
+    CHECK_RESULT(pfn.vkGetSwapchainImagesKHR(*device, swapchain, &image_count, images.data()));
     views.resize(image_count);
 
     for ( size_t i = 0 ; i < images.size() ; ++i ) {
@@ -275,8 +286,7 @@ void Swapchain::acquire_next_image(
     VkFence fence
 ) {
     Logger::getInstance().debug("Acquiring next image from swapchain...");
-    auto vkAcquireNextImageKHR = (PFN_vkAcquireNextImageKHR)vkGetInstanceProcAddr(*instance, "vkAcquireNextImageKHR");
-    CHECK_RESULT(vkAcquireNextImageKHR(*device, swapchain, UINT64_MAX, semaphore, fence, &image_index));
+    CHECK_RESULT(pfn.vkAcquireNextImageKHR(*device, swapchain, UINT64_MAX, semaphore, fence, &image_index));
     Logger::getInstance().debug("Next image acquired successfully at index: " + std::to_string(image_index));
 }
 
@@ -285,7 +295,7 @@ void Swapchain::destroy_swapchain(VkSwapchainKHR& sc) {
         for (VkImageView view : views) {
             vkDestroyImageView(*device, view, nullptr);
         }
-        vkDestroySwapchainKHR(*device, swapchain, nullptr);
+        pfn.vkDestroySwapchainKHR(*device, swapchain, nullptr);
     } else {
     }
 }
@@ -297,7 +307,7 @@ void Swapchain::destroy() {
         }
         views.clear();
         images.clear();
-        vkDestroySwapchainKHR(*device, swapchain, nullptr);
+        pfn.vkDestroySwapchainKHR(*device, swapchain, nullptr);
         swapchain = VK_NULL_HANDLE;
     }
 }
