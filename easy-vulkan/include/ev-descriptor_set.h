@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <algorithm>
 #include "ev-device.h"
 #include "ev-buffer.h"
 #include "ev-image.h"

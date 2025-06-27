@@ -15,10 +15,13 @@ protected:
     shared_ptr<ImageView> attachment;
 
     void SetUp() override {
-        ev::logger::Logger::getInstance().set_log_level(ev::logger::LogLevel::ERROR);
-        instance = make_shared<ev::Instance>(vector<const char*>(), vector<const char*>(), false);
+        ev::logger::Logger::getInstance().set_log_level(ev::logger::LogLevel::DEBUG);
+	vector<const char*> instance_extension = {VK_KHR_SURFACE_EXTENSION_NAME, VK_EXT_DEBUG_UTILS_EXTENSION_NAME };
+	vector<const char*> layers = {"VK_LAYER_KHRONOS_validation"};
+	vector<const char*> device_extension = {"VK_KHR_swapchain"};
+        instance = make_shared<ev::Instance>(instance_extension, layers, true);
         physical_device = make_shared<ev::PhysicalDevice>(instance, ev::utility::list_physical_devices(instance->get_instance())[0]);
-        device = make_shared<ev::Device>(instance, physical_device, vector<const char*>(), VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT);
+        device = make_shared<ev::Device>(instance, physical_device, device_extension, VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT);
 
         vector<VkAttachmentDescription> attachments = {
             {
@@ -49,6 +52,7 @@ protected:
         render_pass = make_shared<ev::RenderPass>(device, attachments, subpasses);
         image = make_shared<ev::Image>(device, VK_IMAGE_TYPE_2D, VK_FORMAT_R8G8B8A8_UNORM, 800, 600);
         memory = make_shared<ev::Memory>(device, image->get_memory_requirements().size, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image->get_memory_requirements(), nullptr);
+	image->bind_memory(memory, 0);
         attachment = make_shared<ev::ImageView>(device, image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_VIEW_TYPE_2D);
     }
 };

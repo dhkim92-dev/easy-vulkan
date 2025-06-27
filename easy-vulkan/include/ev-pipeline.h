@@ -214,7 +214,8 @@ public:
             .alphaToOneEnable = VK_FALSE
         };
 
-        depth_stencil_state = { .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+        depth_stencil_state = { 
+	    .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
             .pNext = nullptr,
             .flags = 0,
             .depthTestEnable = VK_TRUE,
@@ -222,7 +223,8 @@ public:
             .depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL,
             .depthBoundsTestEnable = VK_FALSE,
             .stencilTestEnable = VK_FALSE,
-            .back.compareOp = VK_COMPARE_OP_ALWAYS,
+	    .front = {VK_STENCIL_OP_KEEP, VK_STENCIL_OP_KEEP, VK_STENCIL_OP_KEEP, VK_COMPARE_OP_ALWAYS, 0, 0, 0},
+            .back = { VK_STENCIL_OP_KEEP, VK_STENCIL_OP_KEEP, VK_STENCIL_OP_KEEP, VK_COMPARE_OP_ALWAYS, 0, 0, 0  },
             .minDepthBounds = 0.0f,
             .maxDepthBounds = 1.0f
         };
