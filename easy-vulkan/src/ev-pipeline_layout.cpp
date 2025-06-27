@@ -3,7 +3,7 @@
 namespace ev {
 
 PipelineLayout::PipelineLayout(std::shared_ptr<Device> _device,
-    std::vector<std::shared_ptr<DescriptorSetLayout>> descriptor_set_layouts,
+    std::vector<std::shared_ptr<DescriptorSetLayout>>& descriptor_set_layouts,
     std::vector<VkPushConstantRange> push_constant_ranges
 )
     : device(std::move(_device)) {

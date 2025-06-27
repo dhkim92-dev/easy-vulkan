@@ -18,8 +18,9 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 file(GLOB TEST_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/test_codes/*.cpp")
 file(GLOB TEST_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/test_codes/*.h")
+file(GLOB SHADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/shaders/*")
 
-# Create the test executable
+
 add_executable(test_main ${TEST_SOURCES} ${TEST_HEADERS})
 
 target_compile_definitions(test_main PRIVATE
@@ -28,6 +29,13 @@ target_compile_definitions(test_main PRIVATE
 
 # Link the easy-vulkan library to the test executable
 target_link_libraries(test_main PRIVATE easy-vulkan gtest gtest_main)
+
+add_custom_target(copy_test_shaders ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/shaders"
+            "${CMAKE_CURRENT_BINARY_DIR}/shaders"
+    COMMENT "Copying test shaders to build directory"
+)
 
 # include 디렉토리 추가 (필요시)
 target_include_directories(test_main PRIVATE
