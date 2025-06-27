@@ -10,7 +10,7 @@ ev::Queue::Queue(
     uint32_t _queue_family_index,
     uint32_t _queue_index
 ) : device(std::move(_device)), queue_family_index(_queue_family_index), queue_index(_queue_index) {
-    vkGetDeviceQueue(*device, queue_family_index, queue_index, &queue); 
+    vkGetDeviceQueue(*device, queue_family_index, queue_index, &queue);
     vector<const char*> enabled_extensions = device->get_enabled_extensions();
     if ( std::find(enabled_extensions.begin(), enabled_extensions.end(), "VK_EXT_swapchain") != enabled_extensions.end() ) {
         logger::Logger::getInstance().error("VK_EXT_swapchain extension is enabled.");

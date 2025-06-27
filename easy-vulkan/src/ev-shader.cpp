@@ -7,7 +7,8 @@ using namespace ev;
 Shader::Shader(shared_ptr<Device> _device, VkShaderStageFlagBits stage, const vector<uint32_t>& code)
     : device(std::move(_device)), stage(stage), code(code) {
     if (code.empty()) {
-        throw runtime_error("Shader code cannot be empty.");
+        logger::Logger::getInstance().error("Shader code is empty. Cannot create shader module.");
+        exit(EXIT_FAILURE);
     }
 
     VkShaderModuleCreateInfo create_info = {};
@@ -16,8 +17,10 @@ Shader::Shader(shared_ptr<Device> _device, VkShaderStageFlagBits stage, const ve
     create_info.pCode = code.data();
 
     if (vkCreateShaderModule(*device, &create_info, nullptr, &shader_module) != VK_SUCCESS) {
-        throw runtime_error("Failed to create shader module.");
-    }
+        logger::Logger::getInstance().error("Failed to create shader module.");
+        exit(EXIT_FAILURE);
+    } 
+    logger::Logger::getInstance().debug("Shader module created successfully.");
 }
 
 void Shader::destroy() {

@@ -3,8 +3,11 @@
 #include <vulkan/vulkan.h>
 #include <memory>
 #include <vector>
+#include "ev-shader.h"
 #include "ev-device.h"
+#include "ev-renderpass.h"
 #include "ev-descriptor_set.h"
+#include "ev-macro.h"
 #include "ev-logger.h"
 #include "ev-utility.h"
 
@@ -12,10 +15,31 @@ using namespace std;
 
 namespace ev {
 
+class PipelineCache {
+
+    private:
+
+    shared_ptr<Device> device;  // The Vulkan device associated with this pipeline cache    
+
+    VkPipelineCache cache = VK_NULL_HANDLE;  // The Vulkan pipeline cache handle
+
+    public:
+
+    explicit PipelineCache(shared_ptr<Device> _device, VkPipelineCacheCreateFlags flags = 0, void* next=nullptr);
+
+    ~PipelineCache();
+
+    void destroy();
+
+    operator VkPipelineCache() const {
+        return cache;
+    }
+};
+
 /**
- * @brief Represents a Vulkan pipeline layout.
- * This class encapsulates the creation and management of a Vulkan pipeline layout,
- * which includes descriptor sets and push constants.
+ * @brief Vulkan Pipeline Layout Wrapper
+ * VkPipelineLayout의 생성 및 수명주기를 담당합니다.
+ * 생성자 호출을 통해 파이프라인을 생성하며, destroy() 메서드를 호출하거나 소멸자를 통해 파이프라인 레이아웃을 소멸합니다.
  */
 class PipelineLayout {
 
@@ -32,11 +56,14 @@ private:
 public:
 
     /**
-     * @brief Constructs a PipelineLayout with the given device.
-     * @param _device The Vulkan device to use for this pipeline layout.
+     * @brief 생성자
+     * @param _device Vulkan Device Wrapper
+     * @param descriptor_set_layouts DescriptorSetLayout 객체들의 벡터
+     * @param push_constant_ranges Push constant ranges, default is an empty vector
+     * 
      */
     explicit PipelineLayout(std::shared_ptr<Device> _device,
-        std::vector<std::shared_ptr<DescriptorSetLayout> > descriptor_set_layouts,
+        std::vector<std::shared_ptr<DescriptorSetLayout>>& descriptor_set_layouts,
         std::vector<VkPushConstantRange> push_constant_ranges = {}
     );
 
@@ -86,6 +113,301 @@ public:
     operator VkPipelineLayout() const {
         return layout;
     }
+};
+
+/**
+ * @brief Graphics Pipeline Blueprint
+ * 그래픽스 파이프라인을 생성하기 위한 청사진 역할을 합니다.
+ * 이 클래스는 파이프라인의 상태를 정의하고, 실제 파이프라인을 생성하는 팩토리 클래스를 통해 사용됩니다.
+ */
+struct GraphicsPipelineBluePrint {
+
+public:
+
+    VkPipelineVertexInputStateCreateInfo vertex_input_state = {};
+
+    VkPipelineInputAssemblyStateCreateInfo input_assembly_state = {};
+
+    VkPipelineRasterizationStateCreateInfo rasterization_state = {};
+
+    VkPipelineColorBlendStateCreateInfo color_blend_state = {};
+
+    VkPipelineViewportStateCreateInfo viewport_state = {};
+
+    VkPipelineMultisampleStateCreateInfo multisample_state = {};
+
+    VkPipelineDepthStencilStateCreateInfo depth_stencil_state = {};
+
+    VkPipelineDynamicStateCreateInfo dynamic_state = {};
+
+    VkPipelineColorBlendAttachmentState color_blend_attachment_state = {};
+
+    std::vector<VkDynamicState> dynamic_states;
+
+    std::vector<VkPipelineShaderStageCreateInfo> shader_stages;
+
+    std::shared_ptr<PipelineLayout> pipeline_layout;
+
+    VkPipelineCreateFlags flags = 0;
+
+    uint32_t subpass = 0;
+
+    GraphicsPipelineBluePrint() { 
+        vertex_input_state = { .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,  
+            .pNext = nullptr,
+            .flags = 0,
+            .vertexBindingDescriptionCount = 0,
+            .pVertexBindingDescriptions = nullptr,
+            .vertexAttributeDescriptionCount = 0,
+            .pVertexAttributeDescriptions = nullptr
+        };
+
+        input_assembly_state = { .sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+            .primitiveRestartEnable = VK_FALSE
+        };
+
+        rasterization_state = { .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .depthClampEnable = VK_FALSE,
+            .rasterizerDiscardEnable = VK_FALSE,
+            .polygonMode = VK_POLYGON_MODE_FILL,
+            .cullMode = VK_CULL_MODE_BACK_BIT,
+            .frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
+            .depthBiasEnable = VK_FALSE,
+            .depthBiasConstantFactor = 0.0f,
+            .depthBiasClamp = 0.0f,
+            .depthBiasSlopeFactor = 0.0f,
+            .lineWidth = 1.0f
+        };
+
+        color_blend_state = { .sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0xf,
+            .logicOpEnable = VK_FALSE,
+            .logicOp = VK_LOGIC_OP_COPY,
+            .attachmentCount = 1,
+            .pAttachments = &color_blend_attachment_state,
+            .blendConstants = { 0.0f, 0.0f, 0.0f, 0.0f }
+        };
+
+        viewport_state = { .sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .viewportCount = 1,
+            .pViewports = nullptr,
+            .scissorCount = 1,
+            .pScissors = nullptr
+        };
+
+        multisample_state = { .sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
+            .sampleShadingEnable = VK_FALSE,
+            .minSampleShading = 1.0f,
+            .pSampleMask = nullptr,
+            .alphaToCoverageEnable = VK_FALSE,
+            .alphaToOneEnable = VK_FALSE
+        };
+
+        depth_stencil_state = { .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .depthTestEnable = VK_TRUE,
+            .depthWriteEnable = VK_TRUE,
+            .depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL,
+            .depthBoundsTestEnable = VK_FALSE,
+            .stencilTestEnable = VK_FALSE,
+            .back.compareOp = VK_COMPARE_OP_ALWAYS,
+            .minDepthBounds = 0.0f,
+            .maxDepthBounds = 1.0f
+        };
+
+        dynamic_state = { .sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .dynamicStateCount = 0,
+            .pDynamicStates = nullptr
+        };
+
+        color_blend_attachment_state = { 
+            .blendEnable = VK_FALSE,
+            .srcColorBlendFactor = VK_BLEND_FACTOR_ONE,
+            .dstColorBlendFactor = VK_BLEND_FACTOR_ZERO,
+            .colorBlendOp = VK_BLEND_OP_ADD,
+            .srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
+            .dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
+            .alphaBlendOp = VK_BLEND_OP_ADD,
+            .colorWriteMask =  0xf
+        };
+    }
+};
+
+
+/**
+ * @brief 한 렌더패스에서 공유하는 모든 그래픽스 파이프라인을 생성하기위한 청사진 관리 및 파이프라인 생성 클래스
+ * 이 클래스는 여러 그래픽스 파이프라인을 생성하기 위한 청사진을 관리합니다.
+ * 각 파이프라인의 상태를 정의한 청사진들의 집합을 이용하여 실제 파이프라인을 관리합니다.
+ * 생성된 그래픽스 파이프라인은 각 그래픽스 파이프라인 객체에서 VkPipeline 핸들의 수명을 관리하기 때문에
+ * 매니저를 통한 파이프라인 생성 후에는 매니저가 파이프라인 핸들을 소유하지 않습니다.
+*/
+class GraphicsPipelineBluePrintManager {
+    
+private:
+
+    std::shared_ptr<Device> device;
+
+    std::shared_ptr<RenderPass> render_pass;
+
+    vector<GraphicsPipelineBluePrint> blue_prints;
+
+    bool on_record = false;
+
+public:
+
+    explicit GraphicsPipelineBluePrintManager(std::shared_ptr<Device> _device, std::shared_ptr<RenderPass> _render_pass);
+
+    GraphicsPipelineBluePrintManager& operator=(const GraphicsPipelineBluePrintManager&) = delete;
+
+    GraphicsPipelineBluePrintManager(const GraphicsPipelineBluePrintManager&) = delete;
+
+    ~GraphicsPipelineBluePrintManager();
+
+    void clear();
+
+    GraphicsPipelineBluePrintManager& begin_blueprint();
+
+    GraphicsPipelineBluePrintManager& add_shader_stage(shared_ptr<Shader> shader);
+
+    // 구조체 내 변수들의 기본값을 지정해서 모두 적기
+    GraphicsPipelineBluePrintManager& set_vertex_input_state(
+        vector<VkVertexInputBindingDescription>& vertexBindingDescriptions,
+        vector<VkVertexInputAttributeDescription>& vertexAttributeDescriptions,
+        VkPipelineVertexInputStateCreateFlags flags = 0
+    );
+
+    GraphicsPipelineBluePrintManager& set_vertex_input_state(
+        VkPipelineVertexInputStateCreateInfo& info
+    );
+
+    GraphicsPipelineBluePrintManager& set_input_assembly_state(
+        VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+        VkBool32 primitiveRestartEnable = VK_FALSE,
+        VkPipelineInputAssemblyStateCreateFlags flags = 0
+    );
+
+    GraphicsPipelineBluePrintManager& set_input_assembly_state(
+        VkPipelineInputAssemblyStateCreateInfo& info
+    );
+
+    GraphicsPipelineBluePrintManager& set_rasterization_state(
+        VkBool32 depthClampEnable = VK_FALSE,
+        VkBool32 rasterizerDiscardEnable = VK_FALSE,
+        VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL,
+        VkCullModeFlags cullMode = VK_CULL_MODE_BACK_BIT,
+        VkFrontFace frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
+        VkBool32 depthBiasEnable = VK_FALSE,
+        float depthBiasConstantFactor = 0.0f,
+        float depthBiasClamp = 0.0f,
+        float depthBiasSlopeFactor = 0.0f,
+        float lineWidth = 1.0f,
+        VkPipelineRasterizationStateCreateFlags flags = 0
+    );
+
+    GraphicsPipelineBluePrintManager& set_rasterization_state(
+        VkPipelineRasterizationStateCreateInfo& info
+    );
+
+    GraphicsPipelineBluePrintManager& set_color_blend_state(
+        vector<VkPipelineColorBlendAttachmentState> attachments = {},
+        VkBool32 logicOpEnable = VK_FALSE,
+        VkLogicOp logicOp = VK_LOGIC_OP_CLEAR,
+        vector<float> blendConstants = {0.0f, 0.0f, 0.0f, 0.0f},
+        VkPipelineColorBlendStateCreateFlags flags = 0
+    );
+
+    GraphicsPipelineBluePrintManager& set_color_blend_state(
+        VkPipelineColorBlendStateCreateInfo& info
+    );
+
+    GraphicsPipelineBluePrintManager& set_viewport_state(
+        vector<VkViewport> viewports = { {0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f} },
+        vector<VkRect2D> scissors = { { {0, 0}, {1, 1} } },
+        VkPipelineViewportStateCreateFlags flags = 0
+    );
+
+    GraphicsPipelineBluePrintManager& set_viewport_state(
+        VkPipelineViewportStateCreateInfo& info
+    );
+
+    GraphicsPipelineBluePrintManager& set_multisample_state(
+        VkSampleCountFlagBits rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
+        VkBool32 sampleShadingEnable = VK_FALSE,
+        float minSampleShading = 1.0f,
+        const VkSampleMask* pSampleMask = nullptr,
+        VkBool32 alphaToCoverageEnable = VK_FALSE,
+        VkBool32 alphaToOneEnable = VK_FALSE,
+        VkPipelineMultisampleStateCreateFlags flags = 0
+    );
+
+    GraphicsPipelineBluePrintManager& set_multisample_state(
+        VkPipelineMultisampleStateCreateInfo& info
+    );
+
+    GraphicsPipelineBluePrintManager& set_depth_stencil_state(
+        VkBool32 depthTestEnable = VK_TRUE,
+        VkBool32 depthWriteEnable = VK_TRUE,
+        VkCompareOp depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL,
+        VkBool32 depthBoundsTestEnable = VK_FALSE,
+        VkBool32 stencilTestEnable = VK_FALSE,
+        const VkStencilOpState front = { VK_STENCIL_OP_KEEP, VK_STENCIL_OP_KEEP, VK_STENCIL_OP_KEEP, VK_COMPARE_OP_ALWAYS, 0, 0, 0 },
+        const VkStencilOpState back = { VK_STENCIL_OP_KEEP, VK_STENCIL_OP_KEEP, VK_STENCIL_OP_KEEP, VK_COMPARE_OP_ALWAYS, 0, 0, 0 },
+        float minDepthBounds = 0.0f,
+        float maxDepthBounds = 1.0f,
+        VkPipelineDepthStencilStateCreateFlags flags = 0
+    );
+
+    GraphicsPipelineBluePrintManager& set_depth_stencil_state(
+        VkPipelineDepthStencilStateCreateInfo& info
+    );
+
+    GraphicsPipelineBluePrintManager& set_dynamic_state(
+        const vector<VkDynamicState>& dynamicStates = {},
+        VkPipelineDynamicStateCreateFlags flags = 0
+    );
+
+    GraphicsPipelineBluePrintManager& set_dynamic_state(
+        VkPipelineDynamicStateCreateInfo& info
+    );
+
+    GraphicsPipelineBluePrintManager& set_color_blend_attachment_state(
+        VkBool32 blendEnable = VK_FALSE,
+        VkBlendFactor srcColorBlendFactor = VK_BLEND_FACTOR_ONE,
+        VkBlendFactor dstColorBlendFactor = VK_BLEND_FACTOR_ZERO,
+        VkBlendOp colorBlendOp = VK_BLEND_OP_ADD,
+        VkBlendFactor srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
+        VkBlendFactor dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
+        VkBlendOp alphaBlendOp = VK_BLEND_OP_ADD,
+        VkColorComponentFlags colorWriteMask = 0xf
+    );
+
+    GraphicsPipelineBluePrintManager& set_color_blend_attachment_state(
+        VkPipelineColorBlendAttachmentState& attachmentState
+    );
+
+    GraphicsPipelineBluePrintManager& set_pipeline_layout(shared_ptr<PipelineLayout> layout);
+
+    GraphicsPipelineBluePrintManager& set_flags(VkPipelineCreateFlags flags);
+
+    GraphicsPipelineBluePrintManager& set_subpass_index(uint32_t subpass);
+
+    GraphicsPipelineBluePrintManager& end_blueprint();
+
+    vector<shared_ptr<GraphicsPipeline>> create_pipelines(shared_ptr<PipelineCache> pipeline_cache = nullptr);
 };
 
 } // namespace ev

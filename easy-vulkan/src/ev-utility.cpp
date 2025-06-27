@@ -130,7 +130,7 @@ VkPhysicalDeviceProperties ev::utility::list_device_properties(VkPhysicalDevice 
     return properties;
 }
 
-void read_spirv_shader_file(const char* filename, vector<uint32_t>& code) {
+void ev::utility::read_spirv_shader_file(const char* filename, vector<uint32_t>& code) {
     if (!file_exists(filename)) {
         fprintf(stderr, "Shader file does not exist: %s\n", filename);
         return;

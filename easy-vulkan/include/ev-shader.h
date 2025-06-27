@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include "ev-device.h"
+#include "ev-logger.h"
 
 namespace ev {
 
@@ -36,6 +37,18 @@ public:
 
     operator VkShaderModule() const {
         return shader_module;
+    }
+
+    VkPipelineShaderStageCreateInfo get_shader_stage_create_info() const {
+        return {
+            .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .stage = stage,
+            .module = shader_module,
+            .pName = entry_point.c_str(),
+            .pSpecializationInfo = nullptr // Assuming no specialization info for simplicity
+        };
     }
 
     VkShaderStageFlagBits get_stage() const {
