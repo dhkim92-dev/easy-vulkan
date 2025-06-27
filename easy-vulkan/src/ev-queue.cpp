@@ -1,4 +1,5 @@
 #include "ev-queue.h"
+#include <iostream>
 
 using namespace std;
 
@@ -10,6 +11,16 @@ ev::Queue::Queue(
     uint32_t _queue_index
 ) : device(std::move(_device)), queue_family_index(_queue_family_index), queue_index(_queue_index) {
     vkGetDeviceQueue(*device, queue_family_index, queue_index, &queue); 
+    vector<const char*> enabled_extensions = device->get_enabled_extensions();
+    if ( std::find(enabled_extensions.begin(), enabled_extensions.end(), "VK_EXT_swapchain") != enabled_extensions.end() ) {
+        logger::Logger::getInstance().error("VK_EXT_swapchain extension is enabled.");
+        pfn.vkQueuePresentKHR = (PFN_vkQueuePresentKHR)vkGetDeviceProcAddr(*device, "vkQueuePresentKHR");
+        if (!pfn.vkQueuePresentKHR) {
+            std::cout << pfn.vkQueuePresentKHR << std::endl;
+            logger::Logger::getInstance().error("Failed to load vkQueuePresentKHR function pointer.");
+            exit(EXIT_FAILURE);
+        }
+    }
 }
 
 VkResult ev::Queue::submit(shared_ptr<CommandBuffer> buffer) {
@@ -34,7 +45,7 @@ VkResult ev::Queue::present(std::shared_ptr<Swapchain> swapchain, uint32_t image
     present_info.pSwapchains = &handle;
     present_info.pImageIndices = &image_index;
 
-    return vkQueuePresentKHR(queue, &present_info);
+    return pfn.vkQueuePresentKHR(queue, &present_info);
 }
 
 ev::Queue::~Queue() {

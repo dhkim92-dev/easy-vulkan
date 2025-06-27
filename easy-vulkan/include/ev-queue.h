@@ -23,6 +23,11 @@ private:
 
     uint32_t queue_index = UINT32_MAX;
 
+
+    struct {
+        PFN_vkQueuePresentKHR vkQueuePresentKHR = nullptr;
+    } pfn;
+
     // Disable copy constructor and assignment operator
 
 public:

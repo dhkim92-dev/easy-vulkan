@@ -37,6 +37,17 @@ private:
 
     uint32_t queue_index = UINT32_MAX;
 
+    struct {
+        PFN_vkGetPhysicalDeviceSurfaceSupportKHR vkGetPhysicalDeviceSurfaceSupportKHR = nullptr;
+        PFN_vkGetPhysicalDeviceSurfaceFormatsKHR vkGetPhysicalDeviceSurfaceFormatsKHR = nullptr;
+        PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR vkGetPhysicalDeviceSurfaceCapabilitiesKHR = nullptr;
+        PFN_vkGetPhysicalDeviceSurfacePresentModesKHR vkGetPhysicalDeviceSurfacePresentModesKHR = nullptr;
+        PFN_vkGetSwapchainImagesKHR vkGetSwapchainImagesKHR = nullptr;
+        PFN_vkCreateSwapchainKHR vkCreateSwapchainKHR = nullptr;
+        PFN_vkAcquireNextImageKHR vkAcquireNextImageKHR = nullptr;
+        PFN_vkDestroySwapchainKHR vkDestroySwapchainKHR = nullptr;
+    } pfn;
+
     void register_surface(VkSurfaceKHR surface);
 
     void find_present_queue();
