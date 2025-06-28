@@ -1,6 +1,16 @@
 #pragma once
 
+#include <vector>
+#include <memory>
 #include "ev-device.h"
+#include "ev-utility.h"
+#include "ev-logger.h"
+#include "ev-renderpass.h"
+#include "ev-framebuffer.h"
+#include "ev-descriptor_set.h"
+#include "ev-pipeline.h"
+
+using namespace std;
 
 namespace ev {
 
@@ -8,7 +18,7 @@ class CommandBuffer {
 
 private:
 
-    shared_ptr<Device> device;
+    shared_ptr<Device> device ;
 
     VkCommandBuffer command_buffer = VK_NULL_HANDLE;
 
@@ -30,11 +40,82 @@ public:
 
     void destroy();
 
+    void begin_render_pass(shared_ptr<RenderPass> render_pass, 
+        shared_ptr<Framebuffer> framebuffer, 
+        VkSubpassContents contents = VK_SUBPASS_CONTENTS_INLINE);
+
+    void bind_descriptor_sets(VkPipelineBindPoint pipeline_bind_point, 
+        shared_ptr<PipelineLayout> layout, 
+        vector<shared_ptr<DescriptorSet>> descriptor_sets,
+        uint32_t first_set = 0,
+        const vector<uint32_t> dynamic_offsets = {}
+    );
+
+    void bind_vertex_buffers(uint32_t first_binding, 
+        const vector<shared_ptr<Buffer>>& buffers, 
+        const vector<VkDeviceSize>& offsets = {});
+
+    void bind_index_buffers(vector<shared_ptr<Buffer>> buffers, VkDeviceSize offset = 0, VkIndexType index_type = VK_INDEX_TYPE_UINT32);
+
+    void bind_graphics_pipeline(shared_ptr<GraphicsPipeline> pipeline);
+
+    // VkResult bind_compute_pipeline(shared_ptr<ComputePipeline> &pipeline); TODO: ComputePipeline 구현 후 구현
+
+    // VkResult bind_ray_tracing_pipeline(shared_ptr<RayTracingPipeline> &pipeline); TODO: RayTracingPipeline 구현 후 구현
+
+    void bind_push_constants(shared_ptr<PipelineLayout> layout, VkShaderStageFlags stage_flags, uint32_t offset, const void* data, size_t size);
+
+    void copy_buffer(shared_ptr<Buffer> dst_buffer, shared_ptr<Buffer> src_buffer, VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize dst_offset = 0, VkDeviceSize src_offset = 0);
+    
+    void copy_buffer_to_image(shared_ptr<Image> dst_image, 
+        shared_ptr<Buffer> src_buffer, 
+        VkImageLayout image_layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
+        const vector<VkBufferImageCopy> regions = {}
+    );
+
+    void copy_image(shared_ptr<Image> dst_image, 
+        shared_ptr<Image> src_image, 
+        VkImageLayout dst_image_layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
+        VkImageLayout src_image_layout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 
+        uint32_t region_count = 0,
+        const vector<VkImageCopy> regions = { }
+    );
+
+    void copy_image_to_buffer(shared_ptr<Image> src_image, 
+        shared_ptr<Buffer> dst_buffer, 
+        VkImageLayout src_image_layout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 
+        const vector<VkBufferImageCopy>& regions = {}
+    );
+
+    void draw(uint32_t vertex_count, 
+        uint32_t instance_count = 1, 
+        uint32_t first_vertex = 0, 
+        uint32_t first_instance = 0) ;
+
+    void draw_indexed(uint32_t index_count, 
+        uint32_t instance_count = 1, 
+        uint32_t first_index = 0, 
+        int32_t vertex_offset = 0, 
+        uint32_t first_instance = 0);
+
+    void dispatch(uint32_t group_count_x, uint32_t group_count_y = 1, uint32_t group_count_z = 1);
+
+    // VkResult wait_event() // TODO: Event 구현 후 구현
+    // VkResult reset_event(shared_ptr<Event> &event) // TODO: Event 구현 후 구현
+    // VkResult signal_event(shared_ptr<Event> &event) // TODO: Event 구현 후 구현
+
+    // VkResult barrier() {
+        // vkCmdPipelineBarrier()
+    // }
+
     VkResult begin(VkCommandBufferUsageFlags flags = 0);
 
     VkResult end();
 
     VkResult reset(VkCommandBufferResetFlags flags = 0);
+
+#if defined(VK_VERSION_1_4) 
+#endif
 
     operator VkCommandBuffer() const {
         return command_buffer;

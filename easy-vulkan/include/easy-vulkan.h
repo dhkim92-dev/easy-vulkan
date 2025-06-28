@@ -19,5 +19,6 @@
 #include "ev-shader.h"
 #include "ev-descriptor_set.h"
 #include "ev-pipeline.h"
+#include "ev-sync.h"
 #include "debugger/ev-debug-messenger.h"
 #include "initializer/ev-initializer.h"
