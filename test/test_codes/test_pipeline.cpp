@@ -27,8 +27,7 @@ protected:
         instance = make_shared<Instance>(required_instance_extensions, required_layers, true);
         physical_device = make_shared<PhysicalDevice>(instance, instance->get_physical_devices()[0]);
         device = make_shared<Device>(instance, physical_device, vector<const char*> {"VK_KHR_swapchain"}, VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT);
-        vector<VkAttachmentDescription> attachments = {
-        {
+        vector<VkAttachmentDescription> attachments = {{
             0, // flags
             VK_FORMAT_B8G8R8A8_UNORM, // format
             VK_SAMPLE_COUNT_1_BIT, // samples
@@ -38,15 +37,19 @@ protected:
             VK_ATTACHMENT_STORE_OP_DONT_CARE, // stencilStoreOp
             VK_IMAGE_LAYOUT_UNDEFINED, // initialLayout
             VK_IMAGE_LAYOUT_PRESENT_SRC_KHR // finalLayout
-        }
-        };
+        }};
+
+        vector<VkAttachmentReference> color_attachments = {{
+            0, // attachment index
+            VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL // layout
+        }};
 
         vector<VkSubpassDescription> subpasses = {
             {
                 0, // flags
                 VK_PIPELINE_BIND_POINT_GRAPHICS, // pipelineBindPoint
                 0, nullptr, // inputAttachments
-                0, nullptr, // colorAttachments
+                1, color_attachments.data(), // colorAttachments
                 nullptr, // resolveAttachments
                 nullptr, // depthStencilAttachment
                 0, nullptr // preserveAttachments
@@ -91,9 +94,8 @@ TEST_F(PipelineTest, PipelineLayoutWithPushConstantsCreateTest) {
 TEST_F(PipelineTest, GraphicsPipelineBlueprintManagerCreateTest) {
     GraphicsPipelineBluePrintManager blueprint_manager(device, render_pass);
     shared_ptr<DescriptorSetLayout> descriptor_set_layout = make_shared<DescriptorSetLayout>(device);
-    descriptor_set_layout->add_binding(VK_SHADER_STAGE_VERTEX_BIT, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0);
     descriptor_set_layout->create_layout();
-    vector<shared_ptr<DescriptorSetLayout>> descriptor_set_layouts = {descriptor_set_layout};
+    vector<shared_ptr<DescriptorSetLayout>> descriptor_set_layouts;
     std::shared_ptr<PipelineLayout> pipeline_layout = make_shared<PipelineLayout>(device,descriptor_set_layouts, vector<VkPushConstantRange>());
     shared_ptr<PipelineCache> pipeline_cache = make_shared<PipelineCache>(device, 0, nullptr);
 
@@ -120,9 +122,27 @@ TEST_F(PipelineTest, GraphicsPipelineBlueprintManagerCreateTest) {
 
     EXPECT_FALSE(fragment_shader_code.empty()) << "Fragment shader code should not be empty.";
 
+    // auto input_binding_description = ev::initializer::vertex_input_binding_description(0, sizeof(float) * 3, VK_VERTEX_INPUT_RATE_VERTEX);
+    // auto input_attribute_description = ev::initializer::vertex_input_attribute_description(0, 0);
+
     vector<shared_ptr<GraphicsPipeline>> pipelines = blueprint_manager.begin_blueprint()
         .add_shader_stage(make_shared<Shader>(device, VK_SHADER_STAGE_VERTEX_BIT, vertex_shader_code))
         .add_shader_stage(make_shared<Shader>(device, VK_SHADER_STAGE_FRAGMENT_BIT, fragment_shader_code))
+        .set_input_assembly_state(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
+        // .add_vertex_input_binding_description(input_binding_description)
+        // .add_vertex_attribute_description(input_attribute_description)
+        .set_rasterization_state(VK_POLYGON_MODE_FILL)
+        .set_pipeline_layout(pipeline_layout)
+        .set_color_blend_state()
+        .add_color_blend_attachment_state()
+        .set_viewport_state()
+        .add_viewport(800, 600, 0.0f, 1.0f)
+        .add_scissor(0, 0, 800, 600)
+        .set_multisample_state(VK_SAMPLE_COUNT_1_BIT)
+        .set_depth_stencil_state(VK_FALSE, VK_FALSE)
+        .set_dynamic_state()
+        .add_dynamic_state(VK_DYNAMIC_STATE_VIEWPORT)
+        .add_dynamic_state(VK_DYNAMIC_STATE_SCISSOR)
         .set_pipeline_layout(pipeline_layout)
         .end_blueprint()
         .create_pipelines(pipeline_cache);

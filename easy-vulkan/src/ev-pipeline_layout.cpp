@@ -7,6 +7,8 @@ PipelineLayout::PipelineLayout(std::shared_ptr<Device> _device,
     std::vector<VkPushConstantRange> push_constant_ranges
 )
     : device(std::move(_device)) {
+    logger::Logger::getInstance().debug("Creating PipelineLayout with device: " + std::to_string(reinterpret_cast<uintptr_t>(device.get())));
+    logger::Logger::getInstance().debug("Current handle of PipelineLayout: " + std::to_string(reinterpret_cast<uintptr_t>(layout)));
     // Create the pipeline layout here
     if (!device) {
         logger::Logger::getInstance().error("Invalid device provided for PipelineLayout creation.");
@@ -30,12 +32,15 @@ PipelineLayout::PipelineLayout(std::shared_ptr<Device> _device,
     layout_info.pPushConstantRanges = push_constant_ranges.data();
     layout_info.flags = 0; // No special flags for now
     CHECK_RESULT(vkCreatePipelineLayout(*device, &layout_info, nullptr, &layout));
+    logger::Logger::getInstance().debug("PipelineLayout created successfully. VkPipelineLayout handle: " + std::to_string(reinterpret_cast<uintptr_t>(layout)));
 }
 
 void PipelineLayout::destroy() {
     if (layout != VK_NULL_HANDLE) {
+        logger::Logger::getInstance().debug("Destroying PipelineLayout. " + std::to_string(reinterpret_cast<uintptr_t>(layout)));
         vkDestroyPipelineLayout(*device, layout, nullptr);
         layout = VK_NULL_HANDLE;
+        logger::Logger::getInstance().debug("PipelineLayout destroyed successfully.");
     }
 }
 

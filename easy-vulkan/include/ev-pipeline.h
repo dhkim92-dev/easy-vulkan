@@ -117,30 +117,34 @@ public:
 
 /**
  * @brief Graphics Pipeline Blueprint
- * 그래픽스 파이프라인을 생성하기 위한 청사진 역할을 합니다.
+ * 그래픽스 파이프라인을 생성하기 위한 청사진 역할을 합니다ㅓ
  * 이 클래스는 파이프라인의 상태를 정의하고, 실제 파이프라인을 생성하는 팩토리 클래스를 통해 사용됩니다.
  */
 struct GraphicsPipelineBluePrint {
 
 public:
 
-    VkPipelineVertexInputStateCreateInfo vertex_input_state = {};
+    VkPipelineVertexInputStateCreateInfo vertex_input_state_ci = {.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO};
 
-    VkPipelineInputAssemblyStateCreateInfo input_assembly_state = {};
+    VkPipelineInputAssemblyStateCreateInfo input_assembly_state_ci = {.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO};
 
-    VkPipelineRasterizationStateCreateInfo rasterization_state = {};
+    VkPipelineRasterizationStateCreateInfo rasterization_state_ci = {.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO    };
 
-    VkPipelineColorBlendStateCreateInfo color_blend_state = {};
+    VkPipelineColorBlendStateCreateInfo color_blend_state_ci = {.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO};
 
-    VkPipelineViewportStateCreateInfo viewport_state = {};
+    VkPipelineViewportStateCreateInfo viewport_state_ci = {.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO};
 
-    VkPipelineMultisampleStateCreateInfo multisample_state = {};
+    VkPipelineMultisampleStateCreateInfo multisample_state_ci = {.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO};
 
-    VkPipelineDepthStencilStateCreateInfo depth_stencil_state = {};
+    VkPipelineDepthStencilStateCreateInfo depth_stencil_state_ci = {.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO};
 
-    VkPipelineDynamicStateCreateInfo dynamic_state = {};
+    VkPipelineDynamicStateCreateInfo dynamic_state_ci = {.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO  };
 
-    VkPipelineColorBlendAttachmentState color_blend_attachment_state = {};
+    vector<VkVertexInputAttributeDescription> vertex_attribute_descriptions;
+
+    vector<VkVertexInputBindingDescription> vertex_binding_descriptions;
+
+    vector<VkPipelineColorBlendAttachmentState> color_blend_attachments;
 
     std::vector<VkDynamicState> dynamic_states;
 
@@ -150,103 +154,13 @@ public:
 
     VkPipelineCreateFlags flags = 0;
 
+    vector<float> blend_constants = {0.0f, 0.0f, 0.0f, 0.0f};
+
+    vector<VkViewport> viewports;
+
+    vector<VkRect2D> scissors;
+
     uint32_t subpass = 0;
-
-    GraphicsPipelineBluePrint() { 
-        vertex_input_state = { .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,  
-            .pNext = nullptr,
-            .flags = 0,
-            .vertexBindingDescriptionCount = 0,
-            .pVertexBindingDescriptions = nullptr,
-            .vertexAttributeDescriptionCount = 0,
-            .pVertexAttributeDescriptions = nullptr
-        };
-
-        input_assembly_state = { .sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
-            .pNext = nullptr,
-            .flags = 0,
-            .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
-            .primitiveRestartEnable = VK_FALSE
-        };
-
-        rasterization_state = { .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
-            .pNext = nullptr,
-            .flags = 0,
-            .depthClampEnable = VK_FALSE,
-            .rasterizerDiscardEnable = VK_FALSE,
-            .polygonMode = VK_POLYGON_MODE_FILL,
-            .cullMode = VK_CULL_MODE_BACK_BIT,
-            .frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
-            .depthBiasEnable = VK_FALSE,
-            .depthBiasConstantFactor = 0.0f,
-            .depthBiasClamp = 0.0f,
-            .depthBiasSlopeFactor = 0.0f,
-            .lineWidth = 1.0f
-        };
-
-        color_blend_state = { .sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
-            .pNext = nullptr,
-            .flags = 0xf,
-            .logicOpEnable = VK_FALSE,
-            .logicOp = VK_LOGIC_OP_COPY,
-            .attachmentCount = 1,
-            .pAttachments = &color_blend_attachment_state,
-            .blendConstants = { 0.0f, 0.0f, 0.0f, 0.0f }
-        };
-
-        viewport_state = { .sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
-            .pNext = nullptr,
-            .flags = 0,
-            .viewportCount = 1,
-            .pViewports = nullptr,
-            .scissorCount = 1,
-            .pScissors = nullptr
-        };
-
-        multisample_state = { .sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
-            .pNext = nullptr,
-            .flags = 0,
-            .rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
-            .sampleShadingEnable = VK_FALSE,
-            .minSampleShading = 1.0f,
-            .pSampleMask = nullptr,
-            .alphaToCoverageEnable = VK_FALSE,
-            .alphaToOneEnable = VK_FALSE
-        };
-
-        depth_stencil_state = { 
-	    .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
-            .pNext = nullptr,
-            .flags = 0,
-            .depthTestEnable = VK_TRUE,
-            .depthWriteEnable = VK_TRUE,
-            .depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL,
-            .depthBoundsTestEnable = VK_FALSE,
-            .stencilTestEnable = VK_FALSE,
-	    .front = {VK_STENCIL_OP_KEEP, VK_STENCIL_OP_KEEP, VK_STENCIL_OP_KEEP, VK_COMPARE_OP_ALWAYS, 0, 0, 0},
-            .back = { VK_STENCIL_OP_KEEP, VK_STENCIL_OP_KEEP, VK_STENCIL_OP_KEEP, VK_COMPARE_OP_ALWAYS, 0, 0, 0  },
-            .minDepthBounds = 0.0f,
-            .maxDepthBounds = 1.0f
-        };
-
-        dynamic_state = { .sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
-            .pNext = nullptr,
-            .flags = 0,
-            .dynamicStateCount = 0,
-            .pDynamicStates = nullptr
-        };
-
-        color_blend_attachment_state = { 
-            .blendEnable = VK_FALSE,
-            .srcColorBlendFactor = VK_BLEND_FACTOR_ONE,
-            .dstColorBlendFactor = VK_BLEND_FACTOR_ZERO,
-            .colorBlendOp = VK_BLEND_OP_ADD,
-            .srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
-            .dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
-            .alphaBlendOp = VK_BLEND_OP_ADD,
-            .colorWriteMask =  0xf
-        };
-    }
 };
 
 
@@ -285,39 +199,29 @@ public:
 
     GraphicsPipelineBluePrintManager& add_shader_stage(shared_ptr<Shader> shader);
 
-    // 구조체 내 변수들의 기본값을 지정해서 모두 적기
-    GraphicsPipelineBluePrintManager& set_vertex_input_state(
-        vector<VkVertexInputBindingDescription>& vertexBindingDescriptions,
-        vector<VkVertexInputAttributeDescription>& vertexAttributeDescriptions,
-        VkPipelineVertexInputStateCreateFlags flags = 0
-    );
+    GraphicsPipelineBluePrintManager& add_vertex_input_binding_description(VkVertexInputBindingDescription& binding_description);
 
-    GraphicsPipelineBluePrintManager& set_vertex_input_state(
-        VkPipelineVertexInputStateCreateInfo& info
-    );
+    GraphicsPipelineBluePrintManager& add_vertex_attribute_description(VkVertexInputAttributeDescription& attribute_description);
+
+    // 구조체 내 변수들의 기본값을 지정해서 모두 적기
+    GraphicsPipelineBluePrintManager& set_vertex_input_state(VkPipelineVertexInputStateCreateFlags flags = 0, void* next=nullptr);
 
     GraphicsPipelineBluePrintManager& set_input_assembly_state(
         VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
-        VkBool32 primitiveRestartEnable = VK_FALSE,
-        VkPipelineInputAssemblyStateCreateFlags flags = 0
-    );
-
-    GraphicsPipelineBluePrintManager& set_input_assembly_state(
-        VkPipelineInputAssemblyStateCreateInfo& info
+        VkBool32 primitive_restart_enable = VK_FALSE,
+        VkPipelineInputAssemblyStateCreateFlags flags = 0,
+        void* next = nullptr
     );
 
     GraphicsPipelineBluePrintManager& set_rasterization_state(
-        VkBool32 depthClampEnable = VK_FALSE,
-        VkBool32 rasterizerDiscardEnable = VK_FALSE,
-        VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL,
-        VkCullModeFlags cullMode = VK_CULL_MODE_BACK_BIT,
-        VkFrontFace frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
-        VkBool32 depthBiasEnable = VK_FALSE,
-        float depthBiasConstantFactor = 0.0f,
-        float depthBiasClamp = 0.0f,
-        float depthBiasSlopeFactor = 0.0f,
-        float lineWidth = 1.0f,
-        VkPipelineRasterizationStateCreateFlags flags = 0
+        VkPolygonMode polygon_mode = VK_POLYGON_MODE_FILL,
+        VkCullModeFlags cull_mode = VK_CULL_MODE_BACK_BIT,
+        VkFrontFace front_face = VK_FRONT_FACE_COUNTER_CLOCKWISE,
+        VkBool32 depth_clamp_enable = VK_FALSE,
+        VkBool32 rasterizer_discard_enable = VK_FALSE,
+        float line_width = 1.0f,
+        VkPipelineRasterizationStateCreateFlags flags = 0,
+        void* next = nullptr
     );
 
     GraphicsPipelineBluePrintManager& set_rasterization_state(
@@ -325,35 +229,48 @@ public:
     );
 
     GraphicsPipelineBluePrintManager& set_color_blend_state(
-        vector<VkPipelineColorBlendAttachmentState> attachments = {},
-        VkBool32 logicOpEnable = VK_FALSE,
-        VkLogicOp logicOp = VK_LOGIC_OP_CLEAR,
-        vector<float> blendConstants = {0.0f, 0.0f, 0.0f, 0.0f},
-        VkPipelineColorBlendStateCreateFlags flags = 0
+        VkBool32 logic_op_enable = VK_FALSE,
+        VkLogicOp logic_op = VK_LOGIC_OP_COPY,
+        vector<float> blend_consts = {0.0f, 0.0f, 0.0f, 0.0f},
+        VkPipelineColorBlendStateCreateFlags flags = 0,
+        void* next = nullptr
     );
 
-    GraphicsPipelineBluePrintManager& set_color_blend_state(
-        VkPipelineColorBlendStateCreateInfo& info
+    GraphicsPipelineBluePrintManager& add_color_blend_attachment_state(
+        VkBool32 blend_enable = VK_FALSE,
+        VkBlendFactor src_blend_factor = VK_BLEND_FACTOR_ONE,
+        VkBlendFactor dst_blend_factor= VK_BLEND_FACTOR_ZERO,
+        VkBlendOp op = VK_BLEND_OP_ADD,
+        VkBlendFactor src_alpha_blend_factor = VK_BLEND_FACTOR_ONE,
+        VkBlendFactor dst_alpha_blend_factor = VK_BLEND_FACTOR_ZERO,
+        VkBlendOp alpha_blend_op = VK_BLEND_OP_ADD,
+        VkColorComponentFlags color_write_mask = 0xf
     );
+
+    GraphicsPipelineBluePrintManager& add_color_blend_attachment_state(
+        const VkPipelineColorBlendAttachmentState& attachmentState
+    );
+
+
 
     GraphicsPipelineBluePrintManager& set_viewport_state(
-        vector<VkViewport> viewports = { {0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f} },
-        vector<VkRect2D> scissors = { { {0, 0}, {1, 1} } },
-        VkPipelineViewportStateCreateFlags flags = 0
+        VkPipelineViewportStateCreateFlags flags = 0,
+        void* next = nullptr
     );
 
-    GraphicsPipelineBluePrintManager& set_viewport_state(
-        VkPipelineViewportStateCreateInfo& info
-    );
+    GraphicsPipelineBluePrintManager& add_viewport(uint32_t width, uint32_t height, float minDepth = 0.0f, float maxDepth = 1.0f);
+
+    GraphicsPipelineBluePrintManager& add_scissor(uint32_t width, uint32_t height, int32_t offsetX = 0, int32_t offsetY = 0);
 
     GraphicsPipelineBluePrintManager& set_multisample_state(
-        VkSampleCountFlagBits rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
-        VkBool32 sampleShadingEnable = VK_FALSE,
-        float minSampleShading = 1.0f,
-        const VkSampleMask* pSampleMask = nullptr,
-        VkBool32 alphaToCoverageEnable = VK_FALSE,
-        VkBool32 alphaToOneEnable = VK_FALSE,
-        VkPipelineMultisampleStateCreateFlags flags = 0
+        VkSampleCountFlagBits rasterization_samples = VK_SAMPLE_COUNT_1_BIT,
+        VkBool32 sample_shading_enable = VK_FALSE,
+        float min_sample_shading = 1.0f,
+        const VkSampleMask* sample_mask_optr = nullptr,
+        VkBool32 alpha_to_coverage_enable = VK_FALSE,
+        VkBool32 alpha_to_one_enable = VK_FALSE,
+        VkPipelineMultisampleStateCreateFlags flags = 0,
+        void* next = nullptr
     );
 
     GraphicsPipelineBluePrintManager& set_multisample_state(
@@ -361,16 +278,17 @@ public:
     );
 
     GraphicsPipelineBluePrintManager& set_depth_stencil_state(
-        VkBool32 depthTestEnable = VK_TRUE,
-        VkBool32 depthWriteEnable = VK_TRUE,
-        VkCompareOp depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL,
-        VkBool32 depthBoundsTestEnable = VK_FALSE,
-        VkBool32 stencilTestEnable = VK_FALSE,
+        VkBool32 depth_test_enable = VK_TRUE,
+        VkBool32 depth_write_enable = VK_TRUE,
+        VkCompareOp depth_compare_op = VK_COMPARE_OP_LESS_OR_EQUAL,
+        VkBool32 depth_bounds_test_enable = VK_FALSE,
+        VkBool32 stencil_test_enable = VK_FALSE,
         const VkStencilOpState front = { VK_STENCIL_OP_KEEP, VK_STENCIL_OP_KEEP, VK_STENCIL_OP_KEEP, VK_COMPARE_OP_ALWAYS, 0, 0, 0 },
         const VkStencilOpState back = { VK_STENCIL_OP_KEEP, VK_STENCIL_OP_KEEP, VK_STENCIL_OP_KEEP, VK_COMPARE_OP_ALWAYS, 0, 0, 0 },
-        float minDepthBounds = 0.0f,
-        float maxDepthBounds = 1.0f,
-        VkPipelineDepthStencilStateCreateFlags flags = 0
+        float min_depth_bounds = 0.0f,
+        float max_depth_bounds = 1.0f,
+        VkPipelineDepthStencilStateCreateFlags flags = 0,
+        void* next = nullptr
     );
 
     GraphicsPipelineBluePrintManager& set_depth_stencil_state(
@@ -378,28 +296,11 @@ public:
     );
 
     GraphicsPipelineBluePrintManager& set_dynamic_state(
-        const vector<VkDynamicState>& dynamicStates = {},
-        VkPipelineDynamicStateCreateFlags flags = 0
+        VkPipelineDynamicStateCreateFlags flags = 0,
+        void* next = nullptr
     );
 
-    GraphicsPipelineBluePrintManager& set_dynamic_state(
-        VkPipelineDynamicStateCreateInfo& info
-    );
-
-    GraphicsPipelineBluePrintManager& set_color_blend_attachment_state(
-        VkBool32 blendEnable = VK_FALSE,
-        VkBlendFactor srcColorBlendFactor = VK_BLEND_FACTOR_ONE,
-        VkBlendFactor dstColorBlendFactor = VK_BLEND_FACTOR_ZERO,
-        VkBlendOp colorBlendOp = VK_BLEND_OP_ADD,
-        VkBlendFactor srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
-        VkBlendFactor dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
-        VkBlendOp alphaBlendOp = VK_BLEND_OP_ADD,
-        VkColorComponentFlags colorWriteMask = 0xf
-    );
-
-    GraphicsPipelineBluePrintManager& set_color_blend_attachment_state(
-        VkPipelineColorBlendAttachmentState& attachmentState
-    );
+    GraphicsPipelineBluePrintManager& add_dynamic_state(VkDynamicState dynamicState);
 
     GraphicsPipelineBluePrintManager& set_pipeline_layout(shared_ptr<PipelineLayout> layout);
 
@@ -411,5 +312,6 @@ public:
 
     vector<shared_ptr<GraphicsPipeline>> create_pipelines(shared_ptr<PipelineCache> pipeline_cache = nullptr);
 };
+
 
 } // namespace ev
