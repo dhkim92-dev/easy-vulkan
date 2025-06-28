@@ -8,8 +8,18 @@ protected:
     std::shared_ptr<ev::Device> device;
 
     void SetUp() override {
-        // ev::logger::Logger::getInstance().set_log_level(INFO);
-        instance = std::make_shared<ev::Instance>(std::vector<const char*>(), std::vector<const char*>(), false);
+        ev::logger::Logger::getInstance().set_log_level(ev::logger::LogLevel::DEBUG);
+	std::vector<const char*> instance_extensions = {
+		VK_KHR_SURFACE_EXTENSION_NAME,
+		VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
+#ifdef __APPLE__
+		VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME
+#endif
+	};
+	std::vector<const char*> instance_layers = {
+		"VK_LAYER_KHRONOS_validation"
+	};
+        instance = std::make_shared<ev::Instance>(instance_extensions, instance_layers, true);
         physical_device = std::make_shared<ev::PhysicalDevice>(instance, ev::utility::list_physical_devices(*instance)[0]);
         device = std::make_shared<ev::Device>(instance, physical_device, std::vector<const char*>());
     }
