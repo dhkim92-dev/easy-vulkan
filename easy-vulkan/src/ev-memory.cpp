@@ -18,7 +18,7 @@ Memory::Memory(
     }
     VkMemoryAllocateInfo mem_ai = {};
     mem_ai.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    mem_ai.allocationSize = size;
+    mem_ai.allocationSize = memory_requirements.size;
     mem_ai.memoryTypeIndex = device->get_memory_type_index(
         memory_requirements.memoryTypeBits,
         memory_property_flags,

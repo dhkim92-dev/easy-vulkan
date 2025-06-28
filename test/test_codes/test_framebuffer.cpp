@@ -50,10 +50,10 @@ protected:
         };
 
         render_pass = make_shared<ev::RenderPass>(device, attachments, subpasses);
-        image = make_shared<ev::Image>(device, VK_IMAGE_TYPE_2D, VK_FORMAT_R8G8B8A8_UNORM, 800, 600);
+        image = make_shared<ev::Image>(device, VK_IMAGE_TYPE_2D, VK_FORMAT_B8G8R8A8_UNORM, 800, 600);
         memory = make_shared<ev::Memory>(device, image->get_memory_requirements().size, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image->get_memory_requirements(), nullptr);
 	image->bind_memory(memory, 0);
-        attachment = make_shared<ev::ImageView>(device, image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_VIEW_TYPE_2D);
+        attachment = make_shared<ev::ImageView>(device, image, VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_VIEW_TYPE_2D);
     }
 };
 
