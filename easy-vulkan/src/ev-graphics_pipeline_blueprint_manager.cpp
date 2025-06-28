@@ -1,4 +1,5 @@
 #include "ev-pipeline.h"
+#include <algorithm>
 
 using namespace std;
 using namespace ev;
@@ -45,100 +46,57 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_shader_s
     return *this;
 }
 
-GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_vertex_input_state(
-    vector<VkVertexInputBindingDescription>& vertexBindingDescriptions,
-    vector<VkVertexInputAttributeDescription>& vertexAttributeDescriptions,
-    VkPipelineVertexInputStateCreateFlags flags
+GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_vertex_input_binding_description(
+    VkVertexInputBindingDescription& binding_description
 ) {
     if (!on_record) {
         logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
-    blue_prints.back().vertex_input_state = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-        .pNext = nullptr,
-        .flags = flags,
-        .vertexBindingDescriptionCount = static_cast<uint32_t>(vertexBindingDescriptions.size()),
-        .pVertexBindingDescriptions = vertexBindingDescriptions.data(),
-        .vertexAttributeDescriptionCount = static_cast<uint32_t>(vertexAttributeDescriptions.size()),
-        .pVertexAttributeDescriptions = vertexAttributeDescriptions.data()
-    };
+    blue_prints.back().vertex_binding_descriptions.push_back(binding_description);
+    return *this;
+}
+
+GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_vertex_attribute_description(
+    VkVertexInputAttributeDescription& attribute_description
+) {
+    if (!on_record) {
+        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        return *this;
+    }
+    blue_prints.back().vertex_attribute_descriptions.push_back(attribute_description);
     return *this;
 }
 
 GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_vertex_input_state(
-    VkPipelineVertexInputStateCreateInfo& info
+    VkPipelineVertexInputStateCreateFlags flags,
+    void* next
 ) {
     if (!on_record) {
         logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
-    blue_prints.back().vertex_input_state = info;
+
+    blue_prints.back().vertex_input_state_ci.flags = flags;
+    blue_prints.back().vertex_input_state_ci.pNext = next;
     return *this;
 }
 
 GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_input_assembly_state(
     VkPrimitiveTopology topology,
     VkBool32 primitiveRestartEnable,
-    VkPipelineInputAssemblyStateCreateFlags flags
+    VkPipelineInputAssemblyStateCreateFlags flags,
+    void* next
 ) {
     if (!on_record) {
         logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
-    blue_prints.back().input_assembly_state = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
-        .pNext = nullptr,
-        .flags = flags,
-        .topology = topology,
-        .primitiveRestartEnable = primitiveRestartEnable
-    };
-    return *this;
-}
-
-GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_input_assembly_state(
-    VkPipelineInputAssemblyStateCreateInfo& info
-) {
-    if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
-        return *this;
-    }
-    blue_prints.back().input_assembly_state = info;
-    return *this;
-}
-
-GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_rasterization_state(
-    VkBool32 depthClampEnable,
-    VkBool32 rasterizerDiscardEnable,
-    VkPolygonMode polygonMode,
-    VkCullModeFlags cullMode,
-    VkFrontFace frontFace,
-    VkBool32 depthBiasEnable,
-    float depthBiasConstantFactor,
-    float depthBiasClamp,
-    float depthBiasSlopeFactor,
-    float lineWidth,
-    VkPipelineRasterizationStateCreateFlags flags
-) {
-    if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
-        return *this;
-    }
-    blue_prints.back().rasterization_state = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
-        .pNext = nullptr,
-        .flags = flags,
-        .depthClampEnable = depthClampEnable,
-        .rasterizerDiscardEnable = rasterizerDiscardEnable,
-        .polygonMode = polygonMode,
-        .cullMode = cullMode,
-        .frontFace = frontFace,
-        .depthBiasEnable = depthBiasEnable,
-        .depthBiasConstantFactor = depthBiasConstantFactor,
-        .depthBiasClamp = depthBiasClamp,
-        .depthBiasSlopeFactor = depthBiasSlopeFactor,
-        .lineWidth = lineWidth
-    };
+    auto& info = blue_prints.back().input_assembly_state_ci;
+    info.topology = topology;
+    info.primitiveRestartEnable = primitiveRestartEnable;
+    info.flags = flags;
+    info.pNext = next;
     return *this;
 }
 
@@ -149,103 +107,166 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_rasteriz
         logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
-    blue_prints.back().rasterization_state = info;
+    blue_prints.back().rasterization_state_ci = info;
+    return *this;
+}
+
+GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_rasterization_state(
+    VkPolygonMode polygon_mode,
+    VkCullModeFlags cull_mode,
+    VkFrontFace front_face,
+    VkBool32 depth_clamp_enable,
+    VkBool32 rasterizer_discard_enable,
+    float line_width,
+    VkPipelineRasterizationStateCreateFlags flags,
+    void* next
+) {
+    if (!on_record) {
+        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        return *this;
+    }
+    auto& ci = blue_prints.back().rasterization_state_ci;
+    ci.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    ci.pNext = next;
+    ci.flags = flags;
+    ci.polygonMode = polygon_mode;
+    ci.cullMode = cull_mode;
+    ci.frontFace = front_face;
+    ci.depthClampEnable = depth_clamp_enable;
+    ci.rasterizerDiscardEnable = rasterizer_discard_enable;
+    ci.lineWidth = line_width;
     return *this;
 }
 
 GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_color_blend_state(
-    vector<VkPipelineColorBlendAttachmentState> attachments,
-    VkBool32 logicOpEnable,
-    VkLogicOp logicOp,
-    vector<float> blendConstants,
-    VkPipelineColorBlendStateCreateFlags flags
+    VkBool32 logic_op_enable,
+    VkLogicOp logic_op,
+    vector<float> blend_constants,
+    VkPipelineColorBlendStateCreateFlags flags,
+    void* next
 ) {
     if (!on_record) {
         logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
-
-    blue_prints.back().color_blend_state = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
-        .pNext = nullptr,
-        .flags = flags,
-        .logicOpEnable = logicOpEnable,
-        .logicOp = logicOp,
-        .attachmentCount = static_cast<uint32_t>(attachments.size()),
-        .pAttachments = attachments.data(),
-        .blendConstants = {blendConstants[0], blendConstants[1], blendConstants[2], blendConstants[3]}
-    };
-    blue_prints.back().color_blend_attachment_state = attachments.empty() ? VkPipelineColorBlendAttachmentState{} : attachments[0];
+    auto& ci = blue_prints.back().color_blend_state_ci;
+    ci.logicOpEnable = logic_op_enable;
+    ci.logicOp = logic_op;
+    ci.flags = flags;
+    ci.pNext = next;
+    std::copy(blue_prints.back().blend_constants.begin(), blue_prints.back().blend_constants.end(), ci.blendConstants);
     return *this;
 }
 
-GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_color_blend_state(
-    VkPipelineColorBlendStateCreateInfo& info
+GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_color_blend_attachment_state(
+    VkBool32 blend_enable,
+    VkBlendFactor src_blend_factor,
+    VkBlendFactor dst_blend_factor,
+    VkBlendOp op,
+    VkBlendFactor src_alpha_blend_factor,
+    VkBlendFactor dst_alpha_blend_factor,
+    VkBlendOp alpha_blend_op,
+    VkColorComponentFlags color_write_mask
 ) {
     if (!on_record) {
         logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
-    blue_prints.back().color_blend_state = info;
+    blue_prints.back().color_blend_attachments.push_back({
+        .blendEnable = blend_enable,
+        .srcColorBlendFactor = src_blend_factor,
+        .dstColorBlendFactor = dst_blend_factor,
+        .colorBlendOp = op,
+        .srcAlphaBlendFactor = src_alpha_blend_factor,
+        .dstAlphaBlendFactor = dst_alpha_blend_factor,
+        .alphaBlendOp = alpha_blend_op,
+        .colorWriteMask = color_write_mask
+    });
+    return *this;
+}
+
+GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_color_blend_attachment_state(
+    const VkPipelineColorBlendAttachmentState& attachment_state
+) {
+    if (!on_record) {
+        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        return *this;
+    }
+    blue_prints.back().color_blend_attachments.push_back(attachment_state);
+
     return *this;
 }
 
 GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_viewport_state(
-    vector<VkViewport> viewports,
-    vector<VkRect2D> scissors,
-    VkPipelineViewportStateCreateFlags flags
+    VkPipelineViewportStateCreateFlags flags,
+    void * next
 ) {
     if (!on_record) {
         logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
-    blue_prints.back().viewport_state = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
-        .pNext = nullptr,
-        .flags = flags,
-        .viewportCount = static_cast<uint32_t>(viewports.size()),
-        .pViewports = viewports.data(),
-        .scissorCount = static_cast<uint32_t>(scissors.size()),
-        .pScissors = scissors.data()
-    };
+    auto& ci = blue_prints.back().viewport_state_ci;
+    ci.pNext = next;
+    ci.flags = flags;
     return *this;
 }
 
-GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_viewport_state(
-    VkPipelineViewportStateCreateInfo& info
+GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_viewport(
+    uint32_t width, uint32_t height, float min_depth, float max_depth
 ) {
     if (!on_record) {
         logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
-    blue_prints.back().viewport_state = info;
+    blue_prints.back().viewports.push_back({
+        .x = 0.0f,
+        .y = 0.0f,
+        .width = static_cast<float>(width),
+        .height = static_cast<float>(height),
+        .minDepth = min_depth,
+        .maxDepth = max_depth
+    });
+    return *this;
+}
+
+GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_scissor(
+    uint32_t width, uint32_t height, int32_t offsetX, int32_t offsetY
+) {
+    if (!on_record) {
+        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        return *this;
+    }
+    blue_prints.back().scissors.push_back({
+        .offset = {offsetX, offsetY},
+        .extent = {width, height}
+    });
     return *this;
 }
 
 GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_multisample_state(
-    VkSampleCountFlagBits rasterizationSamples,
-    VkBool32 sampleShadingEnable,
-    float minSampleShading,
-    const VkSampleMask* pSampleMask,
-    VkBool32 alphaToCoverageEnable,
-    VkBool32 alphaToOneEnable,
-    VkPipelineMultisampleStateCreateFlags flags
+    VkSampleCountFlagBits rasterization_samples,
+    VkBool32 sample_shading_enable,
+    float min_sample_shading,
+    const VkSampleMask* p_sample_mask,
+    VkBool32 alpha_to_coverage_enable,
+    VkBool32 alpha_to_one_enable,
+    VkPipelineMultisampleStateCreateFlags flags,
+    void* next
 ) {
     if (!on_record) {
         logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
-    blue_prints.back().multisample_state = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
-        .pNext = nullptr,
-        .flags = flags,
-        .rasterizationSamples = rasterizationSamples,
-        .sampleShadingEnable = sampleShadingEnable,
-        .minSampleShading = minSampleShading,
-        .pSampleMask = pSampleMask,
-        .alphaToCoverageEnable = alphaToCoverageEnable,
-        .alphaToOneEnable = alphaToOneEnable
-    };
+    auto& ci = blue_prints.back().multisample_state_ci;
+    ci.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+    ci.pNext = next;
+    ci.flags = flags;
+    ci.rasterizationSamples = rasterization_samples;
+    ci.sampleShadingEnable = sample_shading_enable;
+    ci.minSampleShading = min_sample_shading;
+    ci.pSampleMask = p_sample_mask;
+    ci.alphaToCoverageEnable = alpha_to_coverage_enable;
+    ci.alphaToOneEnable = alpha_to_one_enable;
     return *this;
 }
 
@@ -256,40 +277,41 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_multisam
         logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
-    blue_prints.back().multisample_state = info;
+    auto& ci = blue_prints.back().multisample_state_ci;
+    ci = info;
     return *this;
 }
 
 GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_depth_stencil_state(
-    VkBool32 depthTestEnable,
-    VkBool32 depthWriteEnable,
-    VkCompareOp depthCompareOp,
-    VkBool32 depthBoundsTestEnable,
-    VkBool32 stencilTestEnable,
-    VkStencilOpState front,
-    VkStencilOpState back,
-    float minDepthBounds,
-    float maxDepthBounds,
-    VkPipelineDepthStencilStateCreateFlags flags
+    VkBool32 depth_test_enable,
+    VkBool32 depth_write_enable,
+    VkCompareOp depth_compare_op,
+    VkBool32 depth_bounds_test_enable,
+    VkBool32 stencil_test_enable,
+    const VkStencilOpState front,
+    const VkStencilOpState back,
+    float min_depth_bounds,
+    float max_depth_bounds,
+    VkPipelineDepthStencilStateCreateFlags flags,
+    void* next
 ) {
     if (!on_record) {
         logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
-    blue_prints.back().depth_stencil_state = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
-        .pNext = nullptr,
-        .flags = flags,
-        .depthTestEnable = depthTestEnable,
-        .depthWriteEnable = depthWriteEnable,
-        .depthCompareOp = depthCompareOp,
-        .depthBoundsTestEnable = depthBoundsTestEnable,
-        .stencilTestEnable = stencilTestEnable,
-        .front = front,
-        .back = back,
-        .minDepthBounds = minDepthBounds,
-        .maxDepthBounds = maxDepthBounds
-    };
+    auto& info = blue_prints.back().depth_stencil_state_ci;
+    info.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+    info.pNext = next;
+    info.flags = flags;
+    info.depthTestEnable = depth_test_enable;
+    info.depthWriteEnable = depth_write_enable;
+    info.depthCompareOp = depth_compare_op;
+    info.depthBoundsTestEnable = depth_bounds_test_enable;
+    info.stencilTestEnable = stencil_test_enable;
+    info.front = front;
+    info.back = back;
+    info.minDepthBounds = min_depth_bounds;
+    info.maxDepthBounds = max_depth_bounds;
     return *this;
 }
 
@@ -300,37 +322,31 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_depth_st
         logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
-    blue_prints.back().depth_stencil_state = info;
+    blue_prints.back().depth_stencil_state_ci = info;
     return *this;
 }
 
 GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_dynamic_state(
-    const std::vector<VkDynamicState>& dynamicStates,
-    VkPipelineDynamicStateCreateFlags flags
+    VkPipelineDynamicStateCreateFlags flags,
+    void* next
 ) {
     if (!on_record) {
         logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
-    blue_prints.back().dynamic_states = dynamicStates;
-    blue_prints.back().dynamic_state = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
-        .pNext = nullptr,
-        .flags = 0,
-        .dynamicStateCount = static_cast<uint32_t>(dynamicStates.size()),
-        .pDynamicStates = dynamicStates.data()
-    };
+    auto& ci = blue_prints.back().dynamic_state_ci;
+    ci.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    ci.pNext = nullptr;
+    ci.flags = flags;
     return *this;
 }
 
-GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_dynamic_state(
-    VkPipelineDynamicStateCreateInfo& info
-) {
+GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_dynamic_state(VkDynamicState state) {
     if (!on_record) {
         logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
-    blue_prints.back().dynamic_state = info;
+    blue_prints.back().dynamic_states.push_back(state);
     return *this;
 }
 
@@ -344,17 +360,6 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_pipeline
         return *this;
     }
     blue_prints.back().pipeline_layout = layout;
-    return *this;
-}
-
-GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_color_blend_attachment_state(
-    VkPipelineColorBlendAttachmentState& attachmentState
-) {
-    if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
-        return *this;
-    }
-    blue_prints.back().color_blend_attachment_state = attachmentState;
     return *this;
 }
 
@@ -386,7 +391,7 @@ vector<shared_ptr<GraphicsPipeline>> GraphicsPipelineBluePrintManager::create_pi
     vector<shared_ptr<GraphicsPipeline>> pipelines;
     vector<VkPipeline> vk_pipelines(this->blue_prints.size());
     vector<VkGraphicsPipelineCreateInfo> pipeline_cis;
-    for (const auto& blueprint : blue_prints) {
+    for (auto& blueprint : blue_prints) {
         if (!blueprint.pipeline_layout) {
             logger::Logger::getInstance().error("Pipeline layout is not set for the blueprint.");
             continue;
@@ -398,16 +403,53 @@ vector<shared_ptr<GraphicsPipeline>> GraphicsPipelineBluePrintManager::create_pi
         pipeline_ci.flags = blueprint.flags;
         pipeline_ci.stageCount = static_cast<uint32_t>(blueprint.shader_stages.size());
         pipeline_ci.pStages = blueprint.shader_stages.data();
-        pipeline_ci.pVertexInputState = &blueprint.vertex_input_state;
-        pipeline_ci.pInputAssemblyState = &blueprint.input_assembly_state;
-        pipeline_ci.pRasterizationState = &blueprint.rasterization_state;
-        pipeline_ci.pColorBlendState = &blueprint.color_blend_state;
-        pipeline_ci.pViewportState = &blueprint.viewport_state;
-        pipeline_ci.pMultisampleState = &blueprint.multisample_state;
-        pipeline_ci.pDepthStencilState = &blueprint.depth_stencil_state;
-        pipeline_ci.pDynamicState = &blueprint.dynamic_state;
+
+        /* --- Vertex Input State Create Info Setting --- */
+        blueprint.vertex_input_state_ci.pVertexAttributeDescriptions = blueprint.vertex_attribute_descriptions.data();
+        blueprint.vertex_input_state_ci.vertexAttributeDescriptionCount = static_cast<uint32_t>(blueprint.vertex_attribute_descriptions.size());
+        blueprint.vertex_input_state_ci.pVertexBindingDescriptions = blueprint.vertex_binding_descriptions.data();
+        blueprint.vertex_input_state_ci.vertexBindingDescriptionCount = static_cast<uint32_t>(blueprint.vertex_binding_descriptions.size());
+        pipeline_ci.pVertexInputState = &blueprint.vertex_input_state_ci;
+
+        /* --- Input Assembly State Create Info Setting --- */
+        pipeline_ci.pInputAssemblyState = &blueprint.input_assembly_state_ci;
+
+        /* --- Rasterization State Create Info Setting --- */
+        pipeline_ci.pRasterizationState = &blueprint.rasterization_state_ci;
+
+        /* --- Color Blend State Create Info Setting --- */
+        blueprint.color_blend_state_ci.attachmentCount = static_cast<uint32_t>(blueprint.color_blend_attachments.size());
+        blueprint.color_blend_state_ci.pAttachments = blueprint.color_blend_attachments.data();
+        blueprint.color_blend_state_ci.blendConstants[0] = blueprint.blend_constants[0];
+        blueprint.color_blend_state_ci.blendConstants[1] = blueprint.blend_constants[1];
+        blueprint.color_blend_state_ci.blendConstants[2] = blueprint.blend_constants[2];
+        blueprint.color_blend_state_ci.blendConstants[3] = blueprint.blend_constants[3];
+        pipeline_ci.pColorBlendState = &blueprint.color_blend_state_ci;
+
+        /* --- Viewport State Create Info Setting --- */
+        if (blueprint.rasterization_state_ci.rasterizerDiscardEnable == VK_TRUE ) {
+            pipeline_ci.pViewportState = nullptr;
+        } else {
+            blueprint.viewport_state_ci.viewportCount = static_cast<uint32_t>(blueprint.viewports.size());
+            blueprint.viewport_state_ci.pViewports = blueprint.viewports.data();
+            blueprint.viewport_state_ci.scissorCount = static_cast<uint32_t>(blueprint.scissors.size());
+            blueprint.viewport_state_ci.pScissors = blueprint.scissors.data();
+            logger::Logger::getInstance().debug("Viewport count : " + std::to_string(blueprint.viewport_state_ci.viewportCount));
+            logger::Logger::getInstance().debug("Scissor count : " + std::to_string(blueprint.viewport_state_ci.scissorCount));
+            pipeline_ci.pViewportState = &blueprint.viewport_state_ci;
+        }
+        pipeline_ci.pMultisampleState = &blueprint.multisample_state_ci;
+        pipeline_ci.pDepthStencilState = &blueprint.depth_stencil_state_ci;
+
+        if ( blueprint.dynamic_states.empty() ) {
+            pipeline_ci.pDynamicState = nullptr; // No dynamic states
+        } else {
+            blueprint.dynamic_state_ci.dynamicStateCount = static_cast<uint32_t>(blueprint.dynamic_states.size());
+            blueprint.dynamic_state_ci.pDynamicStates = blueprint.dynamic_states.data();
+            pipeline_ci.pDynamicState = &blueprint.dynamic_state_ci;
+        }
         pipeline_ci.layout = *blueprint.pipeline_layout;
-        pipeline_ci.renderPass = *render_pass; // Render pass should be set later
+        pipeline_ci.renderPass = *render_pass;  
         pipeline_ci.subpass = blueprint.subpass;
         pipeline_cis.emplace_back(pipeline_ci);
     }

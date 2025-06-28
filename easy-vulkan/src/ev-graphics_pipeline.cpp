@@ -15,10 +15,6 @@ void GraphicsPipeline::destroy() {
         vkDestroyPipeline(*device, pipeline, nullptr);
         pipeline = VK_NULL_HANDLE;
     }
-    if (layout != VK_NULL_HANDLE) {
-        vkDestroyPipelineLayout(*device, layout, nullptr);
-        layout = VK_NULL_HANDLE;
-    }
 }
 
 GraphicsPipeline::~GraphicsPipeline() {
