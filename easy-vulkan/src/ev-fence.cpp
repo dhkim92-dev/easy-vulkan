@@ -21,7 +21,37 @@ Fence::Fence(shared_ptr<Device> device, VkFenceCreateFlags flags, void* next)
         exit(EXIT_FAILURE);
     }
     logger::Logger::getInstance().debug("Fence created successfully");
-};
+}
+
+VkResult Fence::wait(uint64_t timeout) {
+    if (fence == VK_NULL_HANDLE) {
+        logger::Logger::getInstance().error("Fence is not initialized");
+        return VK_ERROR_INITIALIZATION_FAILED;
+    }
+
+    VkResult result = vkWaitForFences(*device, 1, &fence, VK_TRUE, timeout);
+    if (result != VK_SUCCESS) {
+        logger::Logger::getInstance().error("Failed to wait for fence: " + std::to_string(result));
+    } else {
+        logger::Logger::getInstance().debug("Fence waited successfully");
+    }
+    return result;
+}
+
+VkResult Fence::reset() {
+    if (fence == VK_NULL_HANDLE) {
+        logger::Logger::getInstance().error("Fence is not initialized");
+        return VK_ERROR_INITIALIZATION_FAILED;
+    }
+
+    VkResult result = vkResetFences(*device, 1, &fence);
+    if (result != VK_SUCCESS) {
+        logger::Logger::getInstance().error("Failed to reset fence: " + std::to_string(result));
+    } else {
+        logger::Logger::getInstance().debug("Fence reset successfully");
+    }
+    return result;
+}
 
 void Fence::destroy() {
     if (fence != VK_NULL_HANDLE) {

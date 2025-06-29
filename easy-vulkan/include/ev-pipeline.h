@@ -63,7 +63,7 @@ public:
      * 
      */
     explicit PipelineLayout(std::shared_ptr<Device> _device,
-        std::vector<std::shared_ptr<DescriptorSetLayout>>& descriptor_set_layouts,
+        std::vector<std::shared_ptr<DescriptorSetLayout>> descriptor_set_layouts,
         std::vector<VkPushConstantRange> push_constant_ranges = {}
     );
 
@@ -199,9 +199,22 @@ public:
 
     GraphicsPipelineBluePrintManager& add_shader_stage(shared_ptr<Shader> shader);
 
+    GraphicsPipelineBluePrintManager& add_vertex_input_binding_description(
+        uint32_t binding,
+        uint32_t stride,
+        VkVertexInputRate input_rate = VK_VERTEX_INPUT_RATE_VERTEX
+    );
+
     GraphicsPipelineBluePrintManager& add_vertex_input_binding_description(VkVertexInputBindingDescription& binding_description);
 
     GraphicsPipelineBluePrintManager& add_vertex_attribute_description(VkVertexInputAttributeDescription& attribute_description);
+
+    GraphicsPipelineBluePrintManager& add_vertex_attribute_description(
+        uint32_t binding,
+        uint32_t location,
+        VkFormat format,
+        uint32_t offset
+    );
 
     // 구조체 내 변수들의 기본값을 지정해서 모두 적기
     GraphicsPipelineBluePrintManager& set_vertex_input_state(VkPipelineVertexInputStateCreateFlags flags = 0, void* next=nullptr);

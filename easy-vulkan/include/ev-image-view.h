@@ -32,10 +32,10 @@ private:
 
 public:
 
-    ImageView(shared_ptr<Device> device, 
+    explicit ImageView(shared_ptr<Device> device, 
         shared_ptr<Image> image,
-        VkFormat format = VK_FORMAT_UNDEFINED,
         VkImageViewType view_type = VK_IMAGE_VIEW_TYPE_MAX_ENUM,
+        VkFormat format = VK_FORMAT_UNDEFINED,
         VkComponentMapping components = {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY},
         VkImageSubresourceRange subresource_range = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1}
     );

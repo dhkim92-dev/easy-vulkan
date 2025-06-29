@@ -284,5 +284,24 @@ namespace initializer {
         return info;
     }
 
+    inline VkStencilOpState stencil_op_state(
+        VkStencilOp failOp = VK_STENCIL_OP_KEEP,
+        VkStencilOp passOp = VK_STENCIL_OP_KEEP,
+        VkStencilOp depthFailOp = VK_STENCIL_OP_KEEP,
+        VkCompareOp compareOp = VK_COMPARE_OP_ALWAYS,
+        uint32_t compareMask = 0,
+        uint32_t writeMask = 0,
+        uint32_t reference = 0
+    ) {
+        VkStencilOpState state = {};
+        state.failOp = failOp;
+        state.passOp = passOp;
+        state.depthFailOp = depthFailOp;
+        state.compareOp = compareOp;
+        state.compareMask = compareMask;
+        state.writeMask = writeMask;
+        state.reference = reference;
+        return state;
+    }
 }
 }

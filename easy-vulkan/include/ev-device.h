@@ -26,6 +26,8 @@ class Device {
 
     std::vector<VkQueueFamilyProperties> queue_family_properties;
 
+    bool use_swapchain = true;
+
     struct QueueFamilyIndices {
 
         uint32_t graphics = UINT32_MAX;
@@ -43,13 +45,15 @@ class Device {
 
     uint32_t get_queue_family_index(VkQueueFlags flags) const;
 
+
     public:
 
     explicit Device(
         std::shared_ptr<Instance> instance, 
         std::shared_ptr<PhysicalDevice> pdeivce,
         vector<const char*> required_extensions,
-        VkQueueFlags queue_flags = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT
+        VkQueueFlags queue_flags = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT,
+        bool use_swapchain = true
     );
 
     Device& operator=(const Device&) = delete;
@@ -57,6 +61,8 @@ class Device {
     Device(const Device&) = delete;
 
     ~Device();
+
+    void destroy();
 
     uint32_t get_queue_index(VkQueueFlags flags) const;
 
@@ -97,6 +103,10 @@ class Device {
 
     const VkPhysicalDeviceFeatures get_features() const {
         return pdevice->get_features();
+    }
+
+    const bool is_swapchain_enabled() const {
+        return use_swapchain;
     }
 };
 

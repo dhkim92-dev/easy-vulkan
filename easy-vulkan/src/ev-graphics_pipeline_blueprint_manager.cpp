@@ -47,6 +47,23 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_shader_s
 }
 
 GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_vertex_input_binding_description(
+    uint32_t binding,
+    uint32_t stride,
+    VkVertexInputRate input_rate) {
+    if (!on_record) {
+        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        return *this;
+    }
+
+    VkVertexInputBindingDescription description = {};
+    description.binding = binding; // Default binding index
+    description.stride = stride; // Default stride, should be set later
+    description.inputRate = VK_VERTEX_INPUT_RATE_VERTEX; // Default input rate
+    this->blue_prints.back().vertex_binding_descriptions.push_back(description);
+    return *this;
+}
+
+GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_vertex_input_binding_description(
     VkVertexInputBindingDescription& binding_description
 ) {
     if (!on_record) {
@@ -54,6 +71,25 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_vertex_i
         return *this;
     }
     blue_prints.back().vertex_binding_descriptions.push_back(binding_description);
+    return *this;
+}
+
+GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_vertex_attribute_description(
+    uint32_t binding,
+    uint32_t location,
+    VkFormat format,
+    uint32_t offset
+) {
+    if (!on_record) {
+        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        return *this;
+    }
+    VkVertexInputAttributeDescription attribute_description = {};
+    attribute_description.location = location;
+    attribute_description.binding = binding;
+    attribute_description.format = format;
+    attribute_description.offset = offset;
+    blue_prints.back().vertex_attribute_descriptions.push_back(attribute_description);
     return *this;
 }
 

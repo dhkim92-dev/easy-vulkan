@@ -143,8 +143,8 @@ vector<VkPhysicalDevice> ev::Instance::get_physical_devices() const {
     return ev::utility::list_physical_devices(instance);
 }
 
-Instance::~Instance() {
-    if (!is_valid()) {
+void ev::Instance::destroy() {
+    if (  !is_valid() ) {
         return;
     }
 
@@ -152,14 +152,18 @@ Instance::~Instance() {
         auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
         if (func) {
             func(instance, debug_messenger, nullptr);
+            debug_messenger = VK_NULL_HANDLE;
+            Logger::getInstance().info("Debug messenger destroyed.");
         } else {
-            ev::logger::Logger::getInstance().error("Failed to get vkDestroyDebugUtilsMessengerEXT function pointer.");
+            Logger::getInstance().error("Failed to get vkDestroyDebugUtilsMessengerEXT function pointer.");
         }
-        debug_messenger = VK_NULL_HANDLE;
-        ev::logger::Logger::getInstance().info("Debug messenger destroyed.");
     }
 
     vkDestroyInstance(instance, nullptr);
     instance = VK_NULL_HANDLE;
-    ev::logger::Logger::getInstance().info("Vulkan instance destroyed.");
+    Logger::getInstance().info("Vulkan instance destroyed.");
+}
+
+Instance::~Instance() {
+    destroy();
 }

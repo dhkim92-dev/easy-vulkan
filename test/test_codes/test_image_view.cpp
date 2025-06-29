@@ -48,7 +48,7 @@ protected:
 TEST_F(ImageViewTest, CreateImageView) {
     VkComponentMapping components = {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY};
     VkImageSubresourceRange subresource_range = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1};
-    ImageView image_view(device, image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_VIEW_TYPE_2D, components, subresource_range);
+    ImageView image_view(device, image, VK_IMAGE_VIEW_TYPE_2D, VK_FORMAT_R8G8B8A8_UNORM, components, subresource_range);
     EXPECT_NE(VkImageView(image_view), VK_NULL_HANDLE);
     EXPECT_EQ(image_view.get_view_format(), image->get_format());
     EXPECT_EQ(image_view.get_view_type(), VK_IMAGE_VIEW_TYPE_2D);
@@ -57,7 +57,7 @@ TEST_F(ImageViewTest, CreateImageView) {
 TEST_F(ImageViewTest, SupportedFormatCompatibility) {
     VkComponentMapping components = {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY};
     VkImageSubresourceRange subresource_range = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1};
-    ImageView image_view(device, image, VK_FORMAT_R8G8B8A8_SRGB);
+    ImageView image_view(device, image, VK_IMAGE_VIEW_TYPE_2D, VK_FORMAT_R8G8B8A8_SRGB);
     EXPECT_NE(VkImageView(image_view), VK_NULL_HANDLE);
 }   
 
@@ -65,17 +65,17 @@ TEST_F(ImageViewTest, UnsupportedFormatCompatibility) {
     VkComponentMapping components = {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY};
     VkImageSubresourceRange subresource_range = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1};
     ASSERT_DEATH({
-        ImageView image_view(device, image, VK_FORMAT_R64G64B64_SFLOAT, VK_IMAGE_VIEW_TYPE_2D, components, subresource_range);
+        ImageView image_view(device, image, VK_IMAGE_VIEW_TYPE_2D, VK_FORMAT_R64G64B64_SFLOAT, components, subresource_range);
     }, ".*");
 }   
 
 TEST_F(ImageViewTest, SupportedImageViewType) {
-    ImageView image_view(device, image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_VIEW_TYPE_2D);
+    ImageView image_view(device, image, VK_IMAGE_VIEW_TYPE_2D, VK_FORMAT_R8G8B8A8_UNORM);
     EXPECT_EQ(image_view.get_view_type(), VK_IMAGE_VIEW_TYPE_2D);
 }
 
 TEST_F(ImageViewTest, UnsupportedImageViewType) {
     ASSERT_DEATH({
-        ImageView image_view(device, image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_VIEW_TYPE_1D);
+        ImageView image_view(device, image, VK_IMAGE_VIEW_TYPE_1D, VK_FORMAT_R8G8B8A8_UNORM);
     }, ".*");
 }

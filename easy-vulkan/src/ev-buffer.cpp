@@ -38,7 +38,7 @@ VkResult Buffer::create_buffer(
 }
 
 VkResult Buffer::bind_memory(shared_ptr<ev::Memory> memory, VkDeviceSize offset) {
-    Logger::getInstance().debug("Binding buffer memory...");
+    Logger::getInstance().debug("[Buffer::bind_memory] Binding buffer : " + std::to_string(reinterpret_cast<uintptr_t>(buffer)) + " to memory: " + std::to_string(reinterpret_cast<uintptr_t>(VkDeviceMemory(*memory))) + " with offset: " + std::to_string(offset));
     VkBindBufferMemoryInfo bind_info = {};
     bind_info.sType = VK_STRUCTURE_TYPE_BIND_BUFFER_MEMORY_INFO;
     bind_info.buffer = buffer;
@@ -182,26 +182,23 @@ VkResult Buffer::read(void* data, VkDeviceSize size) {
  * 메모리 해제 및 버퍼 파괴를 수행한다.
  */
 void Buffer::destroy() {
-    Logger::getInstance().debug("Destroying Buffer...");
     if ( is_mapped ) {
-        flush();
-        invalidate();
+        // flush();
+        // invalidate();
         unmap();
         is_mapped = false;
     }
 
     if (buffer != VK_NULL_HANDLE) {
+        ev::logger::Logger::getInstance().debug("[Buffer::destroy()] Destroying buffer with handle: " + std::to_string(reinterpret_cast<uintptr_t>(buffer)));
         vkDestroyBuffer(*device, buffer, nullptr);
         buffer = VK_NULL_HANDLE;
     }
 
     size = 0;
     usage_flags = 0;
-    Logger::getInstance().debug("Buffer destroyed successfully.");
 }
 
 Buffer::~Buffer() {
-    Logger::getInstance().debug("Destroying Buffer...");
     destroy();
-    Logger::getInstance().debug("Buffer destroyed successfully.");
 }

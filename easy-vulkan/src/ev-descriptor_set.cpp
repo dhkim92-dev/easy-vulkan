@@ -40,7 +40,7 @@ void DescriptorSetLayout::add_binding(VkShaderStageFlags flags,
 VkResult DescriptorSetLayout::create_layout() {
     if (layout != VK_NULL_HANDLE) {
         logger::Logger::getInstance().warn("DescriptorSetLayout already created, destroying the old layout.");
-        destroy();
+        return VK_ERROR_INITIALIZATION_FAILED;
     }
 
     if (bindings.empty()) {
@@ -95,20 +95,21 @@ void DescriptorSet::write_buffer(uint32_t binding, shared_ptr<Buffer> buffer) {
     write_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     write_set.dstSet = descriptor_set;
     write_set.dstBinding = binding;
-    write_set.dstArrayElement = 0;
+    // write_set.dstArrayElement = 0;
     write_set.descriptorCount = 1;
     write_set.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER; // Assuming uniform buffer type
     write_set.pBufferInfo = &buffer_info;
     write_registry.emplace_back(write_set);
 }
 
-VkResult DescriptorSet::flush() {
+VkResult DescriptorSet::update() {
     if (write_registry.empty()) {
-        logger::Logger::getInstance().warn("No writes to flush in DescriptorSet.");
+        logger::Logger::getInstance().warn("No writes to update in DescriptorSet.");
         return VK_SUCCESS; // Nothing to do
     }
 
     vkUpdateDescriptorSets(*device, static_cast<uint32_t>(write_registry.size()), write_registry.data(), 0, nullptr);
+    logger::Logger::getInstance().debug("Flushed " + std::to_string(write_registry.size()) + " writes to DescriptorSet.");
     write_registry.clear(); // Clear the registry after flushing
     return VK_SUCCESS;
 }

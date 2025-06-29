@@ -8,6 +8,7 @@
 #include "ev-logger.h"
 #include "ev-utility.h"
 #include "ev-device.h"
+#include "ev-sync.h"
 
 namespace ev {
 
@@ -80,9 +81,9 @@ public:
     //     VkFence fence = VK_NULL_HANDLE
     // );
 
-    void acquire_next_image(
-        VkSemaphore semaphore,
+    VkResult acquire_next_image(
         uint32_t& image_index,
+        std::shared_ptr<Semaphore> wait_semaphore,
         VkFence fence = VK_NULL_HANDLE
     );
 
