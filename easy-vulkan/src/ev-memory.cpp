@@ -30,14 +30,14 @@ Memory::Memory(
 }
 
 void Memory::destroy() {
-    Logger::getInstance().debug("Destroying Memory...");
+    Logger::getInstance().debug("[Memory::destroy] Destroying memory with handle: " + std::to_string(reinterpret_cast<uintptr_t>(memory)));
     if (memory != VK_NULL_HANDLE) {
         vkFreeMemory(*device, memory, nullptr);
         memory = VK_NULL_HANDLE;
+        Logger::getInstance().debug("Memory freed successfully.");
     }
     size = 0;
     memory_property_flags = 0;
-    Logger::getInstance().debug("Memory destroyed successfully.");
 }
 
 Memory::~Memory() {

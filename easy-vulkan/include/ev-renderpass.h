@@ -25,9 +25,9 @@ public:
 
     explicit RenderPass(
         shared_ptr<Device> device,
-        const vector<VkAttachmentDescription>& attachments,
-        const vector<VkSubpassDescription>& subpasses = {},
-        const vector<VkSubpassDependency>& dependencies = {}
+        const vector<VkAttachmentDescription> attachments,
+        const vector<VkSubpassDescription> subpasses = {},
+        const vector<VkSubpassDependency> dependencies = {}
     );
 
     RenderPass& operator=(const RenderPass&) = delete;

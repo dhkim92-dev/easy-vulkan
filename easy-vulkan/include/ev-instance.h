@@ -49,6 +49,8 @@ public:
 
     ~Instance();
 
+    void destroy();
+
     vector<VkPhysicalDevice> get_physical_devices() const;
 
     bool is_support_extension(const char* extension_name) const;

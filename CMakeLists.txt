@@ -9,7 +9,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(BUILD_TESTS "Build tests" OFF) # 기본값 OFF
 add_subdirectory(easy-vulkan)
-add_subdirectory(local)
+add_subdirectory(examples)
+add_subdirectory(shaders)
 
 if(BUILD_TESTS)
     add_subdirectory(test)

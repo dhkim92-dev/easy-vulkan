@@ -3,10 +3,9 @@
 namespace ev {
 
 PipelineLayout::PipelineLayout(std::shared_ptr<Device> _device,
-    std::vector<std::shared_ptr<DescriptorSetLayout>>& descriptor_set_layouts,
+    std::vector<std::shared_ptr<DescriptorSetLayout>> descriptor_set_layouts,
     std::vector<VkPushConstantRange> push_constant_ranges
-)
-    : device(std::move(_device)) {
+): device(std::move(_device)) {
     logger::Logger::getInstance().debug("Creating PipelineLayout with device: " + std::to_string(reinterpret_cast<uintptr_t>(device.get())));
     logger::Logger::getInstance().debug("Current handle of PipelineLayout: " + std::to_string(reinterpret_cast<uintptr_t>(layout)));
     // Create the pipeline layout here
@@ -33,6 +32,8 @@ PipelineLayout::PipelineLayout(std::shared_ptr<Device> _device,
     layout_info.flags = 0; // No special flags for now
     CHECK_RESULT(vkCreatePipelineLayout(*device, &layout_info, nullptr, &layout));
     logger::Logger::getInstance().debug("PipelineLayout created successfully. VkPipelineLayout handle: " + std::to_string(reinterpret_cast<uintptr_t>(layout)));
+    logger::Logger::getInstance().debug("  setLayoutCount : " + std::to_string(layout_info.setLayoutCount));
+    logger::Logger::getInstance().debug("  pushConstantRangeCount : " + std::to_string(layout_info.pushConstantRangeCount));
 }
 
 void PipelineLayout::destroy() {

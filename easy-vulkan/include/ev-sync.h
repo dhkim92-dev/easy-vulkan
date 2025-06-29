@@ -44,11 +44,15 @@ private:
 
 public :
 
-    explicit Fence(std::shared_ptr<ev::Device> device, VkFenceCreateFlags flags = 0, void* next = nullptr);
+    explicit Fence(std::shared_ptr<ev::Device> device, VkFenceCreateFlags flags = VK_FENCE_CREATE_SIGNALED_BIT, void* next = nullptr);
 
     Fence(const Fence&) = delete;
 
     Fence& operator=(const Fence&) = delete;
+
+    VkResult wait(uint64_t timeout = UINT64_MAX);
+
+    VkResult reset();
 
     void destroy();
 

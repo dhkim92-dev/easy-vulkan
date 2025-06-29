@@ -90,7 +90,7 @@ public:
     //void write_texture(); 
     // TODO: Sampler 구현 및 Texture 타입 정의 후 구현
 
-    VkResult flush();
+    VkResult update();
 
     DescriptorSet& operator=(const DescriptorSet&) = delete;
 

@@ -2,6 +2,7 @@
 #include <assert.h>
 #include "ev-swapchain.h"
 #include "ev-logger.h"
+#include <iostream>
 
 using namespace std;
 using namespace ev;
@@ -112,6 +113,7 @@ void Swapchain::find_color_format_and_space() {
         if ( std::find(prefered_formats.begin(), prefered_formats.end(), available.format) != prefered_formats.end() ) {
             image_format = available.format;
             color_space = available.colorSpace;
+            Logger::getInstance().debug("Preferred image format found: " + std::to_string(image_format) + ", color space: " + std::to_string(color_space));
             break;
         }
     }
@@ -149,6 +151,7 @@ void Swapchain::create(
     Logger::getInstance().debug("Creating swapchain with surface...");
     register_surface(surface);
     VkSwapchainKHR old_swapchain = swapchain;
+    logger::Logger::getInstance().debug("Old swapchain: " + std::to_string(reinterpret_cast<uint64_t>(old_swapchain)));
 
     VkSurfaceCapabilitiesKHR surface_capabilities;
     // auto vkGetPhysicalDeviceSurfaceCapabilitiesKHR = (PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR)vkGetInstanceProcAddr(*instance, "vkGetPhysicalDeviceSurfaceCapabilitiesKHR");
@@ -192,6 +195,9 @@ void Swapchain::create(
         (target_swapchain_image_count > surface_capabilities.maxImageCount) ) {
         target_swapchain_image_count = surface_capabilities.maxImageCount;
     }
+    image_count = target_swapchain_image_count;
+
+    logger::Logger::getInstance().debug("Target swapchain image count: " + std::to_string(target_swapchain_image_count));
 
     // surface transformation 설정
     VkSurfaceTransformFlagsKHR preferred_transform;
@@ -226,8 +232,7 @@ void Swapchain::create(
     swapchain_ci.imageArrayLayers = 1; // Single layer for 2D images
     swapchain_ci.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
     swapchain_ci.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE; // TODO("다수의 큐를 이용할 경우 변경이 필요")
-    swapchain_ci.queueFamilyIndexCount = 0; 
-    swapchain_ci.pQueueFamilyIndices = nullptr; 
+    swapchain_ci.queueFamilyIndexCount = 0;
     swapchain_ci.preTransform = static_cast<VkSurfaceTransformFlagBitsKHR>(preferred_transform);
     swapchain_ci.compositeAlpha = composite_alpha;
     swapchain_ci.presentMode = present_mode;
@@ -244,16 +249,21 @@ void Swapchain::create(
 
     CHECK_RESULT(pfn.vkCreateSwapchainKHR(*device, &swapchain_ci, nullptr, &swapchain));
 
+    logger::Logger::getInstance().debug("Swapchain created with format: " + std::to_string(image_format) + ", color space: " + std::to_string(color_space) + ", present mode: " + std::to_string(present_mode));
+
     if ( old_swapchain != VK_NULL_HANDLE ) {
         destroy_swapchain(old_swapchain);
+        logger::Logger::getInstance().debug("Old swapchain destroyed successfully.");
     }
-
+    images.clear();
+    views.clear();
     images.resize(image_count);
     // auto vkGetSwapchainImagesKHR = (PFN_vkGetSwapchainImagesKHR)vkGetInstanceProcAddr(*instance, "vkGetSwapchainImagesKHR");
     CHECK_RESULT(pfn.vkGetSwapchainImagesKHR(*device, swapchain, &image_count, images.data()));
+
     views.resize(image_count);
 
-    for ( size_t i = 0 ; i < images.size() ; ++i ) {
+    for ( size_t i = 0 ; i < image_count ; ++i ) {
         create_image_view(images[i], views[i]);
     }
 
@@ -261,7 +271,7 @@ void Swapchain::create(
 }
 
 void Swapchain::create_image_view(VkImage& image, VkImageView &view) {
-    Logger::getInstance().debug("Creating image view for swapchain image...");
+    logger::Logger::getInstance().debug("Image view created for swapchain image: " + std::to_string(reinterpret_cast<uint64_t>(image)));
     VkImageViewCreateInfo view_ci = {};
     view_ci.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     view_ci.image = image;
@@ -276,27 +286,41 @@ void Swapchain::create_image_view(VkImage& image, VkImageView &view) {
     view_ci.subresourceRange.levelCount = 1; // Single mip level
     view_ci.subresourceRange.baseArrayLayer = 0;
     view_ci.subresourceRange.layerCount = 1; // Single layer
-    CHECK_RESULT(vkCreateImageView(*device, &view_ci, nullptr, &view));
+    view_ci.flags = 0; // No special flags
+    view_ci.pNext = nullptr; // No additional structure
+    VkResult result = vkCreateImageView(*device, &view_ci, nullptr, &view);
+    if (result != VK_SUCCESS) {
+        Logger::getInstance().error("Failed to create image view for swapchain image: " + std::to_string(result));
+        exit(EXIT_FAILURE);
+    }
     Logger::getInstance().debug("Image view created successfully for swapchain image.");
 }
 
-void Swapchain::acquire_next_image(
-    VkSemaphore semaphore,
+VkResult Swapchain::acquire_next_image(
     uint32_t& image_index,
+    std::shared_ptr<ev::Semaphore> wait_semaphore,
     VkFence fence
 ) {
     Logger::getInstance().debug("Acquiring next image from swapchain...");
-    CHECK_RESULT(pfn.vkAcquireNextImageKHR(*device, swapchain, UINT64_MAX, semaphore, fence, &image_index));
-    Logger::getInstance().debug("Next image acquired successfully at index: " + std::to_string(image_index));
+    VkResult result = pfn.vkAcquireNextImageKHR(*device, swapchain, UINT64_MAX, *wait_semaphore, fence, &image_index);
+    if( result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR && result != VK_ERROR_OUT_OF_DATE_KHR ) {
+        Logger::getInstance().error("Failed to acquire next image from swapchain: " + std::to_string(result));
+    } else {
+        Logger::getInstance().debug("Next image acquired successfully at index: " + std::to_string(image_index));
+    }
+    return result;
 }
 
 void Swapchain::destroy_swapchain(VkSwapchainKHR& sc) {
-    if (swapchain != VK_NULL_HANDLE) {
+    if (sc != VK_NULL_HANDLE) {
         for (VkImageView view : views) {
             vkDestroyImageView(*device, view, nullptr);
+            view = VK_NULL_HANDLE;
+            logger::Logger::getInstance().debug("Destroyed image view: " + std::to_string(reinterpret_cast<uint64_t>(view)));
         }
-        pfn.vkDestroySwapchainKHR(*device, swapchain, nullptr);
-    } else {
+        pfn.vkDestroySwapchainKHR(*device, sc, nullptr);
+        sc = VK_NULL_HANDLE;
+        logger::Logger::getInstance().debug("Destroyed swapchain");
     }
 }
 

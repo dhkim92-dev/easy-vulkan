@@ -5,8 +5,8 @@ using namespace ev;
 
 ImageView::ImageView(shared_ptr<Device> _device, 
     shared_ptr<Image> _image, 
-    VkFormat view_format,
     VkImageViewType view_type,
+    VkFormat view_format,
     VkComponentMapping components,
     VkImageSubresourceRange subresource_range
 ): device(std::move(_device)), image(std::move(_image)), view_format(view_format), view_type(view_type) {

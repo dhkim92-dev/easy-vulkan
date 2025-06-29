@@ -7,9 +7,14 @@ Device::Device(
     std::shared_ptr<Instance> _instance,
     std::shared_ptr<PhysicalDevice> _pdevice,
     vector<const char*> required_extensions,
-    VkQueueFlags queue_flags
-) : instance(std::move(_instance)), pdevice(std::move(_pdevice)) {
+    VkQueueFlags queue_flags,
+    bool use_swapchain
+) : instance(std::move(_instance)), pdevice(std::move(_pdevice)), use_swapchain(use_swapchain) {
     Logger::getInstance().info("Creating Vulkan device...");
+
+    if ( use_swapchain ) {
+        enabled_extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+    }
 
     check_required_extensions(required_extensions);
     setup_queue_family_properties();
@@ -186,10 +191,15 @@ VkFormat Device::get_supported_depth_format(bool check_sampling_support) const {
     exit(EXIT_FAILURE);
 }
 
-Device::~Device() {
+void Device::destroy() {
     if (device != VK_NULL_HANDLE) {
         vkDestroyDevice(device, nullptr);
         device = VK_NULL_HANDLE;
         Logger::getInstance().info("Vulkan device destroyed.");
     }
+}
+
+Device::~Device() {
+    destroy();
+    Logger::getInstance().info("Device destructor called, resources cleaned up.");
 }

@@ -42,7 +42,11 @@ public:
 
     void begin_render_pass(shared_ptr<RenderPass> render_pass, 
         shared_ptr<Framebuffer> framebuffer, 
+        vector<VkClearValue> clear_values = {},
         VkSubpassContents contents = VK_SUBPASS_CONTENTS_INLINE);
+
+    void end_render_pass();
+         
 
     void bind_descriptor_sets(VkPipelineBindPoint pipeline_bind_point, 
         shared_ptr<PipelineLayout> layout, 
@@ -52,8 +56,8 @@ public:
     );
 
     void bind_vertex_buffers(uint32_t first_binding, 
-        const vector<shared_ptr<Buffer>>& buffers, 
-        const vector<VkDeviceSize>& offsets = {});
+        const vector<shared_ptr<Buffer>> buffers, 
+        const vector<VkDeviceSize> offsets = {});
 
     void bind_index_buffers(vector<shared_ptr<Buffer>> buffers, VkDeviceSize offset = 0, VkIndexType index_type = VK_INDEX_TYPE_UINT32);
 
@@ -97,6 +101,30 @@ public:
         uint32_t first_index = 0, 
         int32_t vertex_offset = 0, 
         uint32_t first_instance = 0);
+
+    void set_viewport(
+        float offset_x,
+        float offset_y,
+        float width,
+        float height,
+        float min_depth = 0.0f,
+        float max_depth = 1.0f
+    );
+
+    void set_viewports(
+        const vector<VkViewport> viewports
+    );
+
+    void set_scissor(
+        uint32_t offset_x,
+        uint32_t offset_y,
+        uint32_t width,
+        uint32_t height
+    );
+
+    void set_scissors(
+        const vector<VkRect2D> scissors
+    );
 
     void dispatch(uint32_t group_count_x, uint32_t group_count_y = 1, uint32_t group_count_z = 1);
 

@@ -13,6 +13,13 @@ using namespace std;
 
 namespace ev {
 
+/** 
+ * @brief Vulkan Framebuffer Wrapper
+ * 이 클래스는 Vulkan Framebuffer를 래핑합니다.
+ * Framebuffer는 렌더 패스와 연결된 이미지 뷰들의 집합으로, 
+ * 렌더링 결과를 저장하는 역할을 합니다.
+ * 이 클래스는 Framebuffer의 생성, 소멸 및 속성 접근을 담당합니다
+*/
 class Framebuffer {
 
 private:
@@ -21,7 +28,8 @@ private:
 
     std::shared_ptr<RenderPass> render_pass;
 
-    std::vector<std::shared_ptr<ImageView>> attachments;
+    // std::vector<std::shared_ptr<ImageView>> attachments;
+    std::vector<VkImageView> attachments;
 
     VkFramebuffer framebuffer = VK_NULL_HANDLE;
 
@@ -33,10 +41,28 @@ private:
 
 public:
 
+    // explicit Framebuffer(
+    //     std::shared_ptr<Device> device,
+    //     std::shared_ptr<RenderPass> render_pass,
+    //     const std::vector<shared_ptr<ImageView>> attachments,
+    //     uint32_t width,
+    //     uint32_t height,
+    //     uint32_t layers = 1
+    // );
+
+    /**
+     * @brief 프레임버퍼 생성자
+     * @param device Vulkan Device Wrapper
+     * @param render_pass Vulkan RenderPass Wrapper
+     * @param attachments 이미지 뷰들의 벡터
+     * @param width 프레임버퍼의 너비
+     * @param height 프레임버퍼의 높이
+     * @param layers 프레임버퍼의 레이어 수 (기본값: 1)
+     */
     explicit Framebuffer(
         std::shared_ptr<Device> device,
         std::shared_ptr<RenderPass> render_pass,
-        const std::vector<std::shared_ptr<ImageView>>& attachments,
+        const std::vector<VkImageView> attachments,
         uint32_t width,
         uint32_t height,
         uint32_t layers = 1

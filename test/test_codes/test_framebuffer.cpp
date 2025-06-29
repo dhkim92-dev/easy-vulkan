@@ -53,13 +53,14 @@ protected:
         image = make_shared<ev::Image>(device, VK_IMAGE_TYPE_2D, VK_FORMAT_B8G8R8A8_UNORM, 800, 600);
         memory = make_shared<ev::Memory>(device, image->get_memory_requirements().size, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image->get_memory_requirements(), nullptr);
 	image->bind_memory(memory, 0);
-        attachment = make_shared<ev::ImageView>(device, image, VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_VIEW_TYPE_2D);
+        attachment = make_shared<ev::ImageView>(device, image, VK_IMAGE_VIEW_TYPE_2D, VK_FORMAT_B8G8R8A8_UNORM);
     }
 };
 
 
 TEST_F(FramebufferTest, CreateFramebuffer) {
-    vector<shared_ptr<ImageView>> attachments = { attachment };
+    // vector<shared_ptr<ImageView>> attachments = { attachment };
+    vector<VkImageView> attachments = { *attachment };
     ev::Framebuffer framebuffer(device, render_pass, attachments, 800, 600);
     EXPECT_NE(VkFramebuffer(framebuffer), VK_NULL_HANDLE);
     EXPECT_EQ(framebuffer.get_width(), 800);

@@ -78,7 +78,7 @@ vector<shared_ptr<DescriptorSet>> DescriptorPool::allocates(
     ai.pNext = nullptr;
     vector<VkDescriptorSet> vk_descriptor_sets(layouts.size());
     CHECK_RESULT(vkAllocateDescriptorSets(*device, &ai, vk_descriptor_sets.data()));
-
+    logger::Logger::getInstance().debug("Allocated " + std::to_string(layouts.size()) + " descriptor sets.");
     return [&] {
         vector<shared_ptr<DescriptorSet>> sets(layouts.size());
         for (const auto& vk_descriptor_set : vk_descriptor_sets) {
@@ -109,8 +109,10 @@ shared_ptr<DescriptorSet> DescriptorPool::allocate(shared_ptr<DescriptorSetLayou
     VkResult result = vkAllocateDescriptorSets(*device, &ai, &descriptor_set);
     if (result != VK_SUCCESS) {
         logger::Logger::getInstance().error("Failed to allocate descriptor set: " + std::to_string(result));
-        return nullptr;
+        exit(EXIT_FAILURE);
     }
+
+    logger::Logger::getInstance().debug("Allocated descriptor set");
 
     return make_shared<DescriptorSet>(device, descriptor_set);
 }

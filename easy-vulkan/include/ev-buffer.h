@@ -52,7 +52,7 @@ public:
 
     ~Buffer();
 
-    VkResult bind_memory(shared_ptr<ev::Memory> memory, VkDeviceSize offset);
+    VkResult bind_memory(shared_ptr<ev::Memory> memory, VkDeviceSize offset = 0);
 
     VkResult map(VkDeviceSize offset = 0, VkDeviceSize size = VK_WHOLE_SIZE);
 
