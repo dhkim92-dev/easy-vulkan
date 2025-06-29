@@ -83,7 +83,7 @@ VkResult ev::Queue::submit(shared_ptr<CommandBuffer> buffer,
     submit_info.pWaitDstStageMask = wait_dst_stage_mask;
     submit_info.pNext = next;
 
-    VkFence fence_vk = fence ? *fence : VK_NULL_HANDLE;
+    VkFence fence_vk = (fence ? VkFence(*fence) : VK_NULL_HANDLE);
 
     return vkQueueSubmit(queue, 1, &submit_info, fence_vk);
 }
@@ -128,7 +128,7 @@ VkResult ev::Queue::submits( std::vector<std::shared_ptr<ev::CommandBuffer>> buf
     submit_info.pWaitDstStageMask = wait_dst_stage_mask;
     submit_info.pNext = next;
 
-    return vkQueueSubmit(queue, 1, &submit_info, fence ? *fence : VK_NULL_HANDLE);
+    return vkQueueSubmit(queue, 1, &submit_info, fence ? VkFence(*fence) : VK_NULL_HANDLE);
 }
 
 VkResult ev::Queue::wait_idle(uint64_t timeout) {
