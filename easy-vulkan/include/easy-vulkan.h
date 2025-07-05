@@ -9,7 +9,7 @@
 #include "ev-macro.h"
 #include "ev-buffer.h"
 #include "ev-image.h"
-#include "ev-image-view.h"
+#include "ev-image_view.h"
 #include "ev-sampler.h"
 #include "ev-memory.h"
 #include "ev-renderpass.h"
