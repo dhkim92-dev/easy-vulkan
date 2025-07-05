@@ -11,6 +11,8 @@
 #include "ev-image.h"
 #include "ev-image-view.h"
 #include "ev-sampler.h"
+#include "ev-texture.h"
+#include "presets/ev-types.h"
 #include "ev-memory.h"
 #include "ev-renderpass.h"
 #include "ev-framebuffer.h"
