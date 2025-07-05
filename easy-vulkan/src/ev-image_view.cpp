@@ -1,4 +1,4 @@
-#include "ev-image-view.h"
+#include "ev-image_view.h"
 
 using namespace ev;
 

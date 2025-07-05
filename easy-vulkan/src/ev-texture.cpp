@@ -11,6 +11,3 @@ Texture::Texture(
         throw std::runtime_error("Failed to create Texture: Image, ImageView or Sampler is null.");
     }
 }
-
-Texture::~Texture() {
-}

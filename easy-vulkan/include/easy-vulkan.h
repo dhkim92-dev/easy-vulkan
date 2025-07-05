@@ -25,3 +25,4 @@
 #include "ev-sync.h"
 #include "debugger/ev-debug-messenger.h"
 #include "initializer/ev-initializer.h"
+#include "tools/ev-tools.h"

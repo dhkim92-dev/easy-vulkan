@@ -33,6 +33,8 @@ public:
         VkMemoryAllocateFlagsInfoKHR* alloc_flags_info = nullptr
     );
 
+    VkResult allocate();
+
     ~Memory();
 
     Memory(const Memory&) = delete;

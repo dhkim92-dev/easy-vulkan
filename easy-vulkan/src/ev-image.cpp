@@ -56,8 +56,17 @@ Image::Image(
     ci.initialLayout = layout; // Initial layout
     ci.flags = flags;// No special flags
     ci.pNext = p_next; // No additional structures
-    CHECK_RESULT(vkCreateImage(*device, &ci, nullptr, &image));
-    Logger::getInstance().debug("Image created successfully.");
+    VkResult result = vkCreateImage(*device, &ci, nullptr, &image);
+
+    if ( result == VK_SUCCESS ) {
+        Logger::getInstance().debug("Image created successfully.");
+        vkGetImageMemoryRequirements(*device, image, &memory_requirements);
+    } 
+
+    if (result != VK_SUCCESS) {
+        Logger::getInstance().error("Failed to create image: " + std::to_string(result));
+        exit(EXIT_FAILURE);
+    }
 }
 
 VkResult Image::bind_memory(shared_ptr<Memory> memory, VkDeviceSize offset) {

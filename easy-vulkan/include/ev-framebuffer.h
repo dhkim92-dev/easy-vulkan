@@ -5,7 +5,7 @@
 #include <vector>
 #include "ev-device.h"
 #include "ev-image.h"
-#include "ev-image-view.h"
+#include "ev-image_view.h"
 #include "ev-renderpass.h"
 #include "ev-logger.h"
 

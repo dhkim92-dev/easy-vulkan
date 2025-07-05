@@ -29,6 +29,8 @@ private:
 
     VkBufferUsageFlags usage_flags = 0;
 
+    VkMemoryRequirements memory_requirements = {};
+
     VkDescriptorBufferInfo descriptor = {};
     
     void *mapped;

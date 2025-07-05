@@ -34,7 +34,13 @@ VkResult Buffer::create_buffer(
     buffer_ci.usage = usage_flags;
     buffer_ci.sharingMode = VK_SHARING_MODE_EXCLUSIVE; // Single queue family 
 
-    return vkCreateBuffer(*device, &buffer_ci, nullptr, &buffer);
+    VkResult result = vkCreateBuffer(*device, &buffer_ci, nullptr, &buffer);
+
+    if (result == VK_SUCCESS) {
+        vkGetBufferMemoryRequirements(*device, buffer, &memory_requirements);
+    }
+
+    return result;
 }
 
 VkResult Buffer::bind_memory(shared_ptr<ev::Memory> memory, VkDeviceSize offset) {
