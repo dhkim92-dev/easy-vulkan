@@ -12,9 +12,9 @@ add_subdirectory(easy-vulkan)
 add_subdirectory(examples)
 add_subdirectory(shaders)
 
-if(BUILD_TESTS)
-    add_subdirectory(test)
-endif()
+# if(BUILD_TESTS)
+add_subdirectory(test)
+# endif()
 
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     message(FATAL_ERROR "빌드 디렉토리는 소스 디렉토리와 분리해야 합니다. 예: cmake -S . -B build")

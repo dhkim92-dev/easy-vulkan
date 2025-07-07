@@ -45,6 +45,8 @@ private:
     
     VkImageCreateFlags flags = 0;
 
+    VkMemoryRequirements memory_requirements = {};
+
     const uint32_t* queue_family_indices = nullptr;
 
     const void* p_next = nullptr;

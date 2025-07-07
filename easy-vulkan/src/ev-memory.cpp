@@ -29,9 +29,41 @@ Memory::Memory(
     Logger::getInstance().debug("Memory created successfully.");
 }
 
-void Memory::destroy() {
-    Logger::getInstance().debug("[Memory::destroy] Destroying memory with handle: " + std::to_string(reinterpret_cast<uintptr_t>(memory)));
+Memory::Memory(
+    std::shared_ptr<ev::Device> _device,
+    uint32_t memory_type_index,
+    VkDeviceSize size
+) : device(std::move(_device)), memory_type_index(memory_type_index), size(size) {
+    if (!device) {
+        Logger::getInstance().error("Invalid device provided for Memory creation");
+        exit(EXIT_FAILURE);
+    }
+    // VkMemoryAllocateInfo mem_ai = {};
+    // mem_ai.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    // mem_ai.allocationSize = size;
+    // mem_ai.memoryTypeIndex = memory_type_index;
+    // mem_ai.pNext = nullptr;
+    
+    Logger::getInstance().debug("Memory created successfully.");
+}
+
+VkResult Memory::allocate() {
+    Logger::getInstance().debug("[Memory::allocate] Allocating memory with size: " + std::to_string(size));
     if (memory != VK_NULL_HANDLE) {
+        Logger::getInstance().warn("Memory already allocated, skipping allocation.");
+        return VK_SUCCESS;
+    }
+    VkMemoryAllocateInfo mem_ai = {};
+    mem_ai.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    mem_ai.allocationSize = size;
+    mem_ai.memoryTypeIndex = memory_type_index;
+    mem_ai.pNext = nullptr;
+    return vkAllocateMemory(*device, &mem_ai, nullptr, &memory);
+}
+
+void Memory::destroy() {
+    if (memory != VK_NULL_HANDLE) {
+        Logger::getInstance().debug("[Memory::destroy] Destroying memory with handle: " + std::to_string(reinterpret_cast<uintptr_t>(memory)));
         vkFreeMemory(*device, memory, nullptr);
         memory = VK_NULL_HANDLE;
         Logger::getInstance().debug("Memory freed successfully.");

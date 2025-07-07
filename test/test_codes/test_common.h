@@ -14,5 +14,5 @@ void create_default_test_context(
     std::shared_ptr<ev::Instance>& instance,
     std::shared_ptr<ev::PhysicalDevice>& physical_device,
     std::shared_ptr<ev::Device>& device,
-    bool debug
+    bool debug = false
 );

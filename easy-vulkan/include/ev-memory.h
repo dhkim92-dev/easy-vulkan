@@ -23,6 +23,8 @@ private:
 
     VkMemoryPropertyFlags memory_property_flags = 0;
 
+    uint32_t memory_type_index = 0;
+
 public:
 
     explicit Memory(
@@ -31,6 +33,12 @@ public:
         VkMemoryPropertyFlags memory_property_flags,
         VkMemoryRequirements memory_requirements,
         VkMemoryAllocateFlagsInfoKHR* alloc_flags_info = nullptr
+    );
+
+    explicit Memory(
+        std::shared_ptr<ev::Device> device,
+        uint32_t memory_type_index,
+        VkDeviceSize size
     );
 
     VkResult allocate();
