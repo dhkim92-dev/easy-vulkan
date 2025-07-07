@@ -15,10 +15,9 @@ namespace ev {
 
 /** 
  * @brief Vulkan Framebuffer Wrapper
- * 이 클래스는 Vulkan Framebuffer를 래핑합니다.
- * Framebuffer는 렌더 패스와 연결된 이미지 뷰들의 집합으로, 
- * 렌더링 결과를 저장하는 역할을 합니다.
- * 이 클래스는 Framebuffer의 생성, 소멸 및 속성 접근을 담당합니다
+ * @note 이 클래스는 Vulkan Framebuffer를 래핑합니다.
+ *       Framebuffer는 렌더 패스와 연결된 이미지 뷰들의 집합으로, 
+ *       렌더링 결과를 저장하는 역할을 합니다.
 */
 class Framebuffer {
 

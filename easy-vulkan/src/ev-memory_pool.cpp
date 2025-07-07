@@ -17,9 +17,10 @@ MemoryPool::~MemoryPool() {
     if ( is_initialized.load() && memory != nullptr) {
         logger::Logger::getInstance().debug("Destroying MemoryPool...");
         mbt.bitmap.clear();
-        memory->destroy();
+        // memory->destroy();
         memory.reset();
         memory = nullptr;
+        is_initialized.store(false);
     } else {
         logger::Logger::getInstance().debug("MemoryPool was not initialized or memory is null, skipping destruction.");
     }
@@ -190,7 +191,7 @@ int32_t MemoryPool::find_free_node(int32_t level, size_t node_idx, int32_t targe
     return -1;
 }
 
-std::shared_ptr<MemoryBlockAllocateInfo> MemoryPool::allocate_internal(
+std::shared_ptr<ev::MemoryBlockMetadata> MemoryPool::allocate_internal(
     VkDeviceSize size, 
     uint32_t alignment
 ) {
@@ -236,8 +237,8 @@ std::shared_ptr<MemoryBlockAllocateInfo> MemoryPool::allocate_internal(
         return nullptr; // 할당할 수 있는 블록이 없음
     }
 
-    std::shared_ptr<MemoryBlockAllocateInfo> blk_info = 
-        std::make_shared<MemoryBlockAllocateInfo>(
+    std::shared_ptr<ev::MemoryBlockMetadata> blk_info = 
+        std::make_shared<ev::MemoryBlockMetadata>(
             memory, // memory 객체
             memory_type_index, // 메모리 타입 인덱스
             node, // 할당된 노드 인덱스
@@ -254,7 +255,7 @@ std::shared_ptr<MemoryBlockAllocateInfo> MemoryPool::allocate_internal(
 }
 
 void MemoryPool::free(
-    std::shared_ptr<MemoryBlockAllocateInfo> info
+    std::shared_ptr<MemoryBlockMetadata> info
 ) {
     if (info -> is_free.load()) {
         return;
@@ -320,7 +321,7 @@ void MemoryPool::merge(size_t node_idx) {
     }
 }
 
-std::shared_ptr<MemoryBlockAllocateInfo> MemoryPool::standalone_allocate(
+std::shared_ptr<ev::MemoryBlockMetadata> MemoryPool::standalone_allocate(
     VkDeviceSize size, 
     uint32_t alignment
 ) {
@@ -341,7 +342,7 @@ std::shared_ptr<MemoryBlockAllocateInfo> MemoryPool::standalone_allocate(
         return nullptr;
     }
 
-    return std::make_shared<MemoryBlockAllocateInfo>(
+    return std::make_shared<ev::MemoryBlockMetadata>(
         standalone_memory,
         memory_type_index,
         0, // 노드 인덱스는 0으로 설정
@@ -351,11 +352,11 @@ std::shared_ptr<MemoryBlockAllocateInfo> MemoryPool::standalone_allocate(
     );
 }
 
-std::shared_ptr<MemoryBlockAllocateInfo> MemoryPool::allocate(
+std::shared_ptr<ev::MemoryBlockMetadata> MemoryPool::allocate(
     VkDeviceSize size, 
     uint32_t alignment
 ) {
-    std::shared_ptr<MemoryBlockAllocateInfo> blk_info = allocate_internal(size, alignment);
+    std::shared_ptr<ev::MemoryBlockMetadata> blk_info = allocate_internal(size, alignment);
     if ( blk_info == nullptr ) {
         return standalone_allocate(size, alignment);
     }

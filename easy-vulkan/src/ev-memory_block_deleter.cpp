@@ -1,7 +1,7 @@
 #include "ev-memory_allocator.h"
 
 void ev::MemoryBlockDeleter::operator() (
-    std::shared_ptr<MemoryBlockAllocateInfo> info
+    std::shared_ptr<MemoryBlockMetadata> info
 ) const {
     if (info->is_free.load()) {
         return; // 이미 해제된 블록은 무시

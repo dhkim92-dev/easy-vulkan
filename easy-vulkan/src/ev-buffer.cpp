@@ -59,6 +59,16 @@ VkResult Buffer::bind_memory(shared_ptr<ev::Memory> memory, VkDeviceSize offset)
     return result;
 }
 
+VkResult Buffer::bind_memory(std::shared_ptr<ev::MemoryBlockMetadata> block_metadata) {
+    Logger::getInstance().debug("[Buffer::bind_memory] Binding buffer : " + std::to_string(reinterpret_cast<uintptr_t>(buffer)) + " to memory block metadata: " + std::to_string(reinterpret_cast<uintptr_t>(block_metadata.get())));
+    if (!block_metadata || !block_metadata->memory) {
+        Logger::getInstance().error("Invalid memory block metadata provided for binding.");
+        return VK_ERROR_INVALID_EXTERNAL_HANDLE;
+    }
+    this->pool_block_metadata = block_metadata;
+    return bind_memory(block_metadata->memory, block_metadata->offset);
+}
+
 /**
  * @brief Buffer의 메모리를 맵핑하는 함수
  * @param offset : 맵핑할 메모리의 시작 오프셋,
@@ -193,6 +203,10 @@ void Buffer::destroy() {
         // invalidate();
         unmap();
         is_mapped = false;
+    }
+
+    if ( pool_block_metadata ) {
+        pool_block_metadata.reset();
     }
 
     if (buffer != VK_NULL_HANDLE) {

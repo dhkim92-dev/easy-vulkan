@@ -5,6 +5,7 @@
 #include <cstring>
 #include "ev-device.h"
 #include "ev-memory.h"
+#include "ev-memory_block_metadata.h"
 
 using namespace std;
 
@@ -32,6 +33,8 @@ private:
     VkMemoryRequirements memory_requirements = {};
 
     VkDescriptorBufferInfo descriptor = {};
+
+    std::shared_ptr<ev::MemoryBlockMetadata> pool_block_metadata = nullptr;
     
     void *mapped;
 
@@ -55,6 +58,8 @@ public:
     ~Buffer();
 
     VkResult bind_memory(shared_ptr<ev::Memory> memory, VkDeviceSize offset = 0);
+
+    VkResult bind_memory(std::shared_ptr<ev::MemoryBlockMetadata> block_metadata);
 
     VkResult map(VkDeviceSize offset = 0, VkDeviceSize size = VK_WHOLE_SIZE);
 

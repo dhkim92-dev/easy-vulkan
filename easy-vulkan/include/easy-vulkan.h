@@ -15,6 +15,7 @@
 #include "presets/ev-types.h"
 #include "ev-memory.h"
 #include "ev-memory_allocator.h"
+#include "ev-memory_block_metadata.h"
 #include "ev-renderpass.h"
 #include "ev-framebuffer.h"
 #include "ev-command_pool.h"

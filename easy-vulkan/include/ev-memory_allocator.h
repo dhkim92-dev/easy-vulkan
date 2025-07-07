@@ -11,6 +11,7 @@
 #include "ev-image.h"
 #include "ev-memory.h"
 #include "ev-macro.h"
+#include "ev-memory_block_metadata.h"
 #include "presets/ev-types.h"
 #include "tools/ev-tools.h"
 
@@ -21,61 +22,6 @@ namespace ev {
 // constexpr uint32_t ALLOCATED = 0x00;
 
 class MemoryPool;
-
-/**
- * @brief 메모리 블록 할당 정보를 저장하는 구조체
- * @details 이 구조체는 메모리 블록의 할당 정보를 저장하며, 
- *          메모리 풀에서 관리되는 메모리 블록의 상태를 나타냅니다.
- * @note 이 구조체는 스레드 세이프를 위해 atomic 변수를 사용합니다.
- *       메모리 블록이 독립적으로 할당되었는지 여부는 `is_standalone` 플래그로 나타냅니다.
- *       `is_free` 플래그는 메모리 블록이 해제되었는지 여부를 나타내며, 
- *       이 플래그는 스레드 세이프를 위해 atomic으로 선언되었습니다.
- *       이 구조체를 통해 메모리를 바인딩한 객체는 반드시 내부에 이 구조체를 소유하고 있어야 합니다.
- *       그렇지 않으면 메모리 블록이 해제되었을 때 풀에 반환되지 않습니다.
- */
-struct MemoryBlockAllocateInfo {
-
-    std::shared_ptr<ev::Memory> memory; // 할당된 메모리 객체
-
-    uint32_t memory_type_index; // 메모리 타입 인덱스
-
-    size_t node_idx; // 할당된 메모리 블럭의 시작 노드 인덱스,
-
-    size_t offset; // 할당된 메모리 블럭의 시작 오프셋,
-
-    size_t size; // 할당된 메모리 크기
-
-    bool is_standalone = false; // 이 블록이 독립적으로 할당되었는지 여부
-
-    std::atomic<bool> is_free = false; // 메모리 블록 해제 여부, 스레드 세이프를 위해 atomic 사용
-
-    MemoryBlockAllocateInfo(
-        std::shared_ptr<ev::Memory> _memory,
-        uint32_t _memory_type_index,
-        size_t _node_idx,
-        size_t _offset,
-        size_t _size,
-        bool _is_standalone = false
-    ) : 
-        memory(std::move(_memory)), 
-        memory_type_index(_memory_type_index), 
-        node_idx(_node_idx), 
-        offset(_offset),
-        size(_size), 
-        is_standalone(_is_standalone) {}
-
-    std::string to_string() const {
-        return "MemoryBlockAllocateInfo{"
-            "memory_type_index: " + std::to_string(memory_type_index) +
-            ", node_idx: " + std::to_string(node_idx) +
-            ", offset: " + std::to_string(offset) +
-            ", size: " + std::to_string(size) +
-            ", is_standalone: " + (is_standalone ? "true" : "false") +
-            ", is_free: " + (is_free.load() ? "true" : "false") +
-            "}";
-    }
-
-};
 
 struct MemoryBlockTree {
     
@@ -98,11 +44,11 @@ struct MemoryBlockTree {
 
 class MemoryBlockDeleter {
 
-    std::weak_ptr<MemoryPool> pool;
+    std::weak_ptr<ev::MemoryPool> pool;
 
     size_t node_idx;
 public:
-    void operator() (std::shared_ptr<MemoryBlockAllocateInfo> info) const;
+    void operator() (std::shared_ptr<ev::MemoryBlockMetadata> info) const;
 };
 
 /**
@@ -177,13 +123,13 @@ private :
      * @brief 메모리 블록을 할당합니다.
      * @param size 할당할 메모리 블록의 크기
      * @param alignment 할당할 메모리 블록의 정렬 크기
-     * @return std::shared_ptr<MemoryBlockAllocateInfo> 할당된 메모리 블록 정보
+     * @return std::shared_ptr<MemoryBlockMetadata> 할당된 메모리 블록 정보
      * @details 이 함수는 메모리 블록을 할당하고, 
      *          메모리 블록 트리에서 해당 블록을 찾아 할당 정보를 반환합니다.
      *          만약 메모리 블록이 충분하지 않다면, 이 풀이 아닌 독립적으로 생성한 ev::Memory 객체를 사용하여 
      *          메모리 블록을 할당합니다.
      */
-    shared_ptr<MemoryBlockAllocateInfo> allocate_internal(
+    shared_ptr<ev::MemoryBlockMetadata> allocate_internal(
         VkDeviceSize size, 
         uint32_t alignment
     );
@@ -210,7 +156,7 @@ public :
      * @param info 해제할 메모리 블록 정보
      * @details 이 함수는 메모리 블록을 해제합니다.
      */
-    void free(shared_ptr<MemoryBlockAllocateInfo> info);
+    void free(shared_ptr<MemoryBlockMetadata> info);
 
     /**
      * @brief 실제 메모리 풀을 생성합니다.
@@ -233,20 +179,20 @@ public :
      * @brief 메모리 블록을 할당합니다.
      * @param size 할당할 메모리 블록의 크기
      * @param alignment 할당할 메모리 블록의 정렬 크기
-     * @return std::shared_ptr<MemoryBlockAllocateInfo> 할당된 메모리 블록 정보
+     * @return std::shared_ptr<MemoryBlockMetadata> 할당된 메모리 블록 정보
      */
-    std::shared_ptr<MemoryBlockAllocateInfo> allocate(VkDeviceSize size, uint32_t alignment);
+    std::shared_ptr<ev::MemoryBlockMetadata> allocate(VkDeviceSize size, uint32_t alignment);
 
     /**
      * @brief 독립적으로 메모리 블록을 할당합니다.
      * @param size 할당할 메모리 블록의 크기
      * @param alignment 할당할 메모리 블록의 정렬 크기
-     * @return std::shared_ptr<MemoryBlockAllocateInfo> 할당된 메모리 블록 정보
+     * @return std::shared_ptr<MemoryBlockMetadata> 할당된 메모리 블록 정보
      * @details 이 함수는 메모리 블록을 독립적으로 할당하고, 
      *          메모리 블록 트리에서 해당 블록을 찾아 할당 정보를 반환합니다.
      *          이 함수는 메모리 풀의 관리을 벗어나 독립적으로 메모리 블록을 할당할 때 사용됩니다.
      */
-    std::shared_ptr<MemoryBlockAllocateInfo> standalone_allocate(
+    std::shared_ptr<ev::MemoryBlockMetadata> standalone_allocate(
         VkDeviceSize size, 
         uint32_t alignment
     ); 
@@ -261,46 +207,124 @@ public :
 struct PoolSize {
     uint32_t memory_type_index;
     VkDeviceSize size;
+
+public: 
+    PoolSize(
+        uint32_t _memory_type_index,
+        VkDeviceSize _size
+    ) : memory_type_index(_memory_type_index), size(_size) {}
+
+    PoolSize() = default;
 };
 
-// class MemoryAllocator {
+class MemoryAllocator {
 
-// private:
+public:
 
-//     std::shared_ptr<ev::Device> device = nullptr;
+    /** 
+     * @brief 메모리 할당기를 빌드하기 전 각 메모리 속성에 따른 
+     * 메모리 타입 인덱스의 생성될 메모리 크기를 지정합니다.
+     * 메서드 호출을 하면 내부적으로 메모리 타입 인덱스를 검색하여 
+     * size 만큼의 메모리의 크기가 해당 메모리 타입 인덱스에 할당됩니다.
+     * build 이후에 이 메서드를 호출하면 무시합니다.
+     * @param flags 메모리 속성 플래그
+     * @param size 메모리 풀의 크기
+    */
+    virtual void add_pool(
+        VkMemoryPropertyFlags flags,
+        VkDeviceSize size
+    ) = 0;
 
-//     std::atomic<bool> is_initialized = false;
+    /**
+     * @brief 메모리 할당기를 빌드합니다.
+     * @return VkResult 성공 시 VK_SUCCESS, 실패 시 에러 코드
+     */
+    virtual VkResult build() = 0;
 
-//     std::vector<shared_ptr<MemoryPool>> memory_pools;
+    /**
+     * @brief 주어진 버퍼에 요구하는 메모리를 할당하고, 바인드까지 수행합니다.
+     * @param buffer 할당할 버퍼 객체
+     * @param mem_flags 메모리 속성 플래그
+     * @return VkResult 바인드 성공 시 VK_SUCCESS, 실패 시 에러 코드
+     */
+    virtual VkResult allocate_buffer(
+        std::shared_ptr<ev::Buffer> buffer,
+        VkMemoryPropertyFlags mem_flags
+    ) = 0;
 
-//     std::unordered_map<uint32_t, PoolSize> pool_sizes;
-
-// public: 
-
-//     explicit MemoryAllocator(std::shared_ptr<ev::Device> device);
-
-//     ~MemoryAllocator();
-
-//     void add_pool(
-//         VkMemoryPropertyFlags flags,
-//         VkDeviceSize size
-//     );
-
-//     VkResult initialize();
-
-//     /**
-//      * @brief 버퍼에 대한 메모리를 할당하고, 바인드합니다.
-//      * @param buffer 할당할 버퍼 객체
-//      * @return std::shared_ptr<ev::Buffer> 할당된 버퍼 객체
-//      */
-//     std::shared_ptr<ev::Buffer> allocate(shared_ptr<ev::Buffer> buffer);
-
-//     /**
-//      * @brief 이미지에 대한 메모리를 할당하고, 바인드합니다.
-//      * @param image 할당할 이미지 객체
-//      * @return std::shared_ptr<ev::Image> 할당된 이미지 객체
-//      */
-//     std::shared_ptr<ev::Image> allocate(shared_ptr<ev::Image> image);
-// };
-
+    /**
+     * @brief 주어진 이미지에 요구하는 메모리를 할당하고, 바인드까지 수행합니다.
+     * @param image 할당할 이미지 객체
+     * @param mem_flags 메모리 속성 플래그
+     * @return VkResult 바인드 성공 시 VK_SUCCESS, 실패 시 에러 코드
+     */
+    virtual VkResult allocate_image(
+        std::shared_ptr<ev::Image> image,
+        VkMemoryPropertyFlags mem_flags
+    ) = 0;
 };
+
+class BitmapBuddyMemoryAllocator : public MemoryAllocator {
+
+private:
+
+    std::shared_ptr<ev::Device> device = nullptr;
+
+    std::atomic<bool> is_initialized = false;
+
+    std::unordered_map<uint32_t, std::shared_ptr<MemoryPool>> memory_pools;
+
+    std::unordered_map<uint32_t, PoolSize> pool_sizes;
+
+public: 
+
+    /**
+     * @brief BitmapBuddyMemoryAllocator 생성자
+     * 실제 메모리 풀을 형성하려면 build() 메서드를 호출해야 합니다.
+     * @param device Vulkan 디바이스 객체
+     */
+    BitmapBuddyMemoryAllocator(
+        std::shared_ptr<ev::Device> device
+    );
+
+    ~BitmapBuddyMemoryAllocator();
+
+    /**
+     * @brief 메모리 풀을 추가합니다.
+     * @param flags 메모리 속성 플래그
+     * @param size 메모리 풀의 크기
+     */
+    void add_pool(
+        VkMemoryPropertyFlags flags,
+        VkDeviceSize size
+    ) override;
+
+    /**
+     * @brief 메모리 할당기를 빌드합니다.
+     * @return VkResult 성공 시 VK_SUCCESS, 실패 시 에러 코드
+     */
+    VkResult build() override;
+
+    /**
+     * @brief 주어진 버퍼에 요구하는 메모리를 할당하고, 바인드까지 수행합니다.
+     * @param buffer 할당할 버퍼 객체
+     * @param mem_flags 메모리 속성 플래그
+     * @return VkResult 바인드 성공 시 VK_SUCCESS, 실패 시 에러 코드
+     */
+    VkResult allocate_buffer(
+        std::shared_ptr<ev::Buffer> buffer,
+        VkMemoryPropertyFlags mem_flags
+    ) override;
+
+    /**
+     * @brief 주어진 이미지에 요구하는 메모리를 할당하고, 바인드까지 수행합니다.
+     * @param image 할당할 이미지 객체
+     * @param mem_flags 메모리 속성 플래그
+     * @return VkResult 바인드 성공 시 VK_SUCCESS, 실패 시 에러 코드
+     */
+    VkResult allocate_image(
+        std::shared_ptr<ev::Image> image,
+        VkMemoryPropertyFlags mem_flags
+    ) override;
+};
+}

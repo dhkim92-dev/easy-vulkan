@@ -108,7 +108,7 @@ TEST_F(MemoryPoolTest, RandomFreeAndReallocateTest) {
     VkResult result = memory_pool->create(1024, 6); // 1MB
     ASSERT_EQ(result, VK_SUCCESS);
 
-    std::vector<std::shared_ptr<MemoryBlockAllocateInfo>> allocated_blocks;
+    std::vector<std::shared_ptr<MemoryBlockMetadata>> allocated_blocks;
 
     for ( uint32_t i = 0 ; i < 16 ; ++i ) {
         auto block_info = memory_pool->allocate(64, 64); // 256 bytes with 64 bytes alignment
@@ -151,7 +151,7 @@ TEST_F(MemoryPoolTest, ExternalFragmentationTest) {
     // memory_pool->print_pool_status();
 
     // 1바이트 16개 할당
-    std::vector<std::shared_ptr<MemoryBlockAllocateInfo>> allocated_blocks;
+    std::vector<std::shared_ptr<MemoryBlockMetadata>> allocated_blocks;
     for ( int i = 0 ; i < 16 ; ++i ) {
         auto block_info = memory_pool->allocate(1, 64); // 1 byte
         ASSERT_NE(block_info, nullptr);
