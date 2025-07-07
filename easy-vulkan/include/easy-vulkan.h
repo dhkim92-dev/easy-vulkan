@@ -14,6 +14,7 @@
 #include "ev-texture.h"
 #include "presets/ev-types.h"
 #include "ev-memory.h"
+#include "ev-memory_allocator.h"
 #include "ev-renderpass.h"
 #include "ev-framebuffer.h"
 #include "ev-command_pool.h"

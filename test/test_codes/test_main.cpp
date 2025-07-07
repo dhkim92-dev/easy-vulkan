@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
 #include "easy-vulkan.h"
 #include "test_common.h"
+#include "gtest/gtest.h"
 
 int main(int argc, char **argv) {
     // Initialize Google Test
