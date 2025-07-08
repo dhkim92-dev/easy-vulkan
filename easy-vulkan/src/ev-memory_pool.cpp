@@ -238,7 +238,7 @@ std::shared_ptr<ev::MemoryBlockMetadata> MemoryPool::allocate_internal(
     }
 
     std::shared_ptr<ev::MemoryBlockMetadata> blk_info = 
-        std::make_shared<ev::MemoryBlockMetadata>(
+        std::make_shared<ev::BitmapBuddyMemoryBlockMetadata>(
             memory, // memory 객체
             memory_type_index, // 메모리 타입 인덱스
             node, // 할당된 노드 인덱스
@@ -257,23 +257,29 @@ std::shared_ptr<ev::MemoryBlockMetadata> MemoryPool::allocate_internal(
 void MemoryPool::free(
     std::shared_ptr<MemoryBlockMetadata> info
 ) {
-    if (info -> is_free.load()) {
+    if (info -> is_free()) {
         return;
     }
 
-    size_t node_idx = info->node_idx;
+    auto casted = std::dynamic_pointer_cast<ev::BitmapBuddyMemoryBlockMetadata>(info);
+    if ( !casted ) {
+        logger::Logger::getInstance().error("Invalid MemoryBlockMetadata type for free operation.");
+        return; // 잘못된 타입의 메모리 블록 정보
+    }
+    size_t node_idx = casted->get_node_idx();
+
     uint8_t is_free = ev::tools::bitmap_read(mbt.bitmap, node_idx);
 
     if ( is_free ) {
-        logger::Logger::getInstance().warn("Memory block is already free: " + info->to_string());
+        logger::Logger::getInstance().warn("Memory block is already free: " + casted->to_string());
         return; // 이미 해제된 블록
     }
 
     ev::logger::Logger::getInstance().debug(
-        "Freeing memory block: " + info->to_string()
+        "Freeing memory block: " + casted->to_string()
     );
 
-    size_t blk_size = info->size;
+    size_t blk_size = casted->get_size();
     // ev::tools::bitmap_clear(mbt.bitmap, node_idx); // 현재 노드 비트 설정
     // mark_parents_and_self(mbt.bitmap, node_idx); // 부모 노드 마킹
 
@@ -283,7 +289,7 @@ void MemoryPool::free(
 
     merge(node_idx);
 
-    info->is_free.store(true); // 메모리 블록 해제 상태로 변경
+    casted->set_free(true); // 메모리 블록 해제 상태로 변경
 }
 
 void MemoryPool::merge(size_t node_idx) {
@@ -342,7 +348,7 @@ std::shared_ptr<ev::MemoryBlockMetadata> MemoryPool::standalone_allocate(
         return nullptr;
     }
 
-    return std::make_shared<ev::MemoryBlockMetadata>(
+    return std::make_shared<ev::BitmapBuddyMemoryBlockMetadata>(
         standalone_memory,
         memory_type_index,
         0, // 노드 인덱스는 0으로 설정

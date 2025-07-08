@@ -42,13 +42,14 @@ struct MemoryBlockTree {
     size_t max_blk_size = 1UL << max_order; // 최대 블록 크기, 2^29 바이트, 512MB
 };
 
-class MemoryBlockDeleter {
+class BitmapBuddyMemoryBlockDeleter {
 
     std::weak_ptr<ev::MemoryPool> pool;
 
     size_t node_idx;
+
 public:
-    void operator() (std::shared_ptr<ev::MemoryBlockMetadata> info) const;
+    void operator() (std::shared_ptr<ev::BitmapBuddyMemoryBlockMetadata> info) const;
 };
 
 /**

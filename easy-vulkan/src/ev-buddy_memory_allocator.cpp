@@ -93,7 +93,7 @@ VkResult BitmapBuddyMemoryAllocator::allocate_buffer(
         logger::Logger::getInstance().error("Failed to allocate memory for the buffer.");
         return VK_ERROR_OUT_OF_DEVICE_MEMORY;  
     }
-    return buffer->bind_memory(metadata->memory, metadata->offset);
+    return buffer->bind_memory(metadata->get_memory(), metadata->get_offset());
 }
 
 VkResult BitmapBuddyMemoryAllocator::allocate_image(
@@ -124,5 +124,5 @@ VkResult BitmapBuddyMemoryAllocator::allocate_image(
         logger::Logger::getInstance().error("Failed to allocate memory for the image.");
         return VK_ERROR_OUT_OF_DEVICE_MEMORY;
     }
-    return image->bind_memory(metadata->memory, metadata->offset);
+    return image->bind_memory(metadata->get_memory(), metadata->get_offset());
 }

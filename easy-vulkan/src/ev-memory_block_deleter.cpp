@@ -1,9 +1,9 @@
 #include "ev-memory_allocator.h"
 
-void ev::MemoryBlockDeleter::operator() (
-    std::shared_ptr<MemoryBlockMetadata> info
+void ev::BitmapBuddyMemoryBlockDeleter::operator() (
+    std::shared_ptr<BitmapBuddyMemoryBlockMetadata> info
 ) const {
-    if (info->is_free.load()) {
+    if (info->is_free()) {
         return; // 이미 해제된 블록은 무시
     }
 
@@ -18,6 +18,6 @@ void ev::MemoryBlockDeleter::operator() (
         return;
     }
 
-    info->is_free.store(true); // 블록을 free 상태로 설정
+    info->set_free(true); // 블록을 free 상태로 설정
     pool_ptr->free(info); // 메모리 풀에 블록 해제 요청
 }

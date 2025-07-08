@@ -31,10 +31,10 @@ TEST_F(MemoryPoolTest, AllocateAndFreeMemoryBlock) {
     auto block_info = memory_pool->allocate(256 * 1024, 256); // 256KB with 256 bytes alignment
 
     ASSERT_NE(block_info, nullptr);
-    EXPECT_EQ(block_info->size, 256 * 1024);
+    EXPECT_EQ(block_info->get_size(), 256 * 1024);
     memory_pool->free(block_info);
     // block_info.reset();
-    EXPECT_TRUE(block_info->is_free.load());
+    EXPECT_TRUE(block_info->is_free());
     
 }
 
@@ -43,16 +43,16 @@ TEST_F(MemoryPoolTest, FreeMemoryBlock) {
     VkResult result = memory_pool->create(1024 * 1024); // 1MB
     ASSERT_EQ(result, VK_SUCCESS);
 
-    auto block_info = memory_pool->allocate(256 * 1024, 256); // 256KB with 256 bytes alignment
+    auto block_info =  dynamic_pointer_cast<ev::BitmapBuddyMemoryBlockMetadata>(memory_pool->allocate(256 * 1024, 256)); // 256KB with 256 bytes alignment
     ASSERT_NE(block_info, nullptr);
     memory_pool->free(block_info);
-    EXPECT_TRUE(block_info->is_free.load());
-    int32_t node_id = block_info->node_idx;
+    EXPECT_TRUE(block_info->is_free());
+    int32_t node_id = block_info->get_node_idx();
     block_info.reset();
     ASSERT_EQ(block_info, nullptr);
-    block_info = memory_pool->allocate(256 * 1024, 256); // 256KB with 256 bytes alignment
+    block_info = dynamic_pointer_cast<ev::BitmapBuddyMemoryBlockMetadata>(memory_pool->allocate(256 * 1024, 256)); // 256KB with 256 bytes alignment
     ASSERT_NE(block_info, nullptr);
-    EXPECT_EQ(block_info->node_idx, node_id);
+    EXPECT_EQ(block_info->get_node_idx(), node_id);
 }
 
 TEST_F(MemoryPoolTest, AllocateEntireMemory) {
@@ -62,8 +62,8 @@ TEST_F(MemoryPoolTest, AllocateEntireMemory) {
 
     auto block_info = memory_pool->allocate(1024 * 1024, 256); // Allocate entire memory with 256 bytes alignment
     ASSERT_NE(block_info, nullptr);
-    EXPECT_EQ(block_info->size, 1024 * 1024);
-    EXPECT_FALSE(block_info->is_standalone );
+    EXPECT_EQ(block_info->get_size(), 1024 * 1024);
+    EXPECT_FALSE(block_info->is_standalone() );
     
     memory_pool->free(block_info);
 }
@@ -78,28 +78,28 @@ TEST_F(MemoryPoolTest, AllocateWithAlignment) {
         "blkinfo_512_32 " + block_info_512_32->to_string()
     );
     ASSERT_NE(block_info_512_32, nullptr);
-    EXPECT_EQ(block_info_512_32->size, 512);
-    EXPECT_EQ(block_info_512_32->offset % 32, 0); // Check alignment
-    EXPECT_EQ(block_info_512_32->offset, 0); // Check alignment
+    EXPECT_EQ(block_info_512_32->get_size(), 512);
+    EXPECT_EQ(block_info_512_32->get_offset() % 32, 0); // Check alignment
+    EXPECT_EQ(block_info_512_32->get_offset(), 0); // Check alignment
 
-    auto block_info_27_32 = memory_pool->allocate(27, 32); // 32 bytes with 32 bytes alignment
+    auto block_info_27_32 = dynamic_pointer_cast<BitmapBuddyMemoryBlockMetadata>(memory_pool->allocate(27, 32)); // 32 bytes with 32 bytes alignment
     logger::Logger::getInstance().debug(
         "blkinfo_27_32 " + block_info_27_32->to_string()
     );
     ASSERT_NE(block_info_27_32, nullptr);
-    EXPECT_EQ(block_info_27_32->size, 64);
-    EXPECT_EQ(block_info_27_32->offset % 32, 0); // Check alignment
-    EXPECT_EQ(block_info_27_32->offset, 512);
-    EXPECT_EQ(block_info_27_32->node_idx, 23); // Check node index
+    EXPECT_EQ(block_info_27_32->get_size(), 64);
+    EXPECT_EQ(block_info_27_32->get_offset() % 32, 0); // Check alignment
+    EXPECT_EQ(block_info_27_32->get_offset(), 512);
+    EXPECT_EQ(block_info_27_32->get_node_idx(), 23); // Check node index
 
     auto block_info_127_128 = memory_pool->allocate(127, 128); // 1024 bytes with 64 bytes alignment
     logger::Logger::getInstance().debug(
         "Allocated block info: " + block_info_127_128->to_string()
     );      
     ASSERT_NE(block_info_127_128, nullptr);
-    EXPECT_EQ(block_info_127_128->size, 128);
-    EXPECT_EQ(block_info_127_128->offset % 128, 0);
-    EXPECT_EQ(block_info_127_128->offset, 640); // Check offset after previous allocations
+    EXPECT_EQ(block_info_127_128->get_size(), 128);
+    EXPECT_EQ(block_info_127_128->get_offset() % 128, 0);
+    EXPECT_EQ(block_info_127_128->get_offset(), 640); // Check offset after previous allocations
 }
 
 TEST_F(MemoryPoolTest, RandomFreeAndReallocateTest) {
@@ -113,9 +113,9 @@ TEST_F(MemoryPoolTest, RandomFreeAndReallocateTest) {
     for ( uint32_t i = 0 ; i < 16 ; ++i ) {
         auto block_info = memory_pool->allocate(64, 64); // 256 bytes with 64 bytes alignment
         ASSERT_NE(block_info, nullptr);
-        EXPECT_EQ(block_info->size, 64);
+        EXPECT_EQ(block_info->get_size(), 64);
         allocated_blocks.push_back(block_info);
-        EXPECT_FALSE(block_info->is_free.load());
+        EXPECT_FALSE(block_info->is_free());
     }
 
     for ( uint32_t i = 0 ; i < 4 ; ++i ) {
@@ -123,15 +123,15 @@ TEST_F(MemoryPoolTest, RandomFreeAndReallocateTest) {
         size_t idx = rand() % allocated_blocks.size();
         auto block_info = allocated_blocks[idx];
         memory_pool->free(block_info);
-        EXPECT_TRUE(block_info->is_free.load());
+        EXPECT_TRUE(block_info->is_free());
         allocated_blocks.erase(allocated_blocks.begin() + idx);
     }
 
     for ( uint32_t i = 0 ; i < 4 ; ++i ) {
-        auto block_info = memory_pool->allocate(64, 64); // 64 bytes with 64 bytes alignment
+        auto block_info = dynamic_pointer_cast<BitmapBuddyMemoryBlockMetadata>(memory_pool->allocate(64, 64)); // 64 bytes with 64 bytes alignment
         ASSERT_NE(block_info, nullptr);
-        EXPECT_EQ(block_info->size, 64);
-        EXPECT_FALSE(block_info->is_free.load());
+        EXPECT_EQ(block_info->get_size(), 64);
+        EXPECT_FALSE(block_info->is_free());
     }
 }
 
@@ -141,7 +141,7 @@ TEST_F(MemoryPoolTest, AllocateWithInsufficientMemory) {
     ASSERT_EQ(result, VK_SUCCESS);
 
     auto block_info = memory_pool->allocate(2 * 1024 * 1024, 256); // Try to allocate more than available
-    EXPECT_TRUE(block_info->is_standalone);
+    EXPECT_TRUE(block_info->is_standalone());
 }
 
 TEST_F(MemoryPoolTest, ExternalFragmentationTest) {
@@ -155,17 +155,17 @@ TEST_F(MemoryPoolTest, ExternalFragmentationTest) {
     for ( int i = 0 ; i < 16 ; ++i ) {
         auto block_info = memory_pool->allocate(1, 64); // 1 byte
         ASSERT_NE(block_info, nullptr);
-        EXPECT_EQ(block_info->size, 64);
+        EXPECT_EQ(block_info->get_size(), 64);
         allocated_blocks.push_back(block_info);
         // memory_pool->print_pool_status();
     }
 
     //256바이트 할당 시도
-    auto block_info = memory_pool->allocate(256, 256); // 256 bytes with 256 bytes alignment
-    EXPECT_TRUE(block_info->is_standalone); // 독립적으로 할당되어야 함
-    EXPECT_EQ(block_info->size, 256); // 할당된 크기 확인
-    EXPECT_EQ(block_info->offset, 0); // 할당된 오프
-    EXPECT_EQ(block_info->node_idx, 0); // 할당된 노드 인덱스 확인
+    auto block_info = dynamic_pointer_cast<BitmapBuddyMemoryBlockMetadata>(memory_pool->allocate(256, 256)); // 256 bytes with 256 bytes alignment
+    EXPECT_TRUE(block_info->is_standalone()); // 독립적으로 할당되어야 함
+    EXPECT_EQ(block_info->get_size(), 256); // 할당된 크기 확인
+    EXPECT_EQ(block_info->get_offset(), 0); // 할당된 오프셋 확인
+    EXPECT_EQ(block_info->get_node_idx(), 0); // 할당된 노드 인덱스 확인
     block_info.reset();
 
     // 1바이트 블록 4개 해제
@@ -176,11 +176,11 @@ TEST_F(MemoryPoolTest, ExternalFragmentationTest) {
     }
 
     // 256바이트 할당 시도
-    block_info = memory_pool->allocate(256, 256); // 256 bytes with 256 bytes alignment
-    EXPECT_FALSE(block_info->is_standalone); // 독립적으로 할당되지 않아야 함
-    EXPECT_EQ(block_info->size, 256); // 할당된 크기 확인
-    EXPECT_EQ(block_info->offset, 768); // 할당된 오프셋
-    EXPECT_EQ(block_info->node_idx, 6); // 할당된 노드 인덱스 확인
+    block_info = dynamic_pointer_cast<BitmapBuddyMemoryBlockMetadata>(memory_pool->allocate(256, 256)); // 256 bytes with 256 bytes alignment
+    EXPECT_FALSE(block_info->is_standalone()); // 독립적으로 할당되지 않아야 함
+    EXPECT_EQ(block_info->get_size(), 256); // 할당된 크기 확인
+    EXPECT_EQ(block_info->get_offset(), 768); // 할당된 오프셋
+    EXPECT_EQ(block_info->get_node_idx(), 6); // 할당된 노드 인덱스 확인
     memory_pool->free(block_info); // 해제
 }
 
@@ -191,19 +191,19 @@ TEST_F(MemoryPoolTest, AllocateNextNodeForAlignment) {
     VkResult result = memory_pool->create(1024, 6); // 1
 
     // 64바이트 할당
-    auto block_info_64 = memory_pool->allocate(64, 64); // 64 bytes with 64 bytes alignment
+    auto block_info_64 = dynamic_pointer_cast<BitmapBuddyMemoryBlockMetadata>(memory_pool->allocate(64, 64)); // 64 bytes with 64 bytes alignment
     ASSERT_NE(block_info_64, nullptr);
-    EXPECT_EQ(block_info_64->size, 64);
-    EXPECT_EQ(block_info_64->offset, 0); // Check offset
-    EXPECT_EQ(block_info_64->node_idx, 15); // Check node index
+    EXPECT_EQ(block_info_64->get_size(), 64);
+    EXPECT_EQ(block_info_64->get_offset(), 0); // Check offset
+    EXPECT_EQ(block_info_64->get_node_idx(), 15); // Check node index
 
     // 256 정렬로 64바이트 할당
-    auto block_info_64_256 = memory_pool->allocate(64, 256);
+    auto block_info_64_256 = dynamic_pointer_cast<BitmapBuddyMemoryBlockMetadata>(memory_pool->allocate(64, 256));
     logger::Logger::getInstance().debug(
         "blkinfo_64_256 " + block_info_64_256->to_string()
     );
     ASSERT_NE(block_info_64_256, nullptr);
-    EXPECT_EQ(block_info_64_256->size, 64);
-    EXPECT_EQ(block_info_64_256->offset, 256); // Check offset after
-    EXPECT_EQ(block_info_64_256->node_idx, 19); // Check node index
+    EXPECT_EQ(block_info_64_256->get_size(), 64);
+    EXPECT_EQ(block_info_64_256->get_offset(), 256); // Check offset after
+    EXPECT_EQ(block_info_64_256->get_node_idx(), 19); // Check node index
 }
