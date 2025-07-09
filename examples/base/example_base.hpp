@@ -23,6 +23,7 @@ class ExampleBase {
 
     ExampleBase(std::string example_name, std::string executable_path, bool debug = false) 
     : title(example_name), executable_path(executable_path), debug(debug) {
+        ev::logger::Logger::getInstance().set_log_level(ev::logger::LogLevel::INFO);
         printf("ExampleBase constructor called with title: %s\n", title.c_str());
         std::filesystem::path bin_path = std::filesystem::path(executable_path).parent_path();
         std::filesystem::path base_path = bin_path.parent_path().parent_path();
