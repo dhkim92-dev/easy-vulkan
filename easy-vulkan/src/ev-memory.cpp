@@ -1,4 +1,3 @@
-
 #include "ev-memory.h"
 
 using namespace ev;
@@ -11,9 +10,9 @@ Memory::Memory(
     VkMemoryRequirements memory_requirements,
     VkMemoryAllocateFlagsInfoKHR* alloc_flags_info
 ) : device(std::move(_device)), size(size), memory_property_flags(memory_property_flags) {
-    Logger::getInstance().debug("Creating Memory with size: " + std::to_string(size));
+    Logger::getInstance().debug("[ev::Memory::Memory] Creating Memory with size: " + std::to_string(size));
     if (!device) {
-        Logger::getInstance().error("Invalid device provided for Memory creation");
+        Logger::getInstance().error("[ev::Memory::Memory] Invalid device provided for Memory creation");
         exit(EXIT_FAILURE);
     }
     VkMemoryAllocateInfo mem_ai = {};
@@ -26,7 +25,7 @@ Memory::Memory(
     );
     mem_ai.pNext = alloc_flags_info;
     CHECK_RESULT(vkAllocateMemory(*device, &mem_ai, nullptr, &memory));
-    Logger::getInstance().debug("Memory created successfully.");
+    Logger::getInstance().debug("[ev::Memory::Memory] Memory created successfully.");
 }
 
 Memory::Memory(
@@ -35,22 +34,18 @@ Memory::Memory(
     VkDeviceSize size
 ) : device(std::move(_device)), memory_type_index(memory_type_index), size(size) {
     if (!device) {
-        Logger::getInstance().error("Invalid device provided for Memory creation");
+        Logger::getInstance().error("[ev::Memory::Memory] Invalid device provided for Memory creation");
         exit(EXIT_FAILURE);
     }
-    // VkMemoryAllocateInfo mem_ai = {};
-    // mem_ai.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    // mem_ai.allocationSize = size;
-    // mem_ai.memoryTypeIndex = memory_type_index;
-    // mem_ai.pNext = nullptr;
+    logger::Logger::getInstance().debug("[ev::Memory::Memory] Creating Memory with size: " + std::to_string(size) + " and memory type index: " + std::to_string(memory_type_index));
     
-    Logger::getInstance().debug("Memory created successfully.");
+    Logger::getInstance().debug("[ev::Memory::Memory] Memory created successfully.");
 }
 
 VkResult Memory::allocate() {
-    Logger::getInstance().debug("[Memory::allocate] Allocating memory with size: " + std::to_string(size));
+    Logger::getInstance().debug("[ev::Memory::allocate] Allocating memory with size: " + std::to_string(size));
     if (memory != VK_NULL_HANDLE) {
-        Logger::getInstance().warn("Memory already allocated, skipping allocation.");
+        Logger::getInstance().warn("[ev::Memory::allocate] Memory already allocated, skipping allocation.");
         return VK_SUCCESS;
     }
     VkMemoryAllocateInfo mem_ai = {};
@@ -63,10 +58,10 @@ VkResult Memory::allocate() {
 
 void Memory::destroy() {
     if (memory != VK_NULL_HANDLE) {
-        Logger::getInstance().debug("[Memory::destroy] Destroying memory with handle: " + std::to_string(reinterpret_cast<uintptr_t>(memory)));
+        Logger::getInstance().debug("[ev::Memory::destroy] Destroying memory with handle: " + std::to_string(reinterpret_cast<uintptr_t>(memory)));
         vkFreeMemory(*device, memory, nullptr);
         memory = VK_NULL_HANDLE;
-        Logger::getInstance().debug("Memory freed successfully.");
+        Logger::getInstance().debug("[ev::Memory::destroy] Memory freed successfully.");
     }
     size = 0;
     memory_property_flags = 0;

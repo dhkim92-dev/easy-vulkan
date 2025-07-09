@@ -24,7 +24,9 @@ private:
 
     VkDeviceMemory memory = VK_NULL_HANDLE;
 
-    VkDeviceSize size = 0;
+    VkDeviceSize size = VK_WHOLE_SIZE;
+
+    VkDeviceSize offset = 0;
 
     VkDeviceSize alignment = 0;
 
@@ -61,7 +63,9 @@ public:
 
     VkResult bind_memory(std::shared_ptr<ev::MemoryBlockMetadata> block_metadata);
 
-    VkResult map(VkDeviceSize offset = 0, VkDeviceSize size = VK_WHOLE_SIZE);
+    // VkResult map(VkDeviceSize offset, VkDeviceSize size = VK_WHOLE_SIZE);
+
+    VkResult map(VkDeviceSize size = VK_WHOLE_SIZE);
 
     VkResult unmap();
 

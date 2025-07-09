@@ -86,6 +86,7 @@ public:
 
     virtual std::string to_string() const {
         return "MemoryBlockMetadata{"
+            "memory handler: " + std::to_string(reinterpret_cast<uintptr_t>(VkDeviceMemory(*memory))) +
             "memory_type_index: " + std::to_string(memory_type_index) +
             ", offset: " + std::to_string(offset) +
             ", size: " + std::to_string(size) +
@@ -129,6 +130,7 @@ public:
 
     std::string to_string() const override {
         return "MemoryBlockMetadata{"
+            "memory handler: " + std::to_string(reinterpret_cast<uintptr_t>(VkDeviceMemory(*memory))) +
             "memory_type_index: " + std::to_string(memory_type_index) +
             ", node_idx: " + std::to_string(node_idx) +
             ", offset: " + std::to_string(offset) +
