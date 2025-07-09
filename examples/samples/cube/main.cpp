@@ -58,6 +58,7 @@ private:
     };
 
     // Cube의 8개 꼭지점 좌표, Normal 값은 해당 좌표에서 0,0,0으로 향하는 벡터의 역방향, 즉 좌표값과 동일
+    // NDC는 -y가 위쪽, +y가 아래쪽으로 설정
     //    v4 -------v5
     //   / |       / |
     //  /  |      /  | 
@@ -78,20 +79,31 @@ private:
     };
 
     // CCW 순서로 Cube의 12개의 삼각형을 구성하는 인덱스
-    std::vector<uint32_t> cube_indices = {
-        1, 2, 3, // 0
-        1, 3, 0, // 1
-        2, 1, 5, // 2
-        2, 5, 6, // 3
-        6, 5, 4, // 4
-        6, 4, 7, // 5
-        3, 7, 4, // 6
-        3, 4, 0, // 7
-        0, 5, 1,// 8
-        0, 4, 5,// 9
-        3, 2, 6,// 10
-        3, 6, 7// 11
-    };
+std::vector<uint32_t> cube_indices = {
+    // 앞면 (+Z) — Vulkan에서 정면 바라볼 때 CCW: v0, v3, v2,  v2, v1, v0
+    0, 3, 2,
+    2, 1, 0,
+
+    // 오른쪽 면 (+X) — CCW: v1, v2, v6,  v6, v5, v1
+    1, 2, 6,
+    6, 5, 1,
+
+    // 뒷면 (-Z) — CCW: v5, v6, v7,  v7, v4, v5
+    5, 6, 7,
+    7, 4, 5,
+
+    // 왼쪽 면 (-X) — CCW: v4, v7, v3,  v3, v0, v4
+    4, 7, 3,
+    3, 0, 4,
+
+    // 윗면 (+Y) — Vulkan에선 아래가 +Y라서 윗면은 시각적으로 아래쪽. CCW: v3, v7, v6,  v6, v2, v3
+    3, 7, 6,
+    6, 2, 3,
+
+    // 아랫면 (-Y) — 시각적으로 위쪽. CCW: v4, v0, v1,  v1, v5, v4
+    4, 0, 1,
+    1, 5, 4
+};
 
     struct {
         std::shared_ptr<ev::Shader> vertex;
@@ -434,7 +446,7 @@ public:
             .add_vertex_attribute_description(0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0)
             .add_vertex_attribute_description(0, 1, VK_FORMAT_R32G32B32_SFLOAT, sizeof(float) * 3)
             .set_input_assembly_state(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
-            .set_rasterization_state(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE, VK_FRONT_FACE_COUNTER_CLOCKWISE)
+            .set_rasterization_state(VK_POLYGON_MODE_LINE, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_COUNTER_CLOCKWISE)
             .set_dynamic_state()
             .add_dynamic_state(VK_DYNAMIC_STATE_VIEWPORT)
             .add_dynamic_state(VK_DYNAMIC_STATE_SCISSOR)
@@ -464,7 +476,7 @@ public:
         ubo.view = glm::lookAt(
             glm::vec3(0.0f, 1.0f, 2.0f), // eye
             glm::vec3(0.0f, 0.0f, 0.0f), // center
-            glm::vec3(0.0f, 1.0f, 0.0f)  // up
+            glm::vec3(0.0f, -1.0f, 0.0f)  // up
         );
         // 일반적인 원근 투영, fovy 45도, aspect, near=0.1, far=10.0
         ubo.proj = glm::perspective(
@@ -472,7 +484,7 @@ public:
             static_cast<float>(display.width) / static_cast<float>(display.height),
             0.1f, 10.0f
         );
-        ubo.proj[1][1] *= -1; // Vulkan NDC 보정
+        // ubo.proj[1][1] *= -1; // Vulkan NDC 보정
         buffers.uniform->map();
         buffers.uniform->write(&ubo, sizeof(ubo));
         // buffers.uniform.buffer->flush();

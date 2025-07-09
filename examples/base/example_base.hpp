@@ -146,7 +146,7 @@ class ExampleBase {
     }
 
     virtual vector<const char*> setup_device_extensions() {
-        return vector<const char*> { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+        return vector<const char*> { VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_KHR_MAINTENANCE1_EXTENSION_NAME };
     }
 
     virtual vector<const char*> setup_instance_layers() {
