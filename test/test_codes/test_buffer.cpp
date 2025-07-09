@@ -72,7 +72,7 @@ TEST_F(BufferTest, MapUnmapBuffer) {
 
     char sample_data[] = "Hello, Vulkan!";
     void *ptr = sample_data;
-    result = buffer->map(0, 1024);
+    result = buffer->map(1024);
     ASSERT_EQ(result, VK_SUCCESS);
     buffer->write(ptr, sizeof(sample_data));
     ASSERT_TRUE(buffer->get_mapped_ptr() != nullptr);

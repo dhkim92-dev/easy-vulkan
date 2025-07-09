@@ -6,17 +6,17 @@ BitmapBuddyMemoryAllocator::BitmapBuddyMemoryAllocator(
     std::shared_ptr<ev::Device> device
 ) : device(std::move(device)) {
     if (!this->device) {
-        logger::Logger::getInstance().error("Invalid device provided for BitmapBuddyMemoryAllocator creation.");
+        logger::Logger::getInstance().error("[ev::BitmapBuddyMemoryAllocator] Invalid device provided for BitmapBuddyMemoryAllocator creation.");
         exit(EXIT_FAILURE);
     }
 }
 
 BitmapBuddyMemoryAllocator::~BitmapBuddyMemoryAllocator() {
     if (is_initialized.load() && !memory_pools.empty()) {
-        logger::Logger::getInstance().debug("Destroying BitmapBuddyMemoryAllocator...");
+        logger::Logger::getInstance().debug("[ev::BitmapBuddyMemoryAllocator] Destroying BitmapBuddyMemoryAllocator...");
         memory_pools.clear();
     } else {
-        logger::Logger::getInstance().debug("BitmapBuddyMemoryAllocator was not initialized or no memory pools exist, skipping destruction.");
+        logger::Logger::getInstance().debug("[ev::BitmapBuddyMemoryAllocator] was not initialized or no memory pools exist, skipping destruction.");
     }
 }
 
@@ -25,14 +25,14 @@ void BitmapBuddyMemoryAllocator::add_pool(
     VkDeviceSize size
 ) {
     if (is_initialized.load()) {
-        logger::Logger::getInstance().warn("BitmapBuddyMemoryAllocator is already initialized, skipping add_pool.");
+        logger::Logger::getInstance().warn("[ev::BitmapBuddyMemoryAllocator] is already initialized, skipping add_pool.");
         return;
     }
 
     uint32_t memory_type_index = device->get_memory_type_index(0xff, flags, nullptr);
 
     if (memory_type_index == UINT32_MAX) {
-        logger::Logger::getInstance().error("Failed to find suitable memory type index for the given flags.");
+        logger::Logger::getInstance().error("[ev::BitmapBuddyMemoryAllocator] Failed to find suitable memory type index for the given flags.");
         return;
     }
 
@@ -46,8 +46,9 @@ void BitmapBuddyMemoryAllocator::add_pool(
 }
 
 VkResult BitmapBuddyMemoryAllocator::build() {
+    logger::Logger::getInstance().debug("[ev::BitmapBuddyMemoryAllocator] Internal memory pool Building...");
     if (is_initialized.load()) {
-        logger::Logger::getInstance().warn("BitmapBuddyMemoryAllocator is already initialized, skipping build.");
+        logger::Logger::getInstance().warn("[ev::BitmapBuddyMemoryAllocator] Already initialized, skipping build.");
         return VK_SUCCESS;
     }
 
@@ -55,7 +56,7 @@ VkResult BitmapBuddyMemoryAllocator::build() {
         auto memory_pool = std::make_shared<ev::MemoryPool>(device, memory_type_index);
         VkResult result = memory_pool->create(pool_size.size, 6); // 6 is the default min_order
         if (result != VK_SUCCESS) {
-            logger::Logger::getInstance().error("Failed to create MemoryPool for memory type index: " + std::to_string(memory_type_index));
+            logger::Logger::getInstance().error("[ev::BitmapBuddyMemoryAllocator] Failed to create memory pool for memory type index: " + std::to_string(memory_type_index));
             memory_pools.clear();
             return result;
         }
@@ -63,7 +64,7 @@ VkResult BitmapBuddyMemoryAllocator::build() {
     }
 
     is_initialized.store(true);
-    logger::Logger::getInstance().debug("BitmapBuddyMemoryAllocator built successfully.");
+    logger::Logger::getInstance().debug("[ev::BitmapBuddyMemoryAllocator] Built successfully.");
     return VK_SUCCESS;
 }
 
@@ -72,25 +73,25 @@ VkResult BitmapBuddyMemoryAllocator::allocate_buffer(
     VkMemoryPropertyFlags mem_flags
 ) {
     if (!is_initialized.load()) {
-        logger::Logger::getInstance().error("BitmapBuddyMemoryAllocator is not initialized, cannot allocate buffer.");
+        logger::Logger::getInstance().error("[ev::BitmapBuddyMemoryAllocator] is not initialized, cannot allocate buffer.");
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
     uint32_t memory_type_index = device->get_memory_type_index(buffer->get_memory_requirements().memoryTypeBits, mem_flags, nullptr);
     if (memory_type_index == UINT32_MAX) {
-        logger::Logger::getInstance().error("Failed to find suitable memory type index for the buffer.");
+        logger::Logger::getInstance().error("[ev::BitmapBuddyMemoryAllocator] Failed to find suitable memory type index for the buffer.");
         return VK_ERROR_MEMORY_MAP_FAILED;
     }
 
     auto it = memory_pools.find(memory_type_index);
     if (it == memory_pools.end()) {
-        logger::Logger::getInstance().error("No memory pool found for the specified memory type index.");
+        logger::Logger::getInstance().error("[ev::BitmapBuddyMemoryAllocator] No memory pool found for the specified memory type index.");
         return VK_ERROR_OUT_OF_POOL_MEMORY;
     }
     VkMemoryRequirements requirements = buffer->get_memory_requirements();
     std::shared_ptr<ev::MemoryBlockMetadata> metadata = it->second->allocate(requirements.size, requirements.alignment);
     if (!metadata) {
-        logger::Logger::getInstance().error("Failed to allocate memory for the buffer.");
+        logger::Logger::getInstance().error("[ev::BitmapBuddyMemoryAllocator] Failed to allocate memory for the buffer.");
         return VK_ERROR_OUT_OF_DEVICE_MEMORY;  
     }
     return buffer->bind_memory(metadata->get_memory(), metadata->get_offset());
@@ -101,19 +102,19 @@ VkResult BitmapBuddyMemoryAllocator::allocate_image(
     VkMemoryPropertyFlags mem_flags
 ) {
     if (!is_initialized.load()) {
-        logger::Logger::getInstance().error("BitmapBuddyMemoryAllocator is not initialized, cannot allocate image.");
+        logger::Logger::getInstance().error("[ev::BitmapBuddyMemoryAllocator] is not initialized, cannot allocate image.");
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
     uint32_t memory_type_index = device->get_memory_type_index(image->get_memory_requirements().memoryTypeBits, mem_flags, nullptr);
     if (memory_type_index == UINT32_MAX) {
-        logger::Logger::getInstance().error("Failed to find suitable memory type index for the image.");
+        logger::Logger::getInstance().error("[ev::BitmapBuddyMemoryAllocator] Failed to find suitable memory type index for the image.");
         return VK_ERROR_MEMORY_MAP_FAILED;
     }
 
     auto it = memory_pools.find(memory_type_index);
     if (it == memory_pools.end()) {
-        logger::Logger::getInstance().error("No memory pool found for the specified memory type index.");
+        logger::Logger::getInstance().error("[ev::BitmapBuddyMemoryAllocator] No memory pool found for the specified memory type index.");
         return VK_ERROR_OUT_OF_POOL_MEMORY;
     }
 
@@ -121,7 +122,7 @@ VkResult BitmapBuddyMemoryAllocator::allocate_image(
         image->get_memory_requirements().alignment);
 
     if (!metadata) {
-        logger::Logger::getInstance().error("Failed to allocate memory for the image.");
+        logger::Logger::getInstance().error("[ev::BitmapBuddyMemoryAllocator] Failed to allocate memory for the image.");
         return VK_ERROR_OUT_OF_DEVICE_MEMORY;
     }
     return image->bind_memory(metadata->get_memory(), metadata->get_offset());
