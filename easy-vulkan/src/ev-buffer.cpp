@@ -55,7 +55,7 @@ VkResult Buffer::bind_memory(shared_ptr<ev::Memory> memory, VkDeviceSize offset)
     VkResult result = vkBindBufferMemory(*device, buffer, *memory, offset);
     if (result == VK_SUCCESS) {
         this->memory = *memory;
-        Logger::getInstance().debug("[ev::Buffer::bind_memory] Buffer memory bound successfully.");
+        Logger::getInstance().debug("[ev::Buffer::bind_memory] Buffer memory bound successfully offset : " + std::to_string(offset));
     }  
     return result;
 }
@@ -67,6 +67,8 @@ VkResult Buffer::bind_memory(std::shared_ptr<ev::MemoryBlockMetadata> block_meta
         return VK_ERROR_INVALID_EXTERNAL_HANDLE;
     }
     this->pool_block_metadata = block_metadata;
+    this->offset = block_metadata->get_offset();
+    this->size = block_metadata->get_size();
     return bind_memory(block_metadata->get_memory(), block_metadata->get_offset());
 }
 
@@ -146,7 +148,10 @@ VkResult Buffer::flush( VkDeviceSize offset, VkDeviceSize size ) {
     VkMappedMemoryRange range = {};
     range.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
     range.memory = memory;
-    range.offset = 0;
+    if ( offset == 0 ) {
+        offset = this->offset; // Use the offset of the buffer if not specified
+    }
+    range.offset = offset;
     range.size = size;
     return vkFlushMappedMemoryRanges(*device, 1, &range);
 }

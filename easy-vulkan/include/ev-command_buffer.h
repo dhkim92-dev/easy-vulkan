@@ -9,6 +9,7 @@
 #include "ev-framebuffer.h"
 #include "ev-descriptor_set.h"
 #include "ev-pipeline.h"
+#include "ev-sync.h"
 
 using namespace std;
 
@@ -135,6 +136,46 @@ public:
     // VkResult barrier() {
         // vkCmdPipelineBarrier()
     // }
+
+    VkResult pipeline_barrier(
+        std::shared_ptr<ev::Image> image,
+        VkPipelineStageFlags src_stage_mask,
+        VkPipelineStageFlags dst_stage_mask,
+        const vector<ImageMemoryBarrier> image_memory_barriers = {},
+        const vector<BufferMemoryBarrier> buffer_memory_barriers = {},
+        const vector<MemoryBarrier> memory_barriers = {}
+    ) {
+        vector<VkImageMemoryBarrier> vk_image_memory_barriers;
+        vk_image_memory_barriers.reserve(image_memory_barriers.size());
+        for (const auto& imb : image_memory_barriers) {
+            vk_image_memory_barriers.push_back(static_cast<VkImageMemoryBarrier>(imb));
+        }
+        vector<VkBufferMemoryBarrier> vk_buffer_memory_barriers;
+        vk_buffer_memory_barriers.reserve(buffer_memory_barriers.size());
+        for (const auto& bmb : buffer_memory_barriers) {
+            vk_buffer_memory_barriers.push_back(static_cast<VkBufferMemoryBarrier>(bmb));
+        }
+        vector<VkMemoryBarrier> vk_memory_barriers;
+        vk_memory_barriers.reserve(memory_barriers.size());
+        for (const auto& mb : memory_barriers) {
+            vk_memory_barriers.push_back(static_cast<VkMemoryBarrier>(mb));
+        }
+
+        vkCmdPipelineBarrier(
+            command_buffer,
+            src_stage_mask,
+            dst_stage_mask,
+            0,
+            static_cast<uint32_t>(vk_memory_barriers.size()),
+            vk_memory_barriers.data(),
+            static_cast<uint32_t>(vk_buffer_memory_barriers.size()),
+            vk_buffer_memory_barriers.data(),
+            static_cast<uint32_t>(vk_image_memory_barriers.size()),
+            vk_image_memory_barriers.data()
+        );
+
+        return VK_SUCCESS;
+    }
 
     VkResult begin(VkCommandBufferUsageFlags flags = 0);
 

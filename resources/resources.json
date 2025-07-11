@@ -1,0 +1,12 @@
+{
+    "textures" : [
+        {
+            "url": "https://www.dohoon-kim.kr/media/graphics/textures/cube/wood.png",
+            "destination_path": "textures/cube/wood.png"
+        }
+    ],
+
+    "models" : [
+
+    ]
+}

@@ -54,7 +54,8 @@ VkResult BitmapBuddyMemoryAllocator::build() {
 
     for (const auto& [memory_type_index, pool_size] : pool_sizes) {
         auto memory_pool = std::make_shared<ev::MemoryPool>(device, memory_type_index);
-        VkResult result = memory_pool->create(pool_size.size, 6); // 6 is the default min_order
+
+        VkResult result = memory_pool->create(pool_size.size, 2); // 2 is the default min_order
         if (result != VK_SUCCESS) {
             logger::Logger::getInstance().error("[ev::BitmapBuddyMemoryAllocator] Failed to create memory pool for memory type index: " + std::to_string(memory_type_index));
             memory_pools.clear();
@@ -89,6 +90,13 @@ VkResult BitmapBuddyMemoryAllocator::allocate_buffer(
         return VK_ERROR_OUT_OF_POOL_MEMORY;
     }
     VkMemoryRequirements requirements = buffer->get_memory_requirements();
+
+    if ( buffer->get_usage_flags() & VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT ) {
+        logger::Logger::getInstance().debug("[ev::BitmapBuddyMemoryAllocator] Minimum uniform buffer offset alignment: " + to_string(device->get_properties().limits.minUniformBufferOffsetAlignment));
+    }
+
+    ev::logger::Logger::getInstance().debug("[ev::BitmapBuddyMemoryAllocator] Allocating buffer with size: " + std::to_string(requirements.size) + 
+        ", alignment: " + std::to_string(requirements.alignment) + ", memory type index: " + std::to_string(memory_type_index));
     std::shared_ptr<ev::MemoryBlockMetadata> metadata = it->second->allocate(requirements.size, requirements.alignment);
     if (!metadata) {
         logger::Logger::getInstance().error("[ev::BitmapBuddyMemoryAllocator] Failed to allocate memory for the buffer.");

@@ -11,6 +11,8 @@ option(BUILD_TESTS "Build tests" OFF) # 기본값 OFF
 add_subdirectory(easy-vulkan)
 add_subdirectory(examples)
 add_subdirectory(shaders)
+add_subdirectory(resources) # resources 디렉터리 추가
+add_subdirectory(external) # 외부 라이브러리 의존성 빌드용
 
 # if(BUILD_TESTS)
 add_subdirectory(test)

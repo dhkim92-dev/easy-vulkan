@@ -3,9 +3,88 @@
 #include <memory>
 #include <vector>
 #include "ev-device.h"
+#include "ev-buffer.h"
+#include "ev-image.h"
 
 
 namespace ev {
+
+class MemoryBarrier {
+private:
+
+    VkMemoryBarrier memory_barrier = {};
+
+public:
+
+    explicit MemoryBarrier(VkAccessFlags src_access_mask,
+        VkAccessFlags dst_access_mask,
+        void* next = nullptr
+    );
+
+    MemoryBarrier(const MemoryBarrier&) = delete;
+
+    MemoryBarrier& operator=(const MemoryBarrier&) = delete;
+
+    ~MemoryBarrier() = default;
+
+    operator VkMemoryBarrier() const {
+        return memory_barrier;
+    }
+};
+
+class BufferMemoryBarrier {
+
+private:
+
+    VkBufferMemoryBarrier buffer_memory_barrier = {};
+
+public:
+
+    explicit BufferMemoryBarrier(std::shared_ptr<ev::Buffer> buffer,
+        VkAccessFlags src_access_mask,
+        VkAccessFlags dst_access_mask,
+        VkDeviceSize size = VK_WHOLE_SIZE,
+        uint32_t src_queue_family_index = VK_QUEUE_FAMILY_IGNORED,
+        uint32_t dst_queue_family_index = VK_QUEUE_FAMILY_IGNORED,
+        void* next = nullptr
+    );
+
+    BufferMemoryBarrier(const BufferMemoryBarrier&) = delete;
+ 
+    BufferMemoryBarrier& operator=(const BufferMemoryBarrier&) = delete;
+ 
+   ~BufferMemoryBarrier() = default;
+
+    operator VkBufferMemoryBarrier() const {
+        return buffer_memory_barrier;
+    }
+};
+
+class ImageMemoryBarrier {
+private:
+
+    VkImageMemoryBarrier image_memory_barrier = {};
+
+public: 
+    explicit ImageMemoryBarrier(std::shared_ptr<ev::Image> image,
+        VkAccessFlags src_access_mask, 
+        VkAccessFlags dst_access_mask, 
+        VkImageLayout new_layout, 
+        uint32_t src_queue_family_index = VK_QUEUE_FAMILY_IGNORED,
+        uint32_t dst_queue_family_index = VK_QUEUE_FAMILY_IGNORED,
+        VkImageSubresourceRange subresource_range = {}
+    );
+
+    ImageMemoryBarrier(const ImageMemoryBarrier&) = default;
+
+    ImageMemoryBarrier& operator=(const ImageMemoryBarrier&) = default;
+
+    ~ImageMemoryBarrier() = default;
+
+    operator VkImageMemoryBarrier() const {
+        return image_memory_barrier;
+    }
+};
 
 class Semaphore {
 
