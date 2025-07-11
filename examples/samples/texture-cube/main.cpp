@@ -121,10 +121,6 @@ private:
     };
 
     struct {
-        std::shared_ptr<ev::DescriptorSetLayout> layout;
-};
-
-    struct {
         std::shared_ptr<ev::Shader> vertex;
         std::shared_ptr<ev::Shader> fragment;
     } shaders;
