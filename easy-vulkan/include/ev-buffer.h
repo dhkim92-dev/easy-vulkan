@@ -81,6 +81,8 @@ public:
 
     VkDescriptorBufferInfo& get_descriptor() {
         descriptor.buffer = buffer;
+        descriptor.offset = 0;
+        descriptor.range = size;
         return descriptor;
     }
 
@@ -104,6 +106,10 @@ public:
         VkMemoryRequirements mem_reqs;
         vkGetBufferMemoryRequirements(*device, buffer, &mem_reqs);
         return mem_reqs;
+    }
+
+    VkDeviceSize get_offset() const {
+        return offset;
     }
 
     operator VkBuffer() const {

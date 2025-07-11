@@ -19,6 +19,14 @@ public:
             std::shared_ptr<ev::Sampler> sampler);
 
     ~Texture() = default;
+
+    VkDescriptorImageInfo get_descriptor() const {
+        VkDescriptorImageInfo descriptor = {};
+        descriptor.imageView = *image_view;
+        descriptor.sampler = *sampler;
+        descriptor.imageLayout = image->get_layout();
+        return descriptor;
+    }
 };
 
 }

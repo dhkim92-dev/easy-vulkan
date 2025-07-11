@@ -203,7 +203,7 @@ public:
         );
         memory_allocator->allocate_buffer(buffers.cube_vertices, ev::memory_type::GPU_ONLY);
 
-        ev::logger::Logger::getInstance().debug("[TriangleExample::setup_vertex_buffer] Creating vertex buffer with size: " + std::to_string(sizeof(cube_vertices)) + " bytes with vk handle : " + std::to_string(reinterpret_cast<uintptr_t>(VkBuffer(*buffers.cube_vertices))));
+        ev::logger::Logger::getInstance().debug("[CubeExample::setup_vertex_buffer] Creating vertex buffer with size: " + std::to_string(sizeof(cube_vertices)) + " bytes with vk handle : " + std::to_string(reinterpret_cast<uintptr_t>(VkBuffer(*buffers.cube_vertices))));
 
         buffers.cube_indices = std::make_shared<ev::Buffer>(
             device, 
@@ -309,10 +309,10 @@ public:
             display.width, 
             display.height, 
             1,1,1,
+            VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
             VK_IMAGE_LAYOUT_UNDEFINED,
             VK_SAMPLE_COUNT_1_BIT,
-            VK_IMAGE_TILING_OPTIMAL,
-            VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT
+            VK_IMAGE_TILING_OPTIMAL
         );
         depth_stencil.memory = std::make_shared<ev::Memory>(
             device,

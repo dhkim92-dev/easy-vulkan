@@ -32,10 +32,10 @@ protected:
             VK_FORMAT_R8G8B8A8_UNORM,
             256, 256, 1,
             1, 1,
+            VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
             VK_IMAGE_LAYOUT_UNDEFINED,
             VK_SAMPLE_COUNT_1_BIT,
             VK_IMAGE_TILING_OPTIMAL,
-            VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
             VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT,
             VK_SHARING_MODE_EXCLUSIVE,
             0, nullptr, nullptr

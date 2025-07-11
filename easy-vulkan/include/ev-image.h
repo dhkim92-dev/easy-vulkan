@@ -62,10 +62,10 @@ public:
         uint32_t depth = 1,
         uint32_t mip_levels = 1,
         uint32_t array_layers = 1,
+        VkImageUsageFlags usage_flags = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
         VkImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED,
         VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT,
         VkImageTiling tiling = VK_IMAGE_TILING_OPTIMAL,
-        VkImageUsageFlags usage_flags = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
         VkImageCreateFlags flags = 0,
         VkSharingMode sharing_mode = VK_SHARING_MODE_EXCLUSIVE,
         uint32_t queue_family_count = 0,
@@ -78,6 +78,8 @@ public:
     void destroy();
 
     VkResult bind_memory(shared_ptr<Memory> memory, VkDeviceSize offset = 0);
+
+    VkResult transient_layout(VkImageLayout new_layout);
 
     VkFormat get_format() {
         return this->format;

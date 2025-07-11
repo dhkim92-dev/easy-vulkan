@@ -7,6 +7,9 @@
 #include "ev-device.h"
 #include "ev-buffer.h"
 #include "ev-image.h"
+#include "ev-image_view.h"
+#include "ev-sampler.h"
+#include "ev-texture.h"
 #include "ev-logger.h"
 
 using namespace std;
@@ -76,6 +79,10 @@ private:
 
     vector<VkWriteDescriptorSet> write_registry;
 
+    vector<VkDescriptorBufferInfo> buffer_infos;
+
+    vector<VkDescriptorImageInfo> image_infos;
+
 public:
 
     explicit DescriptorSet(
@@ -85,10 +92,15 @@ public:
 
     DescriptorSet(const DescriptorSet&) = delete;
 
-    void write_buffer(uint32_t binding, shared_ptr<Buffer> buffer);
+    void write_buffer(uint32_t binding, 
+        shared_ptr<Buffer> buffer,
+        VkDescriptorType type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
+    );
 
-    //void write_texture(); 
-    // TODO: Sampler 구현 및 Texture 타입 정의 후 구현
+    void write_texture(uint32_t binding, 
+        shared_ptr<ev::Texture> texture,
+        VkDescriptorType type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
+    ); 
 
     VkResult update();
 

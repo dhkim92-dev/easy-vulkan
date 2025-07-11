@@ -13,10 +13,10 @@ Image::Image(
     uint32_t depth ,
     uint32_t mip_levels,
     uint32_t array_layers,
+    VkImageUsageFlags usage_flags,
     VkImageLayout layout,
     VkSampleCountFlagBits samples,
     VkImageTiling tiling,
-    VkImageUsageFlags usage_flags,
     VkImageCreateFlags flags,
     VkSharingMode sharing_mode,
     uint32_t queue_family_count,
@@ -38,7 +38,7 @@ Image::Image(
     flags(flags),
     p_next(p_next) {
     if( flags & VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT ) {
-        Logger::getInstance().info("VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT is set, ensure the image format is compatible with the view format.");
+        Logger::getInstance().info("[ev::Image] VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT is set, ensure the image format is compatible with the view format.");
     }
     VkImageCreateInfo ci = {};
     ci.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -59,37 +59,48 @@ Image::Image(
     VkResult result = vkCreateImage(*device, &ci, nullptr, &image);
 
     if ( result == VK_SUCCESS ) {
-        Logger::getInstance().debug("Image created successfully.");
+        Logger::getInstance().debug("[ev::Image] Image created successfully with handle " + std::to_string(reinterpret_cast<uintptr_t>(image)));
         vkGetImageMemoryRequirements(*device, image, &memory_requirements);
     } 
 
     if (result != VK_SUCCESS) {
-        Logger::getInstance().error("Failed to create image: " + std::to_string(result));
+        Logger::getInstance().error("[ev::Image] Failed to create image: " + std::to_string(result));
         exit(EXIT_FAILURE);
     }
 }
 
 VkResult Image::bind_memory(shared_ptr<Memory> memory, VkDeviceSize offset) {
     if (!memory) {
-        Logger::getInstance().error("Memory is null.");
+        Logger::getInstance().error("[ev::Image] Memory is null.");
         return VK_ERROR_INITIALIZATION_FAILED;
     }
     this->memory = memory;
     VkResult result = vkBindImageMemory(*device, image, *memory, offset);
     if (result != VK_SUCCESS) {
-        Logger::getInstance().error("Failed to bind image memory: " + std::to_string(result));
+        Logger::getInstance().error("[ev::Image] Failed to bind image memory: " + std::to_string(result));
     }
     return result;
 }
 
+VkResult Image::transient_layout(VkImageLayout new_layout) {
+    if (layout == new_layout) {
+        Logger::getInstance().debug("[ev::Image] Image is already in the desired layout.");
+        return VK_SUCCESS;
+    }
+    layout = new_layout; // Update the layout after the transition
+    Logger::getInstance().debug("[ev::Image] Image layout transitioned to " + std::to_string(new_layout));
+    
+    return VK_SUCCESS;
+}
+
 void Image::destroy() {
-    Logger::getInstance().debug("Destroying Image...");
+    Logger::getInstance().debug("[ev::Image] Destroying Image...");
     if (image != VK_NULL_HANDLE) {
         vkDestroyImage(*device, image, nullptr);
         image = VK_NULL_HANDLE;
     }
     usage_flags = 0;
-    Logger::getInstance().debug("Image destroyed successfully.");
+    Logger::getInstance().debug("[ev::Image] Image destroyed successfully.");
 }
 
 Image::~Image() {
