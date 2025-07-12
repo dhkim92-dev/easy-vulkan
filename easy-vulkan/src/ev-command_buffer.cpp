@@ -330,6 +330,46 @@ void CommandBuffer::dispatch(uint32_t group_count_x,
     vkCmdDispatch(command_buffer, group_count_x, group_count_y, group_count_z);
 }
 
+VkResult CommandBuffer::pipeline_barrier(
+    VkPipelineStageFlags src_stage_mask,
+    VkPipelineStageFlags dst_stage_mask,
+    const vector<ev::ImageMemoryBarrier> image_memory_barriers,
+    const vector<ev::BufferMemoryBarrier> buffer_memory_barriers,
+    const vector<ev::MemoryBarrier> memory_barriers
+)  {
+    vector<VkImageMemoryBarrier> vk_image_memory_barriers;
+    vk_image_memory_barriers.reserve(image_memory_barriers.size());
+    for (const auto& imb : image_memory_barriers) {
+        vk_image_memory_barriers.push_back(static_cast<VkImageMemoryBarrier>(imb));
+    }
+    vector<VkBufferMemoryBarrier> vk_buffer_memory_barriers;
+    vk_buffer_memory_barriers.reserve(buffer_memory_barriers.size());
+    for (const auto& bmb : buffer_memory_barriers) {
+        vk_buffer_memory_barriers.push_back(static_cast<VkBufferMemoryBarrier>(bmb));
+    }
+    vector<VkMemoryBarrier> vk_memory_barriers;
+    vk_memory_barriers.reserve(memory_barriers.size());
+    for (const auto& mb : memory_barriers) {
+        vk_memory_barriers.push_back(static_cast<VkMemoryBarrier>(mb));
+    }
+
+    vkCmdPipelineBarrier(
+        command_buffer,
+        src_stage_mask,
+        dst_stage_mask,
+        0,
+        static_cast<uint32_t>(vk_memory_barriers.size()),
+        vk_memory_barriers.data(),
+        static_cast<uint32_t>(vk_buffer_memory_barriers.size()),
+        vk_buffer_memory_barriers.data(),
+        static_cast<uint32_t>(vk_image_memory_barriers.size()),
+        vk_image_memory_barriers.data()
+    );
+
+    return VK_SUCCESS;
+}
+
+
 VkResult CommandBuffer::begin(VkCommandBufferUsageFlags flags) {
     if (command_buffer == VK_NULL_HANDLE) {
         logger::Logger::getInstance().error("[CommandBuffer::begin] : Command buffer is not allocated.");
