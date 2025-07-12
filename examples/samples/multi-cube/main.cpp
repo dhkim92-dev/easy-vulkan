@@ -6,11 +6,12 @@
 #include "stb_image.h"
 #include "base/example_base.hpp"
 
-class TextureCubeExample : public ExampleBase {
+
+class MultiCubeExample : public ExampleBase {
 
 private:
 
-    vector<std::shared_ptr<ev::PipelineLayout>> pipeline_layouts;
+    std::vector<std::shared_ptr<ev::PipelineLayout>> pipeline_layouts;
 
     std::shared_ptr<ev::RenderPass> render_pass;
 
@@ -24,38 +25,43 @@ private:
 
     std::shared_ptr<ev::CommandPool> command_pool;
 
-    shared_ptr<ev::DescriptorPool> descriptor_pool;
-
     std::vector<std::shared_ptr<ev::CommandBuffer>> command_buffers;
     
     std::shared_ptr<ev::Queue> queue;
 
     std::shared_ptr<ev::BitmapBuddyMemoryAllocator> memory_allocator;
 
-    struct UniformBufferObject {
-        glm::mat4 model;
+    struct Camera {
         glm::mat4 view;
         glm::mat4 proj;
-    } ubo;
+    } camera;
 
     struct {
-        shared_ptr<ev::DescriptorSetLayout> layout;
-        vector<shared_ptr<ev::DescriptorSet>> sets;
+        std::shared_ptr<ev::DescriptorPool> pool;
+        std::shared_ptr<ev::DescriptorSetLayout> layout;
+        std::vector<std::shared_ptr<ev::DescriptorSet>> sets;
     } descriptors;
 
 
     struct {
-        std::shared_ptr<ev::Buffer> cube_vertices;
-        std::shared_ptr<ev::Buffer> cube_indices;
+        std::shared_ptr<ev::Buffer> vertices;
+        std::shared_ptr<ev::Buffer> indices;
+        std::shared_ptr<ev::Buffer> camera_uniform;
+        std::shared_ptr<ev::Buffer> instance_buffer;
         std::shared_ptr<ev::Texture> texture;
-        std::shared_ptr<ev::Buffer> uniform;
-    } buffers;
+    } d_buffers;
+
+    struct Cube {
+        glm::mat4 model;
+    };
+
+    std::vector<Cube> cubes;
 
     struct Vertex {
         glm::vec3 pos;
         glm::vec2 tex_coord;
         Vertex(glm::vec3 position, glm::vec2 tex_coord)
-            : pos(position), tex_coord(tex_coord) {}
+        : pos(position), tex_coord(tex_coord) {}
     };
 
     // Cube의 8개 꼭지점 좌표, Normal 값은 해당 좌표에서 0,0,0으로 향하는 벡터의 역방향, 즉 좌표값과 동일
@@ -69,7 +75,7 @@ private:
     // |         | /
     // v3-------v2
     
-    std::vector<Vertex> cube_vertices = {
+    const std::vector<Vertex> h_vertices = {
         // 각 면의 정점 위치에 맞게 UV 좌표를 (0,0) ~ (1,1) 사이로 매핑합니다.
         // Y축이 위쪽인 오른손 좌표계를 기준으로 합니다.
 
@@ -111,7 +117,7 @@ private:
     };
 
     // 인덱스는 각 면의 4개 정점을 사용하여 2개의 삼각형을 만듭니다.
-    std::vector<uint32_t> cube_indices = {
+    const std::vector<uint32_t> h_indices = {
         1, 0, 2,   3, 2, 0,       // 앞면
         4, 5, 6,   7, 4, 6,       // 뒷면
         9, 8, 10,  11, 10, 8,      // 왼쪽
@@ -146,9 +152,15 @@ private:
 
 public:
 
-    explicit TextureCubeExample(std::string example_name, std::string executable_path, bool debug = true)
+    explicit MultiCubeExample(std::string example_name, std::string executable_path, bool debug = true)
     : ExampleBase(example_name, executable_path, debug) {
         this->title = example_name;
+
+        /** Host side resources **/
+        setup_camera();
+        setup_cubes();
+
+        /** Device side resources **/
         setup_default_context();
         setup_synchronize_objects();
         setup_depth_stencil();
@@ -156,6 +168,7 @@ public:
         setup_command_buffers();
         setup_memory_pool();
         setup_vertex_buffer();
+        setup_instance_buffer();
         setup_texture();
         setup_uniform_buffer();
         setup_descriptor_sets();
@@ -167,7 +180,7 @@ public:
     }
 
     void setup_texture() {
-
+        ev::logger::Logger::getInstance().info("[Setup Texture Start]");
         uint8_t* texture_data = nullptr;
         int width = 0,height = 0, channels = 0, comp_req=0;
         std::string texture_path = resource_path / "textures" / "cube" / "wood.png";
@@ -185,7 +198,7 @@ public:
             device,
             VK_IMAGE_TYPE_2D,
             VK_FORMAT_R8G8B8A8_SRGB,
-            500, 500, 1
+            width, height, 1
         );
 
         memory_allocator->allocate_image(image, ev::memory_type::GPU_ONLY);
@@ -206,7 +219,7 @@ public:
             VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE
         );
 
-        buffers.texture = std::make_shared<ev::Texture>(
+        d_buffers.texture = std::make_shared<ev::Texture>(
             image, 
             image_view, 
             sampler
@@ -237,7 +250,7 @@ public:
 
         std::vector<ev::ImageMemoryBarrier> image_barriers;
         image_barriers.emplace_back( ev::ImageMemoryBarrier(
-            buffers.texture->image,
+            d_buffers.texture->image,
             VK_ACCESS_NONE_KHR, 
             VK_ACCESS_TRANSFER_WRITE_BIT, 
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
@@ -253,7 +266,6 @@ public:
             {}
         );
 
-
         VkBufferImageCopy region = {};
         region.bufferOffset = 0;
         region.imageOffset = {0, 0, 0};
@@ -263,7 +275,7 @@ public:
         region.imageSubresource.layerCount = 1;
         region.imageSubresource.baseArrayLayer = 0;
 
-        staging_command->copy_buffer_to_image(buffers.texture->image, 
+        staging_command->copy_buffer_to_image(d_buffers.texture->image, 
             staging_buffer,
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             {region}
@@ -272,7 +284,7 @@ public:
         std::vector<ev::ImageMemoryBarrier> post_copy_barriers;
         post_copy_barriers.reserve(1);
         post_copy_barriers.emplace_back( ev::ImageMemoryBarrier(
-            buffers.texture->image,
+            d_buffers.texture->image,
             VK_ACCESS_TRANSFER_WRITE_BIT,
             VK_ACCESS_SHADER_READ_BIT,
             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
@@ -291,8 +303,9 @@ public:
         sync_objects.copy_complete_fence->wait(UINT64_MAX);
         queue->wait_idle(UINT64_MAX);
         staging_buffer.reset();
-        buffers.texture->image->transient_layout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        d_buffers.texture->image->transient_layout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         stbi_image_free(texture_data);
+        ev::logger::Logger::getInstance().info("[Setup Texture End]");
     }
 
     void setup_memory_pool() {
@@ -306,19 +319,57 @@ public:
 
     void setup_uniform_buffer() {
         ev::logger::Logger::getInstance().info("[Setup Uniform Buffer Start]");
-        buffers.uniform= std::make_shared<ev::Buffer>(
+        d_buffers.camera_uniform= std::make_shared<ev::Buffer>(
             device, 
-            sizeof(UniformBufferObject), 
+            sizeof(Camera),
             ev::buffer_type::UNIFORM_BUFFER
         );
-        memory_allocator->allocate_buffer(buffers.uniform, ev::memory_type::HOST_READABLE);
-        buffers.uniform->map();
-        buffers.uniform->write(&ubo, sizeof(ubo));
-        buffers.uniform->flush();
-        buffers.uniform->unmap();
-        VkBuffer uniform_buffer_handle = *buffers.uniform;
-        ev::logger::Logger::getInstance().debug("uniform buffer handler : " + std::to_string(reinterpret_cast<uintptr_t>(uniform_buffer_handle)));
+        memory_allocator->allocate_buffer(d_buffers.camera_uniform, ev::memory_type::HOST_READABLE);
+        d_buffers.camera_uniform->map();
+        d_buffers.camera_uniform->write(&camera, sizeof(Camera));
+        d_buffers.camera_uniform->flush();
+        d_buffers.camera_uniform->unmap();
+        VkBuffer uniform_buffer_handle = *d_buffers.camera_uniform;
+        ev::logger::Logger::getInstance().debug("Camera uniform buffer handler : " + std::to_string(reinterpret_cast<uintptr_t>(uniform_buffer_handle)));
         ev::logger::Logger::getInstance().info("[Setup Uniform Buffer End]");
+    }
+
+    void setup_instance_buffer() {
+        ev::logger::Logger::getInstance().info("[Setup Instance Buffer Start]");
+        std::shared_ptr<ev::CommandBuffer> staging_command = command_pool->allocate(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+        staging_command->begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+        ev::logger::Logger::getInstance().debug("Setting up instance buffer... with size : " + std::to_string(cubes.size()));
+
+        size_t buffer_size = cubes.size() * sizeof(Cube);
+
+        std::shared_ptr<ev::Buffer> staging_buffer = std::make_shared<ev::Buffer>(
+            device, 
+            buffer_size, 
+            ev::buffer_type::STAGING_BUFFER
+        );
+        memory_allocator->allocate_buffer(staging_buffer, ev::memory_type::HOST_READABLE);
+
+        staging_buffer->map();
+        staging_buffer->write(cubes.data(), buffer_size);
+        staging_buffer->flush();
+        staging_buffer->unmap();
+
+        d_buffers.instance_buffer = std::make_shared<ev::Buffer>(
+            device, 
+            buffer_size,
+            ev::buffer_type::VERTEX_BUFFER
+        );
+        memory_allocator->allocate_buffer(d_buffers.instance_buffer, ev::memory_type::GPU_ONLY);
+        staging_command->copy_buffer(d_buffers.instance_buffer, staging_buffer, buffer_size);
+        staging_command->end();
+        sync_objects.copy_complete_fence->reset();
+        CHECK_RESULT(queue->submit(staging_command, {}, {}, nullptr, sync_objects.copy_complete_fence, nullptr));
+        sync_objects.copy_complete_fence->wait(UINT64_MAX);
+        queue->wait_idle(UINT64_MAX);
+        staging_buffer.reset();
+
+        ev::logger::Logger::getInstance().debug("Instance buffer handler : " + std::to_string(reinterpret_cast<uintptr_t>(VkBuffer(*d_buffers.instance_buffer))));
+        ev::logger::Logger::getInstance().info("[Setup Instance Buffer End]");
     }
 
     void setup_synchronize_objects() {
@@ -343,48 +394,47 @@ public:
         ev::logger::Logger::getInstance().debug("Setting up vertex buffer...");
         // ev::logger::Logger::getInstance().debug("Vertex buffer size: " + std::to_string(sizeof(vertices)) + " bytes");
         sync_objects.copy_complete_fence->reset();
-        buffers.cube_vertices= std::make_shared<ev::Buffer>(
+        d_buffers.vertices = std::make_shared<ev::Buffer>(
             device, 
-            cube_vertices.size() * sizeof(Vertex), 
+            h_vertices.size() * sizeof(Vertex), 
             ev::buffer_type::VERTEX_BUFFER
         );
-        memory_allocator->allocate_buffer(buffers.cube_vertices, ev::memory_type::GPU_ONLY);
+        memory_allocator->allocate_buffer(d_buffers.vertices, ev::memory_type::GPU_ONLY);
 
-        ev::logger::Logger::getInstance().debug("[TextureCubeExample::setup_vertex_buffer] Creating vertex buffer with size: " + std::to_string(sizeof(cube_vertices)) + " bytes with vk handle : " + std::to_string(reinterpret_cast<uintptr_t>(VkBuffer(*buffers.cube_vertices))));
-
-        buffers.cube_indices = std::make_shared<ev::Buffer>(
+        d_buffers.indices = std::make_shared<ev::Buffer>(
             device, 
-            cube_indices.size() * sizeof(uint32_t), 
+            h_indices.size() * sizeof(uint32_t), 
             ev::buffer_type::INDEX_BUFFER
         );
-        memory_allocator->allocate_buffer(buffers.cube_indices, ev::memory_type::GPU_ONLY);
+
+        memory_allocator->allocate_buffer(d_buffers.indices, ev::memory_type::GPU_ONLY);
 
         shared_ptr<ev::Buffer> staging_buffer = std::make_shared<ev::Buffer>(
             device, 
-            cube_vertices.size() * sizeof(Vertex), 
+            h_vertices.size() * sizeof(Vertex), 
             VK_BUFFER_USAGE_TRANSFER_SRC_BIT
         );
 
         memory_allocator->allocate_buffer(staging_buffer, ev::memory_type::HOST_READABLE);
         staging_buffer->map();
-        staging_buffer->write(cube_vertices.data(), cube_vertices.size() * sizeof(Vertex));
+        staging_buffer->write((void*)h_vertices.data(), h_vertices.size() * sizeof(Vertex));
         // staging_buffer->flush();
         staging_buffer->unmap();
         auto index_staging_buffer = std::make_shared<ev::Buffer>(
             device, 
-            cube_indices.size() * sizeof(uint32_t), 
+            h_indices.size() * sizeof(uint32_t), 
             VK_BUFFER_USAGE_TRANSFER_SRC_BIT
         );
         memory_allocator->allocate_buffer(index_staging_buffer, ev::memory_type::HOST_READABLE);
         index_staging_buffer->map();
-        index_staging_buffer->write(cube_indices.data(), cube_indices.size() * sizeof(uint32_t));
+        index_staging_buffer->write((void*)h_indices.data(), h_indices.size() * sizeof(uint32_t));
         // index_staging_buffer->flush();
         index_staging_buffer->unmap();
 
         shared_ptr<ev::CommandBuffer> staging_command = command_pool->allocate(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
         staging_command->begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-        staging_command->copy_buffer(buffers.cube_vertices, staging_buffer, cube_vertices.size() * sizeof(Vertex));
-        staging_command->copy_buffer(buffers.cube_indices, index_staging_buffer, cube_indices.size() * sizeof(uint32_t));
+        staging_command->copy_buffer(d_buffers.vertices, staging_buffer, h_vertices.size() * sizeof(Vertex));
+        staging_command->copy_buffer(d_buffers.indices, index_staging_buffer, h_indices.size() * sizeof(uint32_t));
         staging_command->end();
         CHECK_RESULT(queue->submit(staging_command, {}, {}, nullptr, sync_objects.copy_complete_fence, nullptr));
         sync_objects.copy_complete_fence->wait(UINT64_MAX);
@@ -394,7 +444,7 @@ public:
         
 
         ev::logger::Logger::getInstance().debug("Vertex buffer created successfully.");
-        ev::logger::Logger::getInstance().debug("Vertex buffer handle: " + std::to_string(reinterpret_cast<uintptr_t>(VkBuffer(*buffers.cube_vertices))));
+        ev::logger::Logger::getInstance().debug("Vertex buffer handle: " + std::to_string(reinterpret_cast<uintptr_t>(VkBuffer(*d_buffers.vertices))));
         ev::logger::Logger::getInstance().info("[Setup Vertex Buffers End]");
     }
 
@@ -410,9 +460,9 @@ public:
         command_buffers[current_frame_index]->set_scissor(0, 0, display.width, display.height);
         command_buffers[current_frame_index]->bind_descriptor_sets(VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layouts[0], {descriptors.sets[current_frame_index]});
         command_buffers[current_frame_index]->bind_graphics_pipeline(graphics_pipeline);
-        command_buffers[current_frame_index]->bind_vertex_buffers(0, {buffers.cube_vertices}, {0});
-        command_buffers[current_frame_index]->bind_index_buffers({buffers.cube_indices}, 0, VK_INDEX_TYPE_UINT32);
-        command_buffers[current_frame_index]->draw_indexed(cube_indices.size(), 1, 0, 0, 0);
+        command_buffers[current_frame_index]->bind_vertex_buffers(0, {d_buffers.vertices, d_buffers.instance_buffer}, {0, 0});
+        command_buffers[current_frame_index]->bind_index_buffers({d_buffers.indices}, 0, VK_INDEX_TYPE_UINT32);
+        command_buffers[current_frame_index]->draw_indexed(h_indices.size(), cubes.size(), 0, 0, 0);
         command_buffers[current_frame_index]->end_render_pass();
         CHECK_RESULT(command_buffers[current_frame_index]->end());
     }
@@ -427,14 +477,15 @@ public:
 
     void setup_descriptor_sets() {
         ev::logger::Logger::getInstance().debug("[Setup Descriptor Sets Start]");
-        descriptor_pool = std::make_shared<ev::DescriptorPool>(device);
-        descriptor_pool->add(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3);
+        descriptors.pool = std::make_shared<ev::DescriptorPool>(device);
+        auto& descriptor_pool = descriptors.pool;
+        descriptor_pool->add(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3 * cubes.size());
         descriptor_pool->add(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 3);
         CHECK_RESULT(descriptor_pool->create_pool(3, VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT));
         ev::logger::Logger::getInstance().debug("Descriptor pool created");
         descriptors.layout = std::make_shared<ev::DescriptorSetLayout>(device);
-        descriptors.layout->add_binding(VK_SHADER_STAGE_VERTEX_BIT, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, 1);
-        descriptors.layout->add_binding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, 1);
+        descriptors.layout->add_binding(VK_SHADER_STAGE_VERTEX_BIT, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, 1); // Camera uniform buffer
+        descriptors.layout->add_binding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, 1); // Cube texture sampler
         CHECK_RESULT(descriptors.layout->create_layout());
         ev::logger::Logger::getInstance().debug("Descriptor set layout created");
 
@@ -442,13 +493,16 @@ public:
             descriptors.sets.push_back(descriptor_pool->allocate(descriptors.layout));
             ev::logger::Logger::getInstance().debug("Descriptor set " + std::to_string(i) + " allocated");
             descriptors.sets.back()->write_buffer(
-                0, 
-                buffers.uniform
+                0,
+                d_buffers.camera_uniform,
+                VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
             );
-            ev::logger::Logger::getInstance().debug("Descriptor set " + std::to_string(i) + " uniform buffer written");
+            ev::logger::Logger::getInstance().debug("Descriptor set " + std::to_string(i) + "Camera Perspective View uniform buffer written");
+
             descriptors.sets.back()->write_texture(
                 1, 
-                buffers.texture
+                d_buffers.texture,
+                VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
             );
             ev::logger::Logger::getInstance().debug("Descriptor set " + std::to_string(i) + " texture written");
             CHECK_RESULT(descriptors.sets.back()->update());
@@ -493,10 +547,10 @@ public:
 
     void setup_shaders() {
         vector<uint32_t> vertex_shader_code;
-        ev::utility::read_spirv_shader_file( (shader_path / this->title / "texture-cube.vert.spv").c_str(), vertex_shader_code);
+        ev::utility::read_spirv_shader_file( (shader_path / this->title / "multi-cube.vert.spv").c_str(), vertex_shader_code);
         shaders.vertex = std::make_shared<ev::Shader>(device, VK_SHADER_STAGE_VERTEX_BIT, vertex_shader_code);
         vector<uint32_t> fragment_shader_code;
-        ev::utility::read_spirv_shader_file( (shader_path / this->title / "texture-cube.frag.spv").c_str(), fragment_shader_code);
+        ev::utility::read_spirv_shader_file( (shader_path / this->title / "multi-cube.frag.spv").c_str(), fragment_shader_code);
         shaders.fragment = std::make_shared<ev::Shader>(device, VK_SHADER_STAGE_FRAGMENT_BIT, fragment_shader_code);
     }
 
@@ -599,8 +653,13 @@ public:
             .add_shader_stage(shaders.fragment)
             .set_vertex_input_state()
             .add_vertex_input_binding_description(0, sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX)
-            .add_vertex_attribute_description(0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0)
-            .add_vertex_attribute_description(0, 1, VK_FORMAT_R32G32_SFLOAT, sizeof(float) * 3)
+            .add_vertex_input_binding_description(1, sizeof(Cube), VK_VERTEX_INPUT_RATE_INSTANCE)
+            .add_vertex_attribute_description(0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, pos))
+            .add_vertex_attribute_description(0, 1, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, tex_coord))
+            .add_vertex_attribute_description(1, 2, VK_FORMAT_R32G32B32A32_SFLOAT,  offsetof(Cube, model) + sizeof(glm::vec4) * 0 )
+            .add_vertex_attribute_description(1, 3, VK_FORMAT_R32G32B32A32_SFLOAT,  offsetof(Cube, model) + sizeof(glm::vec4) * 1 )
+            .add_vertex_attribute_description(1, 4, VK_FORMAT_R32G32B32A32_SFLOAT,  offsetof(Cube, model) + sizeof(glm::vec4) * 2 )
+            .add_vertex_attribute_description(1, 5, VK_FORMAT_R32G32B32A32_SFLOAT,  offsetof(Cube, model) + sizeof(glm::vec4) * 3 )
             .set_input_assembly_state(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
             .set_rasterization_state(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_COUNTER_CLOCKWISE)
             .set_dynamic_state()
@@ -618,38 +677,54 @@ public:
         graphics_pipeline = pipelines[0];
     }
 
-    void uniform_update() {
-        if ( last_frame_time == 0.0f ) {
-            // last_frame_time = current_frame_time = std::chrono::duration<float>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
-            last_frame_time = current_frame_time = glfwGetTime();
-        } else {
-            // current_frame_time = std::chrono::duration<float>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
-            current_frame_time = glfwGetTime();
-        }
-        // 사각형이 매 프레임마다 회전하도록 설정
-        ubo.model = glm::scale( glm::rotate(glm::mat4(1.0f), glm::radians(current_frame_time * 90.0f), glm::vec3(0.0f, 1.0f, 0.0f)), glm::vec3(0.5f, 0.5f, 0.5f));
-        // 카메라를 z=2 위치에서 원점(0,0,0)을 바라보게 함, up은 +Y
-        ubo.view = glm::lookAt(
-            glm::vec3(0.0f, 1.0f, 2.0f), // eye
+    void setup_camera() {
+        camera.view = glm::lookAt(
+            glm::vec3(0.0f, 0.0f, 8.0f), // position
             glm::vec3(0.0f, 0.0f, 0.0f), // center
-            glm::vec3(0.0f, -1.0f, 0.0f)  // up
+            glm::vec3(0.0f, -1.0f, 0) // up vector
         );
-        // 일반적인 원근 투영, fovy 45도, aspect, near=0.1, far=10.0
-        ubo.proj = glm::perspective(
+        camera.proj = glm::perspective(
             glm::radians(45.0f),
             static_cast<float>(display.width) / static_cast<float>(display.height),
-            0.1f, 10.0f
+            0.1f, 100.0f
         );
-        // ubo.proj[1][1] *= -1; // Vulkan NDC 보정
-        buffers.uniform->map();
-        buffers.uniform->write(&ubo, sizeof(ubo));
-        // buffers.uniform.buffer->flush();
-        buffers.uniform->unmap();
+    }
+
+    void setup_cubes() {
+        std::vector<glm::vec3> cube_positions = {
+            glm::vec3( 0.0f,  0.0f,  0.0f),
+            glm::vec3( 2.0f,  5.0f, -15.0f),
+            glm::vec3(-1.5f, -2.2f, -2.5f),
+            glm::vec3(-3.8f, -2.0f, -12.3f),
+            glm::vec3( 2.4f, -0.4f, -3.5f),
+            glm::vec3(-1.7f,  3.0f, -7.5f),
+            glm::vec3( 1.3f, -2.0f, -2.5f),
+            glm::vec3( 1.5f,  2.0f, -2.5f),
+            glm::vec3( 1.5f,  0.2f, -1.5f),
+            glm::vec3(-1.3f,  1.0f, -1.5f)
+        };
+
+        cubes.resize(10);
+
+        for ( size_t i = 0 ; i < cubes.size() ; ++i ) {
+            cubes[i].model = glm::mat4(1.0f);
+            cubes[i].model = glm::translate(cubes[i].model, cube_positions[i]);
+            cubes[i].model = glm::rotate(cubes[i].model, glm::radians(20.0f * i), glm::vec3(1.0f, 0.3f, 0.5f));
+            cubes[i].model = glm::scale(cubes[i].model, glm::vec3(1.0f, 1.0f, 1.0f));
+        }
+    }
+
+    void uniform_update() {
+        if ( last_frame_time == 0.0f ) {
+            last_frame_time = current_frame_time = glfwGetTime();
+        } else {
+            current_frame_time = glfwGetTime();
+        }
+
         last_frame_time = current_frame_time;
     }
 
     void render() override {
-        // Triangle rendering code goes here
         sync_objects.frame_fences[current_frame_index]->wait();
         CHECK_RESULT(sync_objects.frame_fences[current_frame_index]->reset());
 
@@ -688,6 +763,7 @@ public:
         current_frame_index = (current_frame_index + 1) % swapchain->get_images().size();
         // ev::logger::Logger::getInstance().debug("Current frame index updated to: " + std::to_string(current_frame_index));
         uniform_update();
+            // exit(EXIT_FAILURE);
      }
 
 
@@ -699,4 +775,4 @@ public:
     }
 };
 
-RUN_EXAMPLE_MAIN(TextureCubeExample, "texture-cube")
+RUN_EXAMPLE_MAIN(MultiCubeExample, "multi-cube")

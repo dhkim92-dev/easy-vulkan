@@ -58,7 +58,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_vertex_i
     VkVertexInputBindingDescription description = {};
     description.binding = binding; // Default binding index
     description.stride = stride; // Default stride, should be set later
-    description.inputRate = VK_VERTEX_INPUT_RATE_VERTEX; // Default input rate
+    description.inputRate = input_rate; // Default input rate
     this->blue_prints.back().vertex_binding_descriptions.push_back(description);
     return *this;
 }
