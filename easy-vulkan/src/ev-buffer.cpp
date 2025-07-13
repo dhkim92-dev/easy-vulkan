@@ -68,7 +68,8 @@ VkResult Buffer::bind_memory(std::shared_ptr<ev::MemoryBlockMetadata> block_meta
     }
     this->pool_block_metadata = block_metadata;
     this->offset = block_metadata->get_offset();
-    this->size = block_metadata->get_size();
+    this->allocated_size = block_metadata->get_size();
+    Logger::Logger::getInstance().debug("[ev::Buffer::bind_memory] Binding buffer to memory block metadata with offset: " + std::to_string(this->offset) + ", size: " + std::to_string(this->allocated_size));
     return bind_memory(block_metadata->get_memory(), block_metadata->get_offset());
 }
 
@@ -92,7 +93,12 @@ VkResult Buffer::map(VkDeviceSize size) {
         return VK_SUCCESS;
     }
 
-    size = this->size;
+    if ( size == VK_WHOLE_SIZE ) {
+        size = this->allocated_size;
+    } else if ( size > this->allocated_size ) {
+        Logger::getInstance().error("[ev::Buffer::map] Size exceeds buffer size.");
+        return VK_ERROR_OUT_OF_DEVICE_MEMORY;
+    }
     VkResult result = vkMapMemory(*device, memory, offset, size, 0, &mapped);
     if (result == VK_SUCCESS) {
         is_mapped = true;
@@ -151,8 +157,21 @@ VkResult Buffer::flush( VkDeviceSize offset, VkDeviceSize size ) {
     if ( offset == 0 ) {
         offset = this->offset; // Use the offset of the buffer if not specified
     }
-    range.offset = offset;
-    range.size = size;
+    range.offset = this->offset;
+    if ( size == VK_WHOLE_SIZE ) {
+        size = this->allocated_size; // Use the allocated size of the buffer if not specified
+    } else if ( size > this->allocated_size ) {
+        Logger::getInstance().error("[ev::Buffer::flush] Size exceeds buffer size.");
+        return VK_ERROR_OUT_OF_DEVICE_MEMORY;
+    } else if ( offset + size % device->get_physical_device()->get_properties().limits.nonCoherentAtomSize != 0) {
+        Logger::getInstance().warn("[ev::Buffer::flush] Offset and size are not aligned to non-coherent atom size, flushing may not be effective.");
+        auto non_coherent_atom_size = device->get_physical_device()->get_properties().limits.nonCoherentAtomSize;
+        range.size = (size + non_coherent_atom_size - 1) / non_coherent_atom_size * non_coherent_atom_size; // Align size to non-coherent atom size
+    } else {
+        range.size = size; // Use the specified size
+    }
+
+    logger::Logger::getInstance().debug("[ev::Buffer::flush] Flushing buffer memory with offset: " + std::to_string(range.offset) + ", size: " + std::to_string(range.size));
     return vkFlushMappedMemoryRanges(*device, 1, &range);
 }
 

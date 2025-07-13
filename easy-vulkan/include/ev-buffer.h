@@ -26,6 +26,8 @@ private:
 
     VkDeviceSize size = VK_WHOLE_SIZE;
 
+    VkDeviceSize allocated_size = 0;
+
     VkDeviceSize offset = 0;
 
     VkDeviceSize alignment = 0;

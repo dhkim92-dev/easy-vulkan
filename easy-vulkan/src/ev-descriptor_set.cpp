@@ -92,19 +92,27 @@ void DescriptorSet::write_buffer(uint32_t binding,
     VkDescriptorType type
 ) {
     if (!buffer) {
-        logger::Logger::getInstance().error("[ev::DescriptorSet] Invalid buffer provided for DescriptorSet write.");
+        logger::Logger::getInstance().error("[ev::DescriptorSet::write_buffer] Invalid buffer provided for DescriptorSet write.");
         return;
     }
     buffer_infos.emplace_back(buffer->get_descriptor());
-    VkWriteDescriptorSet write_set = {};
-    write_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    write_set.dstSet = descriptor_set;
-    write_set.dstBinding = binding;
-    // write_set.dstArrayElement = 0;
-    write_set.descriptorCount = 1;
-    write_set.descriptorType = type; // Assuming uniform buffer type
-    write_set.pBufferInfo = &buffer_infos.back(); // Use the last added buffer info
-    write_registry.emplace_back(write_set);
+    WriteInfo write_info = {binding, type, static_cast<uint32_t>(buffer_infos.size() - 1)};
+    buffer_write_infos.emplace_back(write_info);
+    logger::Logger::getInstance().debug("[ev::DescriptorSet::write_buffer] Buffer info added for binding: " 
+        + std::to_string(reinterpret_cast<uintptr_t>(buffer->get_descriptor().buffer))
+        + ", offset: " + std::to_string(buffer->get_descriptor().offset)
+        + ", range: " + std::to_string(buffer->get_descriptor().range)
+    );
+    // VkWriteDescriptorSet write_set = {};
+    // write_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    // write_set.dstSet = descriptor_set;
+    // write_set.dstBinding = binding;
+    // // write_set.dstArrayElement = 0;
+    // write_set.descriptorCount = 1;
+    // write_set.descriptorType = type; // Assuming uniform buffer type
+    // write_set.pBufferInfo = &buffer_infos[buffer_infos.size()-1]; // Use the last added buffer info
+    // write_registry.emplace_back(write_set);
+    logger::Logger::getInstance().debug("[ev::DescriptorSet::write_buffer] Writing buffer to descriptor set with binding: " + std::to_string(binding) + ", type: " + std::to_string(type));
 }
 
 void DescriptorSet::write_texture(uint32_t binding, 
@@ -112,35 +120,90 @@ void DescriptorSet::write_texture(uint32_t binding,
     VkDescriptorType type
 ) {
     if (!texture->image || !texture->image_view || !texture->sampler) {
-        logger::Logger::getInstance().error("[ev::DescriptorSet] Invalid image, view, or sampler provided for DescriptorSet texture write.");
+        logger::Logger::getInstance().error("[ev::DescriptorSet::write_texture] Invalid image, view, or sampler provided for DescriptorSet texture write.");
         return;
     }
 
     image_infos.emplace_back( texture->get_descriptor() );
+    WriteInfo write_info = {binding, type, static_cast<uint32_t>(image_infos.size() - 1)};
+    image_write_infos.emplace_back(write_info);
 
-    VkWriteDescriptorSet write_set = {};
-    write_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    write_set.dstSet = descriptor_set;
-    write_set.dstBinding = binding;
-    write_set.descriptorCount = 1;
-    write_set.descriptorType = type;
-    write_set.pImageInfo = &image_infos.back();
+    // VkWriteDescriptorSet write_set = {};
+    // write_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    // write_set.dstSet = descriptor_set;
+    // write_set.dstBinding = binding;
+    // write_set.descriptorCount = 1;
+    // write_set.descriptorType = type;
+    // write_set.pImageInfo = &image_infos[image_infos.size()-1]; // Use the last added image info
 
-    write_registry.emplace_back(write_set);
+    // write_registry.emplace_back(write_set);
+    logger::Logger::getInstance().debug("[ev::DescriptorSet::write_texture] Writing texture to descriptor set with binding: " 
+        + std::to_string(binding) 
+        + ", type: " + std::to_string(type)
+    );
 }
 
 VkResult DescriptorSet::update() {
-    if (write_registry.empty()) {
-        logger::Logger::getInstance().warn("[ev::DescriptorSet] No writes to update in DescriptorSet.");
+    ev::logger::Logger::getInstance().debug("[ev::DescriptorSet::update] Updating DescriptorSet with " 
+        + std::to_string(buffer_write_infos.size()) + " buffer writes and " 
+        + std::to_string(image_write_infos.size()) + " image writes.");
+
+    for ( const auto& buffer_write_info : buffer_write_infos ) {
+        VkWriteDescriptorSet write_set = {};
+        write_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        write_set.dstSet = descriptor_set;
+        write_set.dstBinding = buffer_write_info.binding;
+        write_set.descriptorCount = 1; // Assuming one buffer per binding
+        write_set.descriptorType = buffer_write_info.type;
+        write_set.pBufferInfo = &buffer_infos[buffer_write_info.resource_index];
+        write_registry.emplace_back(write_set);
+
+        logger::Logger::getInstance().debug("[ev::DescriptorSet::update] Writing to descriptor set with binding: " 
+            + std::to_string(write_set.dstBinding) 
+            + ", type: " + std::to_string(write_set.descriptorType)
+            + ", count: " + std::to_string(write_set.descriptorCount)
+            + ", buffer info: " + (write_set.pBufferInfo ? std::to_string(reinterpret_cast<uintptr_t>(write_set.pBufferInfo->buffer)) : "null")
+        );
+    }
+
+    for ( const auto& image_write_info : image_write_infos ) {
+        VkWriteDescriptorSet write_set = {};
+        write_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        write_set.dstSet = descriptor_set;
+        write_set.dstBinding = image_write_info.binding;
+        write_set.descriptorCount = 1; // Assuming one image per binding
+        write_set.descriptorType = image_write_info.type;
+        write_set.pImageInfo = &image_infos[image_write_info.resource_index];
+        write_registry.emplace_back(write_set);
+        logger::Logger::getInstance().debug("[ev::DescriptorSet::update] Writing to descriptor set with binding: " 
+            + std::to_string(write_set.dstBinding) 
+            + ", type: " + std::to_string(write_set.descriptorType)
+            + ", count: " + std::to_string(write_set.descriptorCount)
+            + ", image info: " + (write_set.pImageInfo ? std::to_string(reinterpret_cast<uintptr_t>(write_set.pImageInfo)) : "null")
+        );
+    }
+
+    for ( const auto& write : write_registry ) {
+        logger::Logger::getInstance().debug("[ev::DescriptorSet::update] Writing to descriptor set with binding: " 
+            + std::to_string(write.dstBinding) 
+            + ", type: " + std::to_string(write.descriptorType)
+            + ", count: " + std::to_string(write.descriptorCount)
+            + ", image info: " + (write.pImageInfo ? std::to_string(reinterpret_cast<uintptr_t>(write.pImageInfo)) : "null") 
+            + ", buffer info: " + (write.pBufferInfo ? std::to_string(reinterpret_cast<uintptr_t>(write.pBufferInfo->buffer)) : "null")
+        );
+    }
+
+    if (  write_registry.empty() ) {
+        logger::Logger::getInstance().warn("[ev::DescriptorSet::update] No valid writes to flush to DescriptorSet.");
         return VK_SUCCESS; // Nothing to do
     }
 
-    logger::Logger::getInstance().debug("[ev::DescriptorSet] Descriptor sets size : " + std::to_string(reinterpret_cast<uintptr_t>(write_registry.size())));
-
     vkUpdateDescriptorSets(*device, static_cast<uint32_t>(write_registry.size()), write_registry.data(), 0, nullptr);
-    logger::Logger::getInstance().debug("[ev::DescriptorSet] Flushed " + std::to_string(write_registry.size()) + " writes to DescriptorSet.");
+    logger::Logger::getInstance().debug("[ev::DescriptorSet::update] Flushed " + std::to_string(write_registry.size()) + " writes to DescriptorSet.");
     write_registry.clear(); // Clear the registry after flushing
     image_infos.clear();
+    buffer_write_infos.clear();
     buffer_infos.clear();
+    image_write_infos.clear();
     return VK_SUCCESS;
 }

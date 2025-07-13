@@ -3,6 +3,10 @@
         {
             "url": "https://www.dohoon-kim.kr/media/graphics/textures/cube/wood.png",
             "destination_path": "textures/cube/wood.png"
+        }, 
+        {
+            "url": "https://www.dohoon-kim.kr/media/graphics/textures/cube/specular.png",
+            "destination_path": "textures/cube/specular.png"
         }
     ],
 
