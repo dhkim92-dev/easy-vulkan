@@ -112,7 +112,7 @@ shared_ptr<DescriptorSet> DescriptorPool::allocate(shared_ptr<DescriptorSetLayou
         exit(EXIT_FAILURE);
     }
 
-    logger::Logger::getInstance().debug("Allocated descriptor set");
+    logger::Logger::getInstance().debug("[ev::DescriptorPool::allocate] Allocated descriptor set");
 
     return make_shared<DescriptorSet>(device, descriptor_set);
 }

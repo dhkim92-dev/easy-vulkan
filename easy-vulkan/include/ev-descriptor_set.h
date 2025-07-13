@@ -1,6 +1,7 @@
 #pragma once 
 
 #include <vector>
+#include <list>
 #include <memory>
 #include <string>
 #include <algorithm>
@@ -73,6 +74,12 @@ class DescriptorSet{
 
 private:
 
+    struct WriteInfo {
+        uint32_t binding;
+        VkDescriptorType type;
+        uint32_t resource_index;
+    };
+
     shared_ptr<Device> device;
 
     VkDescriptorSet descriptor_set = VK_NULL_HANDLE;
@@ -81,7 +88,11 @@ private:
 
     vector<VkDescriptorBufferInfo> buffer_infos;
 
+    vector<WriteInfo> buffer_write_infos;
+
     vector<VkDescriptorImageInfo> image_infos;
+
+    vector<WriteInfo> image_write_infos;
 
 public:
 
