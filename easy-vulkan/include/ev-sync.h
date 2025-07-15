@@ -60,6 +60,16 @@ public:
     }
 };
 
+/**
+ * @brief VkImageMemoryBarrier 래퍼 클래스
+ * @param image 이미지 객체
+ * @param src_access_mask 소스 접근 마스크
+ * @param dst_access_mask 대상 접근 마스크
+ * @param new_layout 새로운 이미지 레이아웃
+ * @param src_queue_family_index 소스 큐 패밀리 인덱스 (기본값: VK_QUEUE_FAMILY_IGNORED)
+ * @param dst_queue_family_index 대상 큐 패밀리 인덱스 (기본값: VK_QUEUE_FAMILY_IGNORED)
+ * @param subresource_range 서브리소스 범위 (기본값: {})
+ */
 class ImageMemoryBarrier {
 private:
 
@@ -69,6 +79,7 @@ public:
     explicit ImageMemoryBarrier(std::shared_ptr<ev::Image> image,
         VkAccessFlags src_access_mask, 
         VkAccessFlags dst_access_mask, 
+        VkImageLayout old_layout,
         VkImageLayout new_layout, 
         uint32_t src_queue_family_index = VK_QUEUE_FAMILY_IGNORED,
         uint32_t dst_queue_family_index = VK_QUEUE_FAMILY_IGNORED,

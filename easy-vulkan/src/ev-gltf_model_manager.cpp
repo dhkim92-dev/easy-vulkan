@@ -1,4 +1,4 @@
-#include "ev-gltf.h"
+#include "tools/ev-gltf.h"
 
 using namespace ev::tools::gltf;
 
@@ -7,14 +7,14 @@ GLTFModelManager::GLTFModelManager(
     std::shared_ptr<ev::MemoryAllocator> memory_allocator,
     std::shared_ptr<ev::DescriptorPool> descriptor_pool,
     std::shared_ptr<ev::CommandPool> command_pool,
-    std::shared_ptr<ev::Queue> transfer_queue,
-    std::filesystem::path resource_path
+    std::shared_ptr<ev::Queue> transfer_queue
+    // std::filesystem::path resource_path
 ) : device(std::move(device)),
     descriptor_pool(std::move(descriptor_pool)),
     memory_allocator(std::move(memory_allocator)),
     command_pool(std::move(command_pool)),
-    transfer_queue(std::move(transfer_queue)),
-    resource_path(resource_path) {
+    transfer_queue(std::move(transfer_queue)) {
+    // resource_path(resource_path) {
 
     if (!this->device) {
         ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager] Device is null");
@@ -45,6 +45,9 @@ std::shared_ptr<ev::tools::gltf::Model> GLTFModelManager::load_model(const std::
 
     bool file_loaded = ctx.LoadASCIIFromFile(&gltf_model, nullptr, nullptr, file_path);
 
+    resource_path = std::filesystem::path(file_path).parent_path();
+    ev::logger::Logger::getInstance().info("[ev::tools::gltf::GLTFModelManager] Resource path set to: " + resource_path.string());
+
     if (!file_loaded) {
         ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager] Failed to load glTF model from file: " + file_path);
         exit(EXIT_FAILURE);
@@ -55,8 +58,8 @@ std::shared_ptr<ev::tools::gltf::Model> GLTFModelManager::load_model(const std::
         device
     );
 
-    std::vector<uint32_t> h_indices;
-    std::vector<ev::tools::gltf::Vertex> h_vertices;
+    // std::vector<uint32_t> h_indices;
+    // std::vector<ev::tools::gltf::Vertex> h_vertices;
 
     load_textures(&gltf_model, model);
     // setup_nodes(&gltf_model, model);
@@ -69,9 +72,9 @@ std::shared_ptr<ev::tools::gltf::Model> GLTFModelManager::load_model(const std::
 }
 
 std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &image, std::string& file_path) {
-    ev::logger::Logger::getInstance().info("[ev::tools::gltf::GLTFModelManager] Loading image file: " + file_path);
+    ev::logger::Logger::getInstance().info("[ev::tools::gltf::GLTFModelManager::load_texture] Loading image file: " + file_path);
     if (!std::filesystem::exists(file_path)) {
-        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager] Image file does not exist: " + file_path);
+        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager::load_texture] Image file does not exist: " + file_path);
         exit(EXIT_FAILURE);
     }
     // Load the image data from the file using stb_image
@@ -110,7 +113,7 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
 
     if ( !(props.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT) 
          || !(props.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) ) {
-        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager] Format not supported for blit or sampled image: " + std::to_string(format));
+        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager::load_texture] Format not supported for blit or sampled image: " + std::to_string(format));
         exit(EXIT_FAILURE);
     }
 
@@ -125,28 +128,32 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
         1,
         VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT
     );
+    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager::load_texture] Texture image created with size: " + std::to_string(width) + "x" + std::to_string(height) + ", mip levels: " + std::to_string(mip_levels));
 
     std::shared_ptr<ev::Buffer> staging_buffer = std::make_shared<ev::Buffer>(
         device,
-        ev::buffer_type::STAGING_BUFFER,
-        buffer_size
+        buffer_size,
+        ev::buffer_type::STAGING_BUFFER
     );
+    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager::load_texture] Staging buffer created with size: " + std::to_string(buffer_size));
 
     if ( memory_allocator->allocate_image(texture_image, ev::memory_type::GPU_ONLY ) != VK_SUCCESS ) {
-        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager] Failed to allocate image memory for texture.");
+        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager::load_texture] Failed to allocate image memory for texture.");
         exit(EXIT_FAILURE);
     }
+    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager::load_texture] Image memory allocated for texture.");
 
     if ( memory_allocator->allocate_buffer(staging_buffer, ev::memory_type::HOST_READABLE) != VK_SUCCESS ) {
-        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager] Failed to allocate buffer memory for staging buffer.");
+        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager::load_texture] Failed to allocate buffer memory for staging buffer.");
         exit(EXIT_FAILURE);
     }
+    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager::load_texture] Buffer memory allocated for staging buffer.");
 
     staging_buffer->map(buffer_size);
     staging_buffer->write(buffer, buffer_size);
     staging_buffer->flush();
     staging_buffer->unmap();
-    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager] Staging buffer created with size: " + std::to_string(buffer_size));
+    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager::load_texture] Staging buffer created with size: " + std::to_string(buffer_size));
 
     std::shared_ptr<ev::CommandBuffer> command_buffer = command_pool->allocate();
     command_buffer->begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
@@ -157,6 +164,7 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
             texture_image,
             VK_ACCESS_NONE_KHR,
             VK_ACCESS_TRANSFER_WRITE_BIT,
+            VK_IMAGE_LAYOUT_UNDEFINED,
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             VK_QUEUE_FAMILY_IGNORED,
             VK_QUEUE_FAMILY_IGNORED,
@@ -180,21 +188,22 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
         {region}
     );
+    texture_image->transient_layout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
     command_buffer->pipeline_barrier(
         VK_PIPELINE_STAGE_TRANSFER_BIT,
-        VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+        VK_PIPELINE_STAGE_TRANSFER_BIT,
         {ev::ImageMemoryBarrier(
             texture_image,
             VK_ACCESS_TRANSFER_WRITE_BIT,
             VK_ACCESS_TRANSFER_READ_BIT,
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
             VK_QUEUE_FAMILY_IGNORED,
             VK_QUEUE_FAMILY_IGNORED,
             {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1}
         )},{},{}
     );
-    texture_image->transient_layout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
     command_buffer->end();
     this->transfer_queue->submit(
         command_buffer,
@@ -203,7 +212,7 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
         VK_NULL_HANDLE
     );
     this->transfer_queue->wait_idle(UINT32_MAX);
-    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager] Image transfer completed.");
+    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager::load_texture] Image transfer completed.");
     staging_buffer.reset();
 
     std::shared_ptr<ev::CommandBuffer> blit_command = command_pool->allocate();
@@ -212,8 +221,8 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
     for ( uint32_t i = 1 ;i < mip_levels ; ++i ) {
         VkImageBlit blit = {};
         blit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        blit.srcSubresource.mipLevel = i - 1;
         blit.srcSubresource.layerCount = 1;
+        blit.srcSubresource.mipLevel = i - 1;
         blit.srcOffsets[1] = { int32_t(width >> (i - 1)), int32_t(height >> (i - 1)), 1 };
 
         blit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -234,6 +243,7 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
                 texture_image,
                 0,
                 VK_ACCESS_TRANSFER_WRITE_BIT,
+                VK_IMAGE_LAYOUT_UNDEFINED,
                 VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                 VK_QUEUE_FAMILY_IGNORED,
                 VK_QUEUE_FAMILY_IGNORED,
@@ -250,7 +260,6 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
             VK_FILTER_LINEAR
         );
         texture_image->transient_layout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-
         blit_command->pipeline_barrier(
             VK_PIPELINE_STAGE_TRANSFER_BIT,
             VK_PIPELINE_STAGE_TRANSFER_BIT,
@@ -258,6 +267,7 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
                 texture_image,
                 VK_ACCESS_TRANSFER_WRITE_BIT,
                 VK_ACCESS_TRANSFER_READ_BIT,
+                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                 VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                 VK_QUEUE_FAMILY_IGNORED,
                 VK_QUEUE_FAMILY_IGNORED,
@@ -273,14 +283,15 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
             texture_image,
             VK_ACCESS_TRANSFER_READ_BIT,
             VK_ACCESS_SHADER_READ_BIT,
+            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
             VK_QUEUE_FAMILY_IGNORED,
             VK_QUEUE_FAMILY_IGNORED,
             {VK_IMAGE_ASPECT_COLOR_BIT, 0, mip_levels, 0, 1}
         )},{},{}
     );
-    texture_image->transient_layout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     blit_command->end();
+    texture_image->transient_layout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     this->transfer_queue->submit(
         blit_command,
         {},
@@ -288,6 +299,8 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
         VK_NULL_HANDLE
     );
     this->transfer_queue->wait_idle(UINT32_MAX);
+
+    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager::load_texture] Mipmaps generated for texture image.");
 
     if ( delete_buffer ) {
         delete[] buffer;
@@ -299,7 +312,6 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
         device,
         VK_FILTER_LINEAR,
         VK_FILTER_LINEAR,
-        VK_SAMPLER_MIPMAP_MODE_LINEAR,
         VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT,
         VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT,
         VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT,
@@ -308,6 +320,7 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
         8.0f, // max_anisotropy
         false,
         false,
+        VK_COMPARE_OP_ALWAYS,
         0.0f, // min_lod
         static_cast<float>(mip_levels)
     );
@@ -357,9 +370,9 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
 }
 
 void GLTFModelManager::load_textures(tinygltf::Model* gltf_model, 
-    std::shared_ptr<Model> model) {
+    std::shared_ptr<Model> model
+) {
     ev::logger::Logger::getInstance().info("[ev::tools::gltf::GLTFModelManager] Loading textures...");  
-
     for (tinygltf::Image& gltf_image : gltf_model->images) {
         if (gltf_image.uri.empty() && gltf_image.bufferView < 0) {
             ev::logger::Logger::getInstance().warn("[ev::tools::gltf::GLTFModelManager] Image has no URI or buffer view, skipping.");

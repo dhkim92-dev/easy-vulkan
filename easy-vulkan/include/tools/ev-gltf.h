@@ -226,11 +226,11 @@ public:
     
     explicit GLTFModelManager(
         std::shared_ptr<ev::Device> device,
-        std::shared_ptr<ev::BitmapBuddyMemoryAllocator> memory_allocator,
+        std::shared_ptr<ev::MemoryAllocator> memory_allocator,
         std::shared_ptr<ev::DescriptorPool> descriptor_pool,
         std::shared_ptr<ev::CommandPool> command_pool,
-        std::shared_ptr<ev::Queue> transfer_queue,
-        std::filesystem::path resource_path = std::filesystem::current_path() / "resources"
+        std::shared_ptr<ev::Queue> transfer_queue
+        // std::filesystem::path resource_path = std::filesystem::current_path() / "resources"
     );
 
     ~GLTFModelManager() = default;

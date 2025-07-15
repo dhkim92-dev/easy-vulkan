@@ -272,6 +272,7 @@ public:
             d_buffers.texture->image,
             VK_ACCESS_NONE_KHR, 
             VK_ACCESS_TRANSFER_WRITE_BIT, 
+            VK_IMAGE_LAYOUT_UNDEFINED,
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED, 
             subresource_range
@@ -306,6 +307,7 @@ public:
             d_buffers.texture->image,
             VK_ACCESS_TRANSFER_WRITE_BIT,
             VK_ACCESS_SHADER_READ_BIT,
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
             0, 0, {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1}
         ));
