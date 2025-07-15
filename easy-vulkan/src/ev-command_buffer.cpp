@@ -67,6 +67,26 @@ void CommandBuffer::begin_render_pass(shared_ptr<RenderPass> render_pass,
     vkCmdBeginRenderPass(command_buffer, &begin_info, contents);
 }
 
+void CommandBuffer::blit_image(
+    shared_ptr<Image> src_image, 
+    VkImageLayout src_image_layout, 
+    shared_ptr<Image> dst_image, 
+    VkImageLayout dst_image_layout, 
+    const vector<VkImageBlit> regions,
+    VkFilter filter
+) {
+    if (command_buffer == VK_NULL_HANDLE) {
+        logger::Logger::getInstance().error("[CommandBuffer::blit_image] : Command buffer is not allocated.");
+        exit(EXIT_FAILURE);
+    }
+    
+    vkCmdBlitImage(command_buffer, 
+        *src_image, src_image_layout, 
+        *dst_image, dst_image_layout, 
+        static_cast<uint32_t>(regions.size()), regions.data(), 
+        filter);
+}
+
 void CommandBuffer::end_render_pass() {
     vkCmdEndRenderPass(command_buffer);
 }

@@ -40,3 +40,12 @@ add_custom_command(
     VERBATIM
 )
 
+add_custom_command(
+    TARGET download_resources POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/glTF-Sample-Models"
+            "${CMAKE_BINARY_DIR}/resources/glTF_Sample-Models"
+    COMMENT "Copying glTF-Sample-Models to build/resources/glTF_Sample-Models..."
+    VERBATIM
+)
+

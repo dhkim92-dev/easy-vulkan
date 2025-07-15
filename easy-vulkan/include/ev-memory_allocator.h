@@ -13,7 +13,7 @@
 #include "ev-macro.h"
 #include "ev-memory_block_metadata.h"
 #include "presets/ev-types.h"
-#include "tools/ev-tools.h"
+#include "tools/ev-bitmap.h"
 
 namespace ev {
 

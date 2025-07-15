@@ -70,6 +70,13 @@ public:
 
     void bind_push_constants(shared_ptr<PipelineLayout> layout, VkShaderStageFlags stage_flags, uint32_t offset, const void* data, size_t size);
 
+    void blit_image(shared_ptr<Image> src_image, 
+        VkImageLayout src_image_layout, 
+        shared_ptr<Image> dst_image, 
+        VkImageLayout dst_image_layout, 
+        const vector<VkImageBlit> regions,
+        VkFilter filter = VK_FILTER_LINEAR);
+
     void copy_buffer(shared_ptr<Buffer> dst_buffer, shared_ptr<Buffer> src_buffer, VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize dst_offset = 0, VkDeviceSize src_offset = 0);
     
     void copy_buffer_to_image(shared_ptr<Image> dst_image, 

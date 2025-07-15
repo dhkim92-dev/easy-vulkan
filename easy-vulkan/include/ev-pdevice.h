@@ -20,7 +20,7 @@ private:
     VkPhysicalDeviceProperties properties;
 
     VkPhysicalDeviceMemoryProperties memory_properties;
-
+    
     vector<VkExtensionProperties> extensions;
 
 public: 
@@ -54,6 +54,8 @@ public:
     const vector<VkExtensionProperties>& get_extensions() const {
         return extensions;
     }
+
+    const VkFormatProperties get_format_properties(VkFormat format) const;
 
     operator VkPhysicalDeviceFeatures() const {
         return features;
