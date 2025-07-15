@@ -2,7 +2,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <memory>
 #include <vector>
-#define STB_IMAGE_IMPLEMENTATION
+// #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "base/example_base.hpp"
 

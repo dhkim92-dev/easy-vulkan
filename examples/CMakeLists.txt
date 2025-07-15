@@ -8,7 +8,10 @@ file(GLOB_RECURSE SAMPLE_MAIN_FILES "${CMAKE_CURRENT_SOURCE_DIR}/samples/*/main.
 
 # Create the test executable
 # set(glfw_DIR "/opt/homebrew/lib/cmake/glfw3")
-include_directories(${CMAKE_SOURCE_DIR}/easy-vulkan/include, ${CMAKE_SOURCE_DIR}/external/stb)
+include_directories(
+    ${CMAKE_SOURCE_DIR}/easy-vulkan/include
+    ${CMAKE_SOURCE_DIR}/external/stb
+    ${CMAKE_SOURCE_DIR}/externals/tiny_gltf)
 find_package(glfw3 REQUIRED)
 find_package(Vulkan REQUIRED)
 
@@ -25,7 +28,7 @@ foreach(SAMPLE_MAIN ${SAMPLE_MAIN_FILES})
     add_executable(${EXAMPLE_NAME}_example ${SAMPLE_MAIN})
 
     # easy-vulkan 동적 라이브러리, glfw, vulkan
-    target_link_libraries(${EXAMPLE_NAME}_example PRIVATE easy-vulkan glfw vulkan)
+    target_link_libraries(${EXAMPLE_NAME}_example PRIVATE easy-vulkan glfw vulkan stb_headers stb_impl tiny_gltf_headers tiny_gltf_impl)
 
     # include 디렉터리 추가
     target_include_directories(${EXAMPLE_NAME}_example PRIVATE
