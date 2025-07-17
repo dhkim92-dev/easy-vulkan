@@ -142,6 +142,7 @@ void CommandBuffer::bind_index_buffers(
     VkDeviceSize offset, 
     VkIndexType index_type
 ) {
+    ev::logger::Logger::getInstance().debug("[CommandBuffer::bind_index_buffers] : Binding index buffers to command buffer with size : " + std::to_string(buffers.size()));
     if (command_buffer == VK_NULL_HANDLE) {
         logger::Logger::getInstance().error("[CommandBuffer::bind_index_buffers] : Command buffer is not allocated.");
         exit(EXIT_FAILURE);

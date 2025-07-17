@@ -10,6 +10,7 @@ namespace ev {
 
 class Texture {
 public:
+    uint32_t index = 0;
     std::shared_ptr<ev::Image> image = nullptr;
     std::shared_ptr<ev::ImageView> image_view = nullptr;
     std::shared_ptr<ev::Sampler> sampler = nullptr;

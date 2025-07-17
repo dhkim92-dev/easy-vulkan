@@ -161,6 +161,8 @@ public:
     vector<VkRect2D> scissors;
 
     uint32_t subpass = 0;
+
+    bool skip_vertex_input_state_ci = false;  // Skip vertex input state CI if true
 };
 
 
@@ -218,6 +220,10 @@ public:
 
     // 구조체 내 변수들의 기본값을 지정해서 모두 적기
     GraphicsPipelineBluePrintManager& set_vertex_input_state(VkPipelineVertexInputStateCreateFlags flags = 0, void* next=nullptr);
+
+    GraphicsPipelineBluePrintManager& set_vertex_input_state(
+        VkPipelineVertexInputStateCreateInfo* info
+    );
 
     GraphicsPipelineBluePrintManager& set_input_assembly_state(
         VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,

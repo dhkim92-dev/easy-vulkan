@@ -16,6 +16,11 @@ void DescriptorSetLayout::add_binding(VkShaderStageFlags flags,
     uint32_t binding, 
     uint32_t count) {
 
+    ev::logger::Logger::getInstance().debug("[ev::DescriptorSetLayout] Adding binding: " + std::to_string(binding) + 
+        ", type: " + std::to_string(type) + 
+        ", count: " + std::to_string(count) + 
+        ", flags: " + std::to_string(flags));
+
     if ( layout != VK_NULL_HANDLE ) {
         logger::Logger::getInstance().warn("[ev::DescriptorSetLayout] DescriptorSetLayout already created. can not add new binding.");
         return;
@@ -35,6 +40,10 @@ void DescriptorSetLayout::add_binding(VkShaderStageFlags flags,
         }
     }
     bindings.push_back(layout_binding);
+    logger::Logger::getInstance().debug("[ev::DescriptorSetLayout] Binding added: " + std::to_string(binding) + 
+        ", type: " + std::to_string(type) + 
+        ", count: " + std::to_string(count) + 
+        ", flags: " + std::to_string(flags));   
 }
 
 VkResult DescriptorSetLayout::create_layout() {
@@ -64,10 +73,12 @@ VkResult DescriptorSetLayout::create_layout() {
 }
 
 void DescriptorSetLayout::destroy() {
+    ev::logger::Logger::getInstance().debug("[ev::DescriptorSetLayout] Destroying DescriptorSetLayout.");
     if (layout != VK_NULL_HANDLE) {
         vkDestroyDescriptorSetLayout(*device, layout, nullptr);
         layout = VK_NULL_HANDLE;
     }
+    ev::logger::Logger::getInstance().debug("[ev::DescriptorSetLayout] DescriptorSetLayout destroyed successfully.");
 }
 
 DescriptorSetLayout::~DescriptorSetLayout() {
