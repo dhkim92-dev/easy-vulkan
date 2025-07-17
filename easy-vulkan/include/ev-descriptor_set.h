@@ -113,6 +113,10 @@ public:
         VkDescriptorType type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
     ); 
 
+    const size_t registry_size() const {
+        return write_registry.size();
+    }
+
     VkResult update();
 
     DescriptorSet& operator=(const DescriptorSet&) = delete;

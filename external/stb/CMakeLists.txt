@@ -20,28 +20,34 @@ endif()
 set(STB_HEADER_SRC ${stb_fetch_SOURCE_DIR}/stb_image.h)
 set(STB_HEADER_DST_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/stb_image.h)
 set(STB_HEADER_DST_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/stb_image.h)
+set(STB_IMAGE_WRITE_HEADER_SRC ${stb_fetch_SOURCE_DIR}/stb_image_write.h)
+set(STB_IMAGE_WRITE_DST_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/stb_image_write.h)
+set(STB_IMAGE_WRITE_DST_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/stb_image_write.h)
 
-# 4. stb_image.h를 소스 및 빌드 디렉터리로 복사하는 커스텀 타겟 생성
+# 4. stb_image.h, stb_image_write.h를 소스 및 빌드 디렉터리로 복사하는 커스텀 타겟 생성
 add_custom_command(
     OUTPUT ${STB_HEADER_DST_SRC_DIR} ${STB_HEADER_DST_BUILD_DIR}
+           ${STB_IMAGE_WRITE_DST_SRC_DIR} ${STB_IMAGE_WRITE_DST_BUILD_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${STB_HEADER_SRC} ${STB_HEADER_DST_SRC_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${STB_HEADER_SRC} ${STB_HEADER_DST_BUILD_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${STB_IMAGE_WRITE_HEADER_SRC} ${STB_IMAGE_WRITE_DST_SRC_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${STB_IMAGE_WRITE_HEADER_SRC} ${STB_IMAGE_WRITE_DST_BUILD_DIR}
     DEPENDS ${STB_HEADER_SRC}
-    COMMENT "Copying stb_image.h to source and build directories"
+    DEPENDS ${STB_IMAGE_WRITE_HEADER_SRC}
+    COMMENT "Copying stb_image.h stb_image_write.h to source and build directories"
 )
 
 add_custom_target(copy_stb_header ALL
     DEPENDS ${STB_HEADER_DST_SRC_DIR} ${STB_HEADER_DST_BUILD_DIR}
+            ${STB_IMAGE_WRITE_DST_SRC_DIR} ${STB_IMAGE_WRITE_DST_BUILD_DIR}
 )
 
-# 5. 다른 타겟들이 stb_image.h를 쉽게 사용하도록 INTERFACE 라이브러리 타겟 생성
-#    이 타겟을 링크하면 현재 소스 디렉터리가 include 경로에 추가됩니다.
+# 5. INTERFACE 라이브러리로 include 경로 제공
 add_library(stb_headers INTERFACE)
 target_include_directories(stb_headers INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 add_dependencies(stb_headers copy_stb_header)
 
-# 6. 중복 정의 오류를 방지하기 위해 stb 구현부를 포함할 별도의 OBJECT 라이브러리 생성
-#    이 파일을 external/stb/stb_image_impl.cpp 로 생성해야 합니다.
+# 6. OBJECT 라이브러리 stb_impl 생성 (구현부가 필요하다면)
 add_library(stb_impl OBJECT stb_impl.cpp)
 target_include_directories(stb_impl PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 add_dependencies(stb_impl copy_stb_header)

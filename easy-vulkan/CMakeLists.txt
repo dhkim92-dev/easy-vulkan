@@ -29,7 +29,7 @@ target_include_directories(${LIBRARY_OUTPUT_NAME} PUBLIC
 
 # Vulkan SDK 찾기 (OS별 지원)
 find_package(Vulkan REQUIRED)
-target_link_libraries(${LIBRARY_OUTPUT_NAME} PUBLIC Vulkan::Vulkan)
+target_link_libraries(${LIBRARY_OUTPUT_NAME} PUBLIC Vulkan::Vulkan tiny_gltf_headers tiny_gltf_impl stb_headers stb_impl)
 
 # 설치 규칙: 라이브러리와 헤더를 함께 배포
 install(TARGETS ${LIBRARY_OUTPUT_NAME}

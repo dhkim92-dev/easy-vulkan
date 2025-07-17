@@ -118,6 +118,18 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_vertex_i
     return *this;
 }
 
+GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_vertex_input_state(
+    VkPipelineVertexInputStateCreateInfo* info
+) {
+    if (!on_record) {
+        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        return *this;
+    }
+    blue_prints.back().vertex_input_state_ci = *info;
+    blue_prints.back().skip_vertex_input_state_ci = true;
+    return *this;
+}
+
 GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_input_assembly_state(
     VkPrimitiveTopology topology,
     VkBool32 primitiveRestartEnable,
@@ -441,10 +453,12 @@ vector<shared_ptr<GraphicsPipeline>> GraphicsPipelineBluePrintManager::create_pi
         pipeline_ci.pStages = blueprint.shader_stages.data();
 
         /* --- Vertex Input State Create Info Setting --- */
-        blueprint.vertex_input_state_ci.pVertexAttributeDescriptions = blueprint.vertex_attribute_descriptions.data();
-        blueprint.vertex_input_state_ci.vertexAttributeDescriptionCount = static_cast<uint32_t>(blueprint.vertex_attribute_descriptions.size());
-        blueprint.vertex_input_state_ci.pVertexBindingDescriptions = blueprint.vertex_binding_descriptions.data();
-        blueprint.vertex_input_state_ci.vertexBindingDescriptionCount = static_cast<uint32_t>(blueprint.vertex_binding_descriptions.size());
+        if (!blueprint.skip_vertex_input_state_ci) {
+            blueprint.vertex_input_state_ci.pVertexAttributeDescriptions = blueprint.vertex_attribute_descriptions.data();
+            blueprint.vertex_input_state_ci.vertexAttributeDescriptionCount = static_cast<uint32_t>(blueprint.vertex_attribute_descriptions.size());
+            blueprint.vertex_input_state_ci.pVertexBindingDescriptions = blueprint.vertex_binding_descriptions.data();
+            blueprint.vertex_input_state_ci.vertexBindingDescriptionCount = static_cast<uint32_t>(blueprint.vertex_binding_descriptions.size());
+        } 
         pipeline_ci.pVertexInputState = &blueprint.vertex_input_state_ci;
 
         /* --- Input Assembly State Create Info Setting --- */
@@ -470,8 +484,8 @@ vector<shared_ptr<GraphicsPipeline>> GraphicsPipelineBluePrintManager::create_pi
             blueprint.viewport_state_ci.pViewports = blueprint.viewports.data();
             blueprint.viewport_state_ci.scissorCount = static_cast<uint32_t>(blueprint.scissors.size());
             blueprint.viewport_state_ci.pScissors = blueprint.scissors.data();
-            logger::Logger::getInstance().debug("Viewport count : " + std::to_string(blueprint.viewport_state_ci.viewportCount));
-            logger::Logger::getInstance().debug("Scissor count : " + std::to_string(blueprint.viewport_state_ci.scissorCount));
+            // logger::Logger::getInstance().debug("Viewport count : " + std::to_string(blueprint.viewport_state_ci.viewportCount));
+            // logger::Logger::getInstance().debug("Scissor count : " + std::to_string(blueprint.viewport_state_ci.scissorCount));
             pipeline_ci.pViewportState = &blueprint.viewport_state_ci;
         }
         pipeline_ci.pMultisampleState = &blueprint.multisample_state_ci;

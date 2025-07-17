@@ -22,6 +22,12 @@ PhysicalDevice::PhysicalDevice(std::shared_ptr<Instance> _instance, VkPhysicalDe
     vkGetPhysicalDeviceMemoryProperties(handle, &memory_properties);
 }
 
+const VkFormatProperties PhysicalDevice::get_format_properties(VkFormat format) const {
+    VkFormatProperties format_properties;   
+    vkGetPhysicalDeviceFormatProperties(handle, format, &format_properties);
+    return format_properties;
+}
+
 PhysicalDevice::~PhysicalDevice() {
     if (handle != VK_NULL_HANDLE) {
         // Cleanup code if necessary
