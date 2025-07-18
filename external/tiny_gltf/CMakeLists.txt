@@ -46,6 +46,7 @@ add_dependencies(tiny_gltf_headers copy_tinygltf_header)
 target_link_libraries(tiny_gltf_headers INTERFACE stb_headers)
 
 add_library(tiny_gltf_impl OBJECT tinygltf_impl.cpp)
+set_target_properties(tiny_gltf_impl PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(tiny_gltf_impl PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
