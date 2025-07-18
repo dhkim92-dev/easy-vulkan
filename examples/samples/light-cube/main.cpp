@@ -930,4 +930,4 @@ public:
     }
 };
 
-RUN_EXAMPLE_MAIN(LightCubeExample, "light-cube")
+RUN_EXAMPLE_MAIN(LightCubeExample, "light-cube", false)

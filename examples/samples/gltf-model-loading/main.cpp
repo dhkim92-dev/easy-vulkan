@@ -491,7 +491,6 @@ public:
 
         current_frame_index = (current_frame_index + 1) % swapchain->get_images().size();
         // ev::logger::Logger::getInstance().debug("Current frame index updated to: " + std::to_string(current_frame_index));
-        // exit(EXIT_SUCCESS);
      }
 
     void on_window_resize() {
@@ -501,4 +500,4 @@ public:
     }
 };
 
-RUN_EXAMPLE_MAIN(GltfModelLoadingExample, "gltf-model-loading")
+RUN_EXAMPLE_MAIN(GltfModelLoadingExample, "gltf-model-loading", false)

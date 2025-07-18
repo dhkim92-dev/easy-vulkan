@@ -541,4 +541,4 @@ public:
     }
 };
 
-RUN_EXAMPLE_MAIN(PhongShadingExample, "phong-shading")
+RUN_EXAMPLE_MAIN(PhongShadingExample, "phong-shading", false)

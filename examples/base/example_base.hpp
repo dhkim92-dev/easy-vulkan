@@ -9,9 +9,9 @@
 
 using namespace std;
 
-#define RUN_EXAMPLE_MAIN(IMPLEMENTED_CLASS_NAME, EXAMPLE_NAME) \
+#define RUN_EXAMPLE_MAIN(IMPLEMENTED_CLASS_NAME, EXAMPLE_NAME, DEBUG) \
     int main(int argc, char** argv) { \
-        ExampleBase* example = new IMPLEMENTED_CLASS_NAME(std::string(EXAMPLE_NAME), std::string(argv[0]), true); \
+        ExampleBase* example = new IMPLEMENTED_CLASS_NAME(std::string(EXAMPLE_NAME), std::string(argv[0]), DEBUG); \
         example->run(); \
         delete example; \
         return 0; \
@@ -25,12 +25,16 @@ class ExampleBase {
     : title(example_name), executable_path(executable_path), debug(debug) {
         ev::logger::Logger::getInstance().set_log_level(ev::logger::LogLevel::INFO);
         printf("ExampleBase constructor called with title: %s\n", title.c_str());
-        std::filesystem::path bin_path = std::filesystem::path(executable_path).parent_path();
-        std::filesystem::path base_path = bin_path.parent_path().parent_path();
+        std::filesystem::path bin_path = std::filesystem::canonical(executable_path);
+        std::filesystem::path base_path = bin_path.parent_path().parent_path().parent_path();
 
         shader_path = base_path.parent_path() / "shaders";
 
         resource_path = base_path.parent_path() / "resources";
+
+        ev::logger::Logger::getInstance().info("Executable path set to: " + executable_path);
+        ev::logger::Logger::getInstance().info("Shader path set to: " + shader_path.string());
+        ev::logger::Logger::getInstance().info("Resource path set to: " + resource_path.string());
 
         if (debug) {
             ev::logger::Logger::getInstance().set_log_level(ev::logger::LogLevel::DEBUG);

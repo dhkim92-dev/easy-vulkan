@@ -485,4 +485,4 @@ public:
     }
 };
 
-RUN_EXAMPLE_MAIN(TriangleExample, "triangle")
+RUN_EXAMPLE_MAIN(TriangleExample, "triangle", false)

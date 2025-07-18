@@ -701,4 +701,4 @@ public:
     }
 };
 
-RUN_EXAMPLE_MAIN(TextureCubeExample, "texture-cube")
+RUN_EXAMPLE_MAIN(TextureCubeExample, "texture-cube", false)

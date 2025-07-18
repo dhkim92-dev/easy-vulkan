@@ -777,4 +777,4 @@ public:
     }
 };
 
-RUN_EXAMPLE_MAIN(MultiCubeExample, "multi-cube")
+RUN_EXAMPLE_MAIN(MultiCubeExample, "multi-cube", false)

@@ -543,4 +543,4 @@ public:
     }
 };
 
-RUN_EXAMPLE_MAIN(CubeExample, "cube")
+RUN_EXAMPLE_MAIN(CubeExample, "cube", false)
