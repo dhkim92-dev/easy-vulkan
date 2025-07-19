@@ -1,8 +1,11 @@
 #include "ev-image.h"
+#include "ev-command_pool.h"
+#include <sstream>
 
 using namespace std;
 using namespace ev;
 using namespace ev::logger;
+
 
 Image::Image(
     shared_ptr<Device> _device,
@@ -67,6 +70,9 @@ Image::Image(
         Logger::getInstance().error("[ev::Image] Failed to create image: " + std::to_string(result));
         exit(EXIT_FAILURE);
     }
+    std::stringstream ss;
+    ss << std::hex << reinterpret_cast<uintptr_t>(image);
+    Logger::getInstance().debug("[ev::Image] Image created, handle: 0x" + ss.str() );
 }
 
 VkResult Image::bind_memory(shared_ptr<Memory> memory, VkDeviceSize offset) {

@@ -303,5 +303,47 @@ namespace initializer {
         state.reference = reference;
         return state;
     }
+
+    inline VkImageSubresourceRange image_subresource_range(
+        VkImageAspectFlags aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+        uint32_t baseMipLevel = 0,
+        uint32_t levelCount = VK_REMAINING_MIP_LEVELS,
+        uint32_t baseArrayLayer = 0,
+        uint32_t layerCount = VK_REMAINING_ARRAY_LAYERS
+    ) {
+        VkImageSubresourceRange range = {};
+        range.aspectMask = aspectMask;
+        range.baseMipLevel = baseMipLevel;
+        range.levelCount = levelCount;
+        range.baseArrayLayer = baseArrayLayer;
+        range.layerCount = layerCount;
+        return range;
+    }
+
+    inline VkComponentMapping component_mapping(
+        VkComponentSwizzle r = VK_COMPONENT_SWIZZLE_IDENTITY,
+        VkComponentSwizzle g = VK_COMPONENT_SWIZZLE_IDENTITY,
+        VkComponentSwizzle b = VK_COMPONENT_SWIZZLE_IDENTITY,
+        VkComponentSwizzle a = VK_COMPONENT_SWIZZLE_IDENTITY
+    ) {
+        VkComponentMapping mapping = {};
+        mapping.r = r;
+        mapping.g = g;
+        mapping.b = b;
+        mapping.a = a;
+        return mapping;
+    }
+
+    inline VkPushConstantRange push_constant_range(
+        VkShaderStageFlags stageFlags,
+        uint32_t offset,
+        uint32_t size
+    ) {
+        VkPushConstantRange range = {};
+        range.stageFlags = stageFlags;
+        range.offset = offset;
+        range.size = size;
+        return range;
+    }
 }
 }
