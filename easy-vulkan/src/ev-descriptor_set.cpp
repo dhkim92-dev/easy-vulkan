@@ -154,6 +154,37 @@ void DescriptorSet::write_texture(uint32_t binding,
     );
 }
 
+void DescriptorSet::write_texture(uint32_t binding, 
+    shared_ptr<ev::Texture> texture,
+    VkDescriptorType type,
+    VkImageLayout layout
+) {
+    if (!texture->image || !texture->image_view || !texture->sampler) {
+        logger::Logger::getInstance().error("[ev::DescriptorSet::write_texture] Invalid image, view, or sampler provided for DescriptorSet texture write.");
+        return;
+    }
+
+    auto bind_descriptor = texture->get_descriptor();
+    bind_descriptor.imageLayout = layout;
+    image_infos.emplace_back( bind_descriptor );
+    WriteInfo write_info = {binding, type, static_cast<uint32_t>(image_infos.size() - 1)};
+    image_write_infos.emplace_back(write_info);
+
+    // VkWriteDescriptorSet write_set = {};
+    // write_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    // write_set.dstSet = descriptor_set;
+    // write_set.dstBinding = binding;
+    // write_set.descriptorCount = 1;
+    // write_set.descriptorType = type;
+    // write_set.pImageInfo = &image_infos[image_infos.size()-1]; // Use the last added image info
+
+    // write_registry.emplace_back(write_set);
+    logger::Logger::getInstance().debug("[ev::DescriptorSet::write_texture] Writing texture to descriptor set with binding: " 
+        + std::to_string(binding) 
+        + ", type: " + std::to_string(type)
+    );
+}
+
 VkResult DescriptorSet::update() {
     ev::logger::Logger::getInstance().debug("[ev::DescriptorSet::update] Updating DescriptorSet with " 
         + std::to_string(buffer_write_infos.size()) + " buffer writes and " 
@@ -218,3 +249,24 @@ VkResult DescriptorSet::update() {
     image_write_infos.clear();
     return VK_SUCCESS;
 }
+
+// void DescriptorSet::write_image(uint32_t binding, 
+//     shared_ptr<ev::ImageView> image_view,
+//     VkDescriptorType type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE // Default to storage image type
+// ) {
+//     if (!image_view || !image_view->get_image()) {
+//         logger::Logger::getInstance().error("[ev::DescriptorSet::write_image] Invalid image view or image provided for DescriptorSet image write.");
+//         return;
+//     }
+//     WriteInfo write_info = {
+//         .binding = binding,
+//         .type = type,
+//         .resource_index = static_cast<uint32_t>(image_infos.size())
+//     };
+//     image_write_infos.emplace_back(write_info);
+//     // write_registry.emplace_back(write_set);
+//     logger::Logger::getInstance().debug("[ev::DescriptorSet::write_image] Writing image to descriptor set with binding: " 
+//         + std::to_string(binding) 
+//         + ", type: " + std::to_string(type)
+//     );
+// }

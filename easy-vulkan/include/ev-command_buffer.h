@@ -64,9 +64,7 @@ public:
 
     void bind_graphics_pipeline(shared_ptr<GraphicsPipeline> pipeline);
 
-    // VkResult bind_compute_pipeline(shared_ptr<ComputePipeline> &pipeline); TODO: ComputePipeline 구현 후 구현
-
-    // VkResult bind_ray_tracing_pipeline(shared_ptr<RayTracingPipeline> &pipeline); TODO: RayTracingPipeline 구현 후 구현
+    void bind_compute_pipeline(std::shared_ptr<ComputePipeline> &pipeline);
 
     void bind_push_constants(shared_ptr<PipelineLayout> layout, VkShaderStageFlags stage_flags, uint32_t offset, const void* data, size_t size);
 

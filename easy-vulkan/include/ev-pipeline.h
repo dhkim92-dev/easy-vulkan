@@ -115,6 +115,7 @@ public:
     }
 };
 
+
 /**
  * @brief Graphics Pipeline Blueprint
  * 그래픽스 파이프라인을 생성하기 위한 청사진 역할을 합니다ㅓ
@@ -332,5 +333,58 @@ public:
     vector<shared_ptr<GraphicsPipeline>> create_pipelines(shared_ptr<PipelineCache> pipeline_cache = nullptr);
 };
 
+class ComputePipeline {
 
-} // namespace ev
+private:
+
+    std::shared_ptr<ev::Device> device;
+
+    VkPipeline pipeline = VK_NULL_HANDLE;
+
+    std::shared_ptr<ev::PipelineLayout> layout = nullptr;
+
+    std::shared_ptr<ev::Shader> shader;
+
+public:
+
+    explicit ComputePipeline(std::shared_ptr<ev::Device> _device, 
+        std::shared_ptr<ev::PipelineLayout> layout, 
+        const std::shared_ptr<ev::Shader> shader
+    );
+
+    explicit ComputePipeline(std::shared_ptr<ev::Device> _device);
+
+    ~ComputePipeline();
+
+    VkResult create_pipeline(
+        std::shared_ptr<ev::PipelineCache> pipeline_cache = nullptr,
+        VkPipelineCreateFlags flags = 0,
+        void* next = nullptr
+    );
+
+    ComputePipeline& set_shader_stage(const std::shared_ptr<ev::Shader> shader);
+
+    void destroy();
+
+    void set_handle(VkPipeline pipeline) {
+        this->pipeline = pipeline;
+    }
+
+    void set_shader(std::shared_ptr<ev::Shader> shader) {
+        this->shader = shader;
+    }
+
+    void set_layout(std::shared_ptr<ev::PipelineLayout> layout) {
+        this->layout = layout;
+    }
+
+    operator VkPipeline() const {
+        return pipeline;
+    }
+
+    operator VkPipelineLayout() const {
+        return *layout;
+    }
+};
+
+}

@@ -65,6 +65,7 @@ public:
  * @param image 이미지 객체
  * @param src_access_mask 소스 접근 마스크
  * @param dst_access_mask 대상 접근 마스크
+ * @param old_layout 이전 이미지 레이아웃
  * @param new_layout 새로운 이미지 레이아웃
  * @param src_queue_family_index 소스 큐 패밀리 인덱스 (기본값: VK_QUEUE_FAMILY_IGNORED)
  * @param dst_queue_family_index 대상 큐 패밀리 인덱스 (기본값: VK_QUEUE_FAMILY_IGNORED)

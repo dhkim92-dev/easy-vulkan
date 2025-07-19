@@ -402,6 +402,20 @@ VkResult CommandBuffer::begin(VkCommandBufferUsageFlags flags) {
     return vkBeginCommandBuffer(command_buffer, &begin_info);
 }
 
+void CommandBuffer::bind_compute_pipeline(std::shared_ptr<ComputePipeline> &pipeline) {
+    if (command_buffer == VK_NULL_HANDLE) {
+        logger::Logger::getInstance().error("[CommandBuffer::bind_compute_pipeline] : Command buffer is not allocated.");
+        exit(EXIT_FAILURE);
+    }
+
+    if (!pipeline) {
+        logger::Logger::getInstance().error("[CommandBuffer::bind_compute_pipeline] : Invalid compute pipeline provided.");
+        exit(EXIT_FAILURE);
+    }
+
+    vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_COMPUTE, *pipeline);
+}
+
 VkResult CommandBuffer::reset(VkCommandBufferResetFlags flags) {
     if (command_buffer == VK_NULL_HANDLE) {
         logger::Logger::getInstance().error("[CommandBuffer::reset] : Command buffer is not allocated.");

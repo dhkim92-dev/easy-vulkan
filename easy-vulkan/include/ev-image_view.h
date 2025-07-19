@@ -74,6 +74,10 @@ public:
         return components;
     }
 
+    std::shared_ptr<Image> get_image() const {
+        return image;
+    }
+
     operator VkImageView() const {
         return view;
     }

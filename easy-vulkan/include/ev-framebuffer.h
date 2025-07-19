@@ -30,6 +30,8 @@ private:
     // std::vector<std::shared_ptr<ImageView>> attachments;
     std::vector<VkImageView> attachments;
 
+    std::vector<std::shared_ptr<ev::ImageView>> image_views;
+
     VkFramebuffer framebuffer = VK_NULL_HANDLE;
 
     uint32_t width;
@@ -62,6 +64,15 @@ public:
         std::shared_ptr<Device> device,
         std::shared_ptr<RenderPass> render_pass,
         const std::vector<VkImageView> attachments,
+        uint32_t width,
+        uint32_t height,
+        uint32_t layers = 1
+    );
+
+    explicit Framebuffer(
+        std::shared_ptr<Device> device,
+        std::shared_ptr<RenderPass> render_pass,
+        const std::vector<std::shared_ptr<ev::ImageView>> attachments,
         uint32_t width,
         uint32_t height,
         uint32_t layers = 1
