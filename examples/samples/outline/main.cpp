@@ -353,8 +353,8 @@ public:
             attachments.push_back(depth_attachment);
 
             VkAttachmentReference color_reference = {
-                .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                .attachment = 0 
+                .attachment = 0 ,
+                .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
             };
 
             VkAttachmentReference depth_reference = {
@@ -406,8 +406,8 @@ public:
             attachments.push_back(color_attachment);
 
             VkAttachmentReference color_reference = {
-                .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                .attachment = 0 
+                .attachment = 0,
+                .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
             };
 
             VkSubpassDescription subpass = {

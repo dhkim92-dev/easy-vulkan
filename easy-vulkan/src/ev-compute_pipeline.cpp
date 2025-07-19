@@ -56,7 +56,7 @@ VkResult ComputePipeline::create_pipeline(
 
     return vkCreateComputePipelines(
         *device, 
-        pipeline_cache ? *pipeline_cache : VK_NULL_HANDLE,
+        pipeline_cache ? VkPipelineCache(*pipeline_cache) : VK_NULL_HANDLE,
         1, 
         &info, 
         nullptr, 
