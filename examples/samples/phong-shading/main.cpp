@@ -4,7 +4,7 @@
 #include <vector>
 #include "base/example_base.hpp"
 
-class PhongShadingExample : public ExampleBase {
+class ExampleImpl : public ExampleBase {
 
 private:
 
@@ -87,7 +87,7 @@ private:
 
 public:
 
-    explicit PhongShadingExample(std::string example_name, std::string executable_path, bool debug = false)
+    explicit ExampleImpl(std::string example_name, std::string executable_path, bool debug = false)
     : ExampleBase(example_name, executable_path, debug) {
         this->title = example_name;
         setup_default_context();
@@ -530,9 +530,14 @@ public:
         current_frame_index = (current_frame_index + 1) % swapchain->get_images().size();
         ev::logger::Logger::getInstance().debug("Current frame index updated to: " + std::to_string(current_frame_index));
         uniform_update();
-     }
-
-
+    }
+    
+    void pre_destroy() override {
+        // Cleanup code before destruction
+        ev::logger::Logger::getInstance().debug("Pre-destroy cleanup for Phong Shading example");
+        queue->wait_idle(UINT64_MAX);
+        ev::logger::Logger::getInstance().debug("Pre-destroy cleanup for Phong Shading example complete");
+    }
 
     void on_window_resize() {
         // Handle window resize
@@ -541,4 +546,4 @@ public:
     }
 };
 
-RUN_EXAMPLE_MAIN(PhongShadingExample, "phong-shading", false)
+RUN_EXAMPLE_MAIN(ExampleImpl, "phong-shading", false)

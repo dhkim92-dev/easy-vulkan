@@ -43,7 +43,7 @@ VkResult Buffer::create_buffer(
     return result;
 }
 
-VkResult Buffer::bind_memory(shared_ptr<ev::Memory> memory, VkDeviceSize offset) {
+VkResult Buffer::bind_memory(shared_ptr<ev::Memory> memory, VkDeviceSize offset, VkDeviceSize size) {
     Logger::getInstance().debug("[ev::Buffer::bind_memory] Binding buffer : " + std::to_string(reinterpret_cast<uintptr_t>(buffer)) + " to memory: " + std::to_string(reinterpret_cast<uintptr_t>(VkDeviceMemory(*memory))) + " with offset: " + std::to_string(offset));
     VkBindBufferMemoryInfo bind_info = {};
     bind_info.sType = VK_STRUCTURE_TYPE_BIND_BUFFER_MEMORY_INFO;
@@ -52,6 +52,7 @@ VkResult Buffer::bind_memory(shared_ptr<ev::Memory> memory, VkDeviceSize offset)
     bind_info.memoryOffset = offset;
     bind_info.pNext = nullptr;
     this->offset = offset;
+    this->allocated_size = size;
     VkResult result = vkBindBufferMemory(*device, buffer, *memory, offset);
     if (result == VK_SUCCESS) {
         this->memory = *memory;
@@ -70,7 +71,7 @@ VkResult Buffer::bind_memory(std::shared_ptr<ev::MemoryBlockMetadata> block_meta
     this->offset = block_metadata->get_offset();
     this->allocated_size = block_metadata->get_size();
     Logger::Logger::getInstance().debug("[ev::Buffer::bind_memory] Binding buffer to memory block metadata with offset: " + std::to_string(this->offset) + ", size: " + std::to_string(this->allocated_size));
-    return bind_memory(block_metadata->get_memory(), block_metadata->get_offset());
+    return bind_memory(block_metadata->get_memory(), block_metadata->get_offset(), block_metadata->get_size());
 }
 
 /**
@@ -82,7 +83,7 @@ VkResult Buffer::bind_memory(std::shared_ptr<ev::MemoryBlockMetadata> block_meta
 
 VkResult Buffer::map(VkDeviceSize size) {
     // TODO: 추추 Memory Object 구현 후 바인딩 할 때 memory_property_flags 를 확인하여 처리해야한다.
-    Logger::getInstance().debug("[ev::Buffer::map] Mapping buffer memory...");
+    Logger::getInstance().debug("[ev::Buffer::map] Mapping buffer memory with size : " + std::to_string(this->allocated_size));
     if (buffer == VK_NULL_HANDLE) {
         Logger::getInstance().error("[ev::Buffer::map] Buffer is not created yet.");
         return VK_ERROR_INITIALIZATION_FAILED;
@@ -101,6 +102,7 @@ VkResult Buffer::map(VkDeviceSize size) {
     }
     VkResult result = vkMapMemory(*device, memory, offset, size, 0, &mapped);
     if (result == VK_SUCCESS) {
+        Logger::getInstance().debug("[ev::Buffer::map] Buffer memory mapped successfully.");
         is_mapped = true;
     } else {
         Logger::getInstance().error("[ev::Buffer::map] Failed to map buffer memory: " + std::to_string(result));

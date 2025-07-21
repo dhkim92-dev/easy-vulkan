@@ -6,7 +6,7 @@
 #include "stb_image.h"
 #include "base/example_base.hpp"
 
-class TextureCubeExample : public ExampleBase {
+class ExampleImpl : public ExampleBase {
 
 private:
 
@@ -146,7 +146,7 @@ private:
 
 public:
 
-    explicit TextureCubeExample(std::string example_name, std::string executable_path, bool debug = true)
+    explicit ExampleImpl(std::string example_name, std::string executable_path, bool debug = true)
     : ExampleBase(example_name, executable_path, debug) {
         this->title = example_name;
         setup_default_context();
@@ -352,7 +352,7 @@ public:
         );
         memory_allocator->allocate_buffer(buffers.cube_vertices, ev::memory_type::GPU_ONLY);
 
-        ev::logger::Logger::getInstance().debug("[TextureCubeExample::setup_vertex_buffer] Creating vertex buffer with size: " + std::to_string(sizeof(cube_vertices)) + " bytes with vk handle : " + std::to_string(reinterpret_cast<uintptr_t>(VkBuffer(*buffers.cube_vertices))));
+        ev::logger::Logger::getInstance().debug("[ExampleImpl::setup_vertex_buffer] Creating vertex buffer with size: " + std::to_string(sizeof(cube_vertices)) + " bytes with vk handle : " + std::to_string(reinterpret_cast<uintptr_t>(VkBuffer(*buffers.cube_vertices))));
 
         buffers.cube_indices = std::make_shared<ev::Buffer>(
             device, 
@@ -690,9 +690,13 @@ public:
         current_frame_index = (current_frame_index + 1) % swapchain->get_images().size();
         // ev::logger::Logger::getInstance().debug("Current frame index updated to: " + std::to_string(current_frame_index));
         uniform_update();
-     }
+    }
 
-
+    void pre_destroy() override {
+        ev::logger::Logger::getInstance().debug("Pre-destroying resources...");
+        queue->wait_idle(UINT64_MAX);
+        ev::logger::Logger::getInstance().debug("Pre-destroying resources completed.");
+    }
 
     void on_window_resize() {
         // Handle window resize
@@ -701,4 +705,4 @@ public:
     }
 };
 
-RUN_EXAMPLE_MAIN(TextureCubeExample, "texture-cube", false)
+RUN_EXAMPLE_MAIN(ExampleImpl, "texture-cube", false)

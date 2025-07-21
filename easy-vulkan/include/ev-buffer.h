@@ -61,7 +61,7 @@ public:
 
     ~Buffer();
 
-    VkResult bind_memory(shared_ptr<ev::Memory> memory, VkDeviceSize offset = 0);
+    VkResult bind_memory(shared_ptr<ev::Memory> memory, VkDeviceSize offset = 0, VkDeviceSize size = VK_WHOLE_SIZE);
 
     VkResult bind_memory(std::shared_ptr<ev::MemoryBlockMetadata> block_metadata);
 

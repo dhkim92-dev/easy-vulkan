@@ -6,7 +6,7 @@
 #include "stb_image.h"
 #include "base/example_base.hpp"
 
-class GltfModelLoadingExample : public ExampleBase {
+class ExampleImpl : public ExampleBase {
 
 private:
 
@@ -71,7 +71,7 @@ private:
 
 public:
 
-    explicit GltfModelLoadingExample(std::string example_name, std::string executable_path, bool debug = true)
+    explicit ExampleImpl(std::string example_name, std::string executable_path, bool debug = true)
     : ExampleBase(example_name, executable_path, debug) {
         this->title = example_name;
         setup_default_context();
@@ -491,7 +491,14 @@ public:
 
         current_frame_index = (current_frame_index + 1) % swapchain->get_images().size();
         // ev::logger::Logger::getInstance().debug("Current frame index updated to: " + std::to_string(current_frame_index));
-     }
+    }
+
+    void pre_destroy() override {
+        // Cleanup code before destruction
+        ev::logger::Logger::getInstance().debug("Pre-destroy cleanup for GLTF Model Loading example");
+        queue->wait_idle(UINT64_MAX);
+        ev::logger::Logger::getInstance().debug("Pre-destroy cleanup for GLTF Model Loading example complete");
+    }
 
     void on_window_resize() {
         // Handle window resize
@@ -500,4 +507,4 @@ public:
     }
 };
 
-RUN_EXAMPLE_MAIN(GltfModelLoadingExample, "gltf-model-loading", false)
+RUN_EXAMPLE_MAIN(ExampleImpl, "gltf-model-loading", false)

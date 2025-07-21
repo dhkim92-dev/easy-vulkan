@@ -755,7 +755,13 @@ public:
         // ev::logger::Logger::getInstance().debug("Current frame index updated to: " + std::to_string(current_frame_index));
      }
 
+     void pre_destroy() override {
+         // Cleanup code before destruction
+        ev::logger::Logger::getInstance().debug("Pre-destroy cleanup for Gaussian Blur example");
+        queue->wait_idle(UINT64_MAX);
 
+        ev::logger::Logger::getInstance().debug("Pre-destroy cleanup for Gaussian Blur example complete");
+     }
 
     void on_window_resize() {
         // Handle window resize

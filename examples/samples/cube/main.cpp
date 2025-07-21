@@ -4,7 +4,7 @@
 #include <vector>
 #include "base/example_base.hpp"
 
-class CubeExample : public ExampleBase {
+class ExampleImpl : public ExampleBase {
 
 private:
 
@@ -131,7 +131,7 @@ std::vector<uint32_t> cube_indices = {
 
 public:
 
-    explicit CubeExample(std::string example_name, std::string executable_path, bool debug = false)
+    explicit ExampleImpl(std::string example_name, std::string executable_path, bool debug = false)
     : ExampleBase(example_name, executable_path, debug) {
         this->title = example_name;
         setup_default_context();
@@ -532,15 +532,19 @@ public:
         current_frame_index = (current_frame_index + 1) % swapchain->get_images().size();
         ev::logger::Logger::getInstance().debug("Current frame index updated to: " + std::to_string(current_frame_index));
         uniform_update();
-     }
-
-
+    }
 
     void on_window_resize() {
         // Handle window resize
         // swapchain->create(swapchain->get_surface(), display.width, display.height);
         ev::logger::Logger::getInstance().debug("Window resized to: " + std::to_string(display.width) + "x" + std::to_string(display.height));
     }
+
+    void pre_destroy() override {
+        ev::logger::Logger::getInstance().info("[Pre Destroy Start]");
+        queue->wait_idle(UINT64_MAX);
+        ev::logger::Logger::getInstance().info("[Pre Destroy End]");
+    }
 };
 
-RUN_EXAMPLE_MAIN(CubeExample, "cube", false)
+RUN_EXAMPLE_MAIN(ExampleImpl, "cube", false)

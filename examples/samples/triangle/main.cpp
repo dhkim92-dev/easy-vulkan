@@ -117,16 +117,16 @@ public:
         buffers.uniform.buffer = std::make_shared<ev::Buffer>(
             device, 
             sizeof(UniformBufferObject), 
-            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT
+            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT
         );
         buffers.uniform.memory = std::make_shared<ev::Memory>(
             device, 
             buffers.uniform.buffer->get_memory_requirements().size, 
-            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 
             buffers.uniform.buffer->get_memory_requirements()
         );
         buffers.uniform.buffer->bind_memory(buffers.uniform.memory, 0);
-        buffers.uniform.buffer->map();
+        // buffers.uniform.buffer->map();
     }
 
     void setup_synchronize_objects() {
@@ -141,9 +141,9 @@ public:
     }
 
     void setup_queue() {
-        ev::logger::Logger::getInstance().debug("[Setup Queue Start]");
+        ev::logger::Logger::getInstance().info("[Setup Queue Start]");
         queue = std::make_shared<ev::Queue>(device, device->get_queue_index(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT));
-        ev::logger::Logger::getInstance().debug("[Setup Queue End]");
+        ev::logger::Logger::getInstance().info("[Setup Queue End]");
     }
 
     void setup_vertex_buffer() {
@@ -180,11 +180,11 @@ public:
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 
             staging_buffer->get_memory_requirements()
         );
-        staging_buffer->bind_memory(staging_memory, 0);
-        staging_buffer->map();
-        staging_buffer->write(vertices, sizeof(vertices));
-        // staging_buffer->flush();
-        staging_buffer->unmap();
+        CHECK_RESULT(staging_buffer->bind_memory(staging_memory, 0));
+        CHECK_RESULT(staging_buffer->map());
+        CHECK_RESULT(staging_buffer->write(vertices, sizeof(vertices)));
+        CHECK_RESULT(staging_buffer->flush());
+        CHECK_RESULT(staging_buffer->unmap());
 
         shared_ptr<ev::CommandBuffer> staging_command = command_pool->allocate(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
         staging_command->begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
@@ -428,10 +428,11 @@ public:
             0.1f, 10.0f
         );
         ubo.proj[1][1] *= -1; // Vulkan NDC 보정
-        buffers.uniform.buffer->map();
-        buffers.uniform.buffer->write(&ubo, sizeof(ubo));
-        // buffers.uniform.buffer->flush();
-        buffers.uniform.buffer->unmap();
+        ev::logger::Logger::getInstance().debug("Updating uniform buffer with model, view, and projection matrices");
+        CHECK_RESULT(buffers.uniform.buffer->map());
+        CHECK_RESULT(buffers.uniform.buffer->write(&ubo, sizeof(ubo)));
+        CHECK_RESULT(buffers.uniform.buffer->flush());
+        CHECK_RESULT(buffers.uniform.buffer->unmap());
     }
 
     void render() override {
@@ -474,9 +475,14 @@ public:
         current_frame_index = (current_frame_index + 1) % swapchain->get_images().size();
         ev::logger::Logger::getInstance().debug("Current frame index updated to: " + std::to_string(current_frame_index));
         uniform_update();
-     }
+    }
 
-
+    void pre_destroy() override {
+        // Cleanup code before destruction
+        ev::logger::Logger::getInstance().debug("Pre-destroy cleanup for Triangle example");
+        queue->wait_idle(UINT64_MAX);
+        ev::logger::Logger::getInstance().debug("Pre-destroy cleanup for Triangle example complete");
+    }
 
     void on_window_resize() {
         // Handle window resize
