@@ -1,0 +1,35 @@
+// 7x7 Gaussian Blur Compute Shader
+#version 450
+
+layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
+
+layout(binding = 0, rgba8) uniform readonly image2D input_image;
+layout(binding = 1, rgba8) uniform writeonly image2D output_image;
+
+const float gaussian_kernel[7][7] = float[7][7](
+    float[7](0.00000067, 0.00002292, 0.00019117, 0.00038771, 0.00019117, 0.00002292, 0.00000067),
+    float[7](0.00002292, 0.00078634, 0.00655602, 0.01331211, 0.00655602, 0.00078634, 0.00002292),
+    float[7](0.00019117, 0.00655602, 0.05472157, 0.11098164, 0.05472157, 0.00655602, 0.00019117),
+    float[7](0.00038771, 0.01331211, 0.11098164, 0.22508352, 0.11098164, 0.01331211, 0.00038771),
+    float[7](0.00019117, 0.00655602, 0.05472157, 0.11098164, 0.05472157, 0.00655602, 0.00019117),
+    float[7](0.00002292, 0.00078634, 0.00655602, 0.01331211, 0.00655602, 0.00078634, 0.00002292),
+    float[7](0.00000067, 0.00002292, 0.00019117, 0.00038771, 0.00019117, 0.00002292, 0.00000067)
+);
+
+void main() {
+    ivec2 size = imageSize(input_image);
+    ivec2 coord = ivec2(gl_GlobalInvocationID.xy);
+    if (coord.x >= size.x || coord.y >= size.y) {
+        return;
+    }
+
+    vec4 color = vec4(0.0);
+    for (int ky = -3; ky <= 3; ++ky) {
+        for (int kx = -3; kx <= 3; ++kx) {
+            ivec2 _coord = clamp(coord + ivec2(kx, ky), ivec2(0), size - ivec2(1));
+            vec4 filtered = imageLoad(input_image, _coord);
+            color += filtered * gaussian_kernel[ky + 3][kx + 3];
+        }
+    }
+    imageStore(output_image, coord, color);
+}

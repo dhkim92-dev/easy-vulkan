@@ -7,6 +7,10 @@
         {
             "url": "https://www.dohoon-kim.kr/media/graphics/textures/cube/specular.png",
             "destination_path": "textures/cube/specular.png"
+        }, 
+        {
+            "url": "https://www.dohoon-kim.kr/media/graphics/photos/cat-330x330.png",
+            "destination_path": "photos/cat-330x330.png"
         }
     ],
 

@@ -29,23 +29,24 @@ add_custom_target(download_resources ALL
     DEPENDS ${STAMP_FILE}
 )
 
+# 더 이상 사용되지않음 
 # 'download_resources' 타겟이 빌드된 후, 리소스 디렉터리의 모든 내용을
 # 빌드 트리 내의 해당 디렉터리로 복사합니다.
-add_custom_command(
-    TARGET download_resources POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_CURRENT_SOURCE_DIR}"
-            "${CMAKE_CURRENT_BINARY_DIR}"
-    COMMENT "Copying resources to build directory..."
-    VERBATIM
-)
+# add_custom_command(
+#     TARGET download_resources POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy_directory
+#             "${CMAKE_CURRENT_SOURCE_DIR}"
+#             "${CMAKE_CURRENT_BINARY_DIR}"
+#     COMMENT "Copying resources to build directory..."
+#     VERBATIM
+# )
 
-add_custom_command(
-    TARGET download_resources POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_CURRENT_SOURCE_DIR}/glTF-Sample-Models"
-            "${CMAKE_BINARY_DIR}/resources/glTF_Sample-Models"
-    COMMENT "Copying glTF-Sample-Models to build/resources/glTF_Sample-Models..."
-    VERBATIM
-)
+# add_custom_command(
+#     TARGET download_resources POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy_directory
+#             "${CMAKE_CURRENT_SOURCE_DIR}/glTF-Sample-Models"
+#             "${CMAKE_BINARY_DIR}/resources/glTF_Sample-Models"
+#     COMMENT "Copying glTF-Sample-Models to build/resources/glTF_Sample-Models..."
+#     VERBATIM
+# )
 

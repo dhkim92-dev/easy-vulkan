@@ -166,6 +166,7 @@ void DescriptorSet::write_texture(uint32_t binding,
 
     auto bind_descriptor = texture->get_descriptor();
     bind_descriptor.imageLayout = layout;
+
     image_infos.emplace_back( bind_descriptor );
     WriteInfo write_info = {binding, type, static_cast<uint32_t>(image_infos.size() - 1)};
     image_write_infos.emplace_back(write_info);
