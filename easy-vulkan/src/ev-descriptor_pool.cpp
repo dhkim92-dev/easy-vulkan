@@ -42,6 +42,7 @@ VkResult DescriptorPool::create_pool(uint32_t max_sets, VkDescriptorPoolCreateFl
         logger::Logger::getInstance().error("[ev::DescriptorPool::create_pool] No descriptor types added to the pool.");
         return VK_ERROR_INITIALIZATION_FAILED;
     }
+    ev::logger::Logger::getInstance().info("[ev::DescriptorPool::create_pool] Creating descriptor pool with max sets: " + std::to_string(max_sets) + " and flags: " + std::to_string(flags));
     VkDescriptorPoolCreateInfo pool_info = {};
     pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     pool_info.poolSizeCount = static_cast<uint32_t>(pool_sizes.size());
@@ -56,7 +57,7 @@ VkResult DescriptorPool::create_pool(uint32_t max_sets, VkDescriptorPoolCreateFl
         }
     }
 
-    logger::Logger::getInstance().debug("[ev::DescriptorPool::create_pool] Creating descriptor pool with max sets: " + std::to_string(max_sets) + " and flags: " + std::to_string(flags));
+    logger::Logger::getInstance().info("[ev::DescriptorPool::create_pool] Creating descriptor pool with max sets: " + std::to_string(max_sets) + " and flags: " + std::to_string(flags));
     return vkCreateDescriptorPool(*device, &pool_info, nullptr, &pool);
 }
 
@@ -144,11 +145,13 @@ VkResult DescriptorPool::release(shared_ptr<DescriptorSet> descriptor_set) {
 
 
 void DescriptorPool::destroy() {
+    ev::logger::Logger::getInstance().info("[ev::DescriptorPool::destroy] Destroying DescriptorPool.");
     if (pool != VK_NULL_HANDLE) {
         vkDestroyDescriptorPool(*device, pool, nullptr);
         pool = VK_NULL_HANDLE;
         pool_sizes.clear();
     }
+    ev::logger::Logger::getInstance().info("[ev::DescriptorPool::destroy] DescriptorPool destroyed successfully.");
 }
 
 DescriptorPool::~DescriptorPool() {

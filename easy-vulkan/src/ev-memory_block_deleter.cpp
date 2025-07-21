@@ -3,6 +3,7 @@
 void ev::BitmapBuddyMemoryBlockDeleter::operator() (
     std::shared_ptr<BitmapBuddyMemoryBlockMetadata> info
 ) const {
+    ev::logger::Logger::getInstance().debug("BitmapBuddyMemoryBlockDeleter called for block with node index: " + std::to_string(info->get_node_idx()));
     if (info->is_free()) {
         return; // 이미 해제된 블록은 무시
     }
@@ -20,4 +21,5 @@ void ev::BitmapBuddyMemoryBlockDeleter::operator() (
 
     info->set_free(true); // 블록을 free 상태로 설정
     pool_ptr->free(info); // 메모리 풀에 블록 해제 요청
+    logger::Logger::getInstance().debug("BitmapBuddyMemoryBlockDeleter completed for block with node index: " + std::to_string(info->get_node_idx()));
 }

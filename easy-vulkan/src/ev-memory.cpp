@@ -43,7 +43,7 @@ Memory::Memory(
 }
 
 VkResult Memory::allocate() {
-    Logger::getInstance().debug("[ev::Memory::allocate] Allocating memory with size: " + std::to_string(size));
+    Logger::getInstance().info("[ev::Memory::allocate] Allocating memory with size: " + std::to_string(size));
     if (memory != VK_NULL_HANDLE) {
         Logger::getInstance().warn("[ev::Memory::allocate] Memory already allocated, skipping allocation.");
         return VK_SUCCESS;
@@ -58,10 +58,10 @@ VkResult Memory::allocate() {
 
 void Memory::destroy() {
     if (memory != VK_NULL_HANDLE) {
-        Logger::getInstance().debug("[ev::Memory::destroy] Destroying memory with handle: " + std::to_string(reinterpret_cast<uintptr_t>(memory)));
+        Logger::getInstance().info("[ev::Memory::destroy] Destroying memory with handle: " + std::to_string(reinterpret_cast<uintptr_t>(memory)));
         vkFreeMemory(*device, memory, nullptr);
         memory = VK_NULL_HANDLE;
-        Logger::getInstance().debug("[ev::Memory::destroy] Memory freed successfully.");
+        Logger::getInstance().info("[ev::Memory::destroy] Memory freed successfully.");
     }
     size = 0;
     memory_property_flags = 0;

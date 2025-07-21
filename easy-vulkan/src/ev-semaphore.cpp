@@ -7,8 +7,10 @@ using namespace ev;
 Semaphore::Semaphore(std::shared_ptr<ev::Device> device,
     VkSemaphoreCreateFlags flags,
 void* next): device(device) {
+    ev::logger::Logger::getInstance().info("[ev::Semaphore] Creating semaphore with flags: " + std::to_string(flags));
     if (!this->device) {
-        throw std::runtime_error("Device is null");
+        ev::logger::Logger::getInstance().error("Device is null. Cannot create semaphore.");
+        exit(EXIT_FAILURE);
     }
 
     VkSemaphoreCreateInfo semaphore_info = {};
@@ -21,15 +23,17 @@ void* next): device(device) {
         exit(EXIT_FAILURE);
     }
     this->device = device;
-    logger::Logger::getInstance().debug("Semaphore created successfully");
+    logger::Logger::getInstance().info("Semaphore created successfully");
 }
 
 void Semaphore::destroy() {
+    ev::logger::Logger::getInstance().info("[ev::Semaphore::destroy] Destroying semaphore.");
     if (semaphore != VK_NULL_HANDLE) {
         vkDestroySemaphore(*device, semaphore, nullptr);
         semaphore = VK_NULL_HANDLE;
-        logger::Logger::getInstance().debug("Semaphore destroyed successfully");
+        logger::Logger::getInstance().info("Semaphore destroyed successfully");
     }
+    ev::logger::Logger::getInstance().debug("[ev::Semaphore::destroy] Semaphore already destroyed or not initialized.");
 }
 
 Semaphore::~Semaphore() {

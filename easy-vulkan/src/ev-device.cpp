@@ -10,7 +10,7 @@ Device::Device(
     VkQueueFlags queue_flags,
     bool use_swapchain
 ) : instance(std::move(_instance)), pdevice(std::move(_pdevice)), use_swapchain(use_swapchain) {
-    Logger::getInstance().info("Creating Vulkan device...");
+    Logger::getInstance().info("[ev::Device] Creating Vulkan device...");
 
     if ( use_swapchain ) {
         enabled_extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
@@ -36,7 +36,7 @@ Device::Device(
     device_ci.ppEnabledLayerNames = nullptr; // No layers enabled
     device_ci.pEnabledFeatures = &pdevice->get_features(); // Use physical device features
     CHECK_RESULT(vkCreateDevice(*pdevice, &device_ci, nullptr, &device));
-    Logger::getInstance().info("Vulkan device created successfully.");
+    Logger::getInstance().info("[ev::Device] Vulkan device created successfully.");
 }
 
 uint32_t Device::get_queue_family_index(VkQueueFlags flags) const {
@@ -192,14 +192,14 @@ VkFormat Device::get_supported_depth_format(bool check_sampling_support) const {
 }
 
 void Device::destroy() {
+    Logger::getInstance().info("[ev::Device] Destroying Vulkan device.");
     if (device != VK_NULL_HANDLE) {
         vkDestroyDevice(device, nullptr);
         device = VK_NULL_HANDLE;
-        Logger::getInstance().info("Vulkan device destroyed.");
     }
+    Logger::getInstance().info("[ev::Device] Vulkan device destroyed.");
 }
 
 Device::~Device() {
     destroy();
-    Logger::getInstance().info("Device destructor called, resources cleaned up.");
 }

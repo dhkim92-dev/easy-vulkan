@@ -6,7 +6,7 @@ MemoryPool::MemoryPool(
     std::shared_ptr<ev::Device> device, 
     uint32_t memory_type_index
 ) : device(std::move(device)), memory_type_index(memory_type_index) {
-    logger::Logger::getInstance().debug("[ev::MemoryPool] constructor called.");
+    logger::Logger::getInstance().info("[ev::MemoryPool] constructor called.");
     if (!this->device) {
         logger::Logger::getInstance().error("[ev::MemoryPool] Invalid device provided for MemoryPool creation.");
         exit(EXIT_FAILURE);

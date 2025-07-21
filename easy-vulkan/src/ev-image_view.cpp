@@ -111,10 +111,12 @@ VkResult ImageView::check_view_type_compatibility() {
 }
 
 void ImageView::destroy() {
+    ev::logger::Logger::getInstance().info("[ev::ImageView::destroy] Destroying ImageView.");
     if (view != VK_NULL_HANDLE) {
         vkDestroyImageView(*device, view, nullptr);
         view = VK_NULL_HANDLE;
     }
+    ev::logger::Logger::getInstance().info("[ev::ImageView::destroy] ImageView destroyed successfully.");
 }
 
 ImageView::~ImageView() {

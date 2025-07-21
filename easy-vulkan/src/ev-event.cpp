@@ -5,8 +5,10 @@ using namespace ev;
 
 Event::Event(std::shared_ptr<Device> device, VkEventCreateFlags flags, void* next)
     : device(std::move(device)) {
+    ev::logger::Logger::getInstance().info("[ev::Event] Creating event with flags: " + std::to_string(flags));
     if (!this->device) {
-        throw std::runtime_error("Device is null");
+        ev::logger::Logger::getInstance().error("[ev::Event] Device is null. Cannot create event.");
+        exit(EXIT_FAILURE);
     }
 
     VkEventCreateInfo event_info = {};
@@ -19,15 +21,16 @@ Event::Event(std::shared_ptr<Device> device, VkEventCreateFlags flags, void* nex
         logger::Logger::getInstance().error("Failed to create event: " + std::to_string(result));
         exit(EXIT_FAILURE);
     }
-    logger::Logger::getInstance().debug("Event created successfully");
+    logger::Logger::getInstance().info("[ev::Event] Event created successfully");
 }
 
 void Event::destroy() {
+    ev::logger::Logger::getInstance().info("[ev::Event::destroy] Destroying event.");
     if (event != VK_NULL_HANDLE) {
         vkDestroyEvent(*device, event, nullptr);
         event = VK_NULL_HANDLE;
-        logger::Logger::getInstance().debug("Event destroyed successfully");
     }
+    ev::logger::Logger::getInstance().info("[ev::Event] Event destroyed successfully");
 }
 
 Event::~Event() {

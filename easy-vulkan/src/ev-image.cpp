@@ -100,13 +100,13 @@ VkResult Image::transient_layout(VkImageLayout new_layout) {
 }
 
 void Image::destroy() {
-    Logger::getInstance().debug("[ev::Image] Destroying Image...");
+    Logger::getInstance().info("[ev::Image] Destroying Image...");
     if (image != VK_NULL_HANDLE) {
         vkDestroyImage(*device, image, nullptr);
         image = VK_NULL_HANDLE;
     }
     usage_flags = 0;
-    Logger::getInstance().debug("[ev::Image] Image destroyed successfully.");
+    Logger::getInstance().info("[ev::Image] Image destroyed successfully.");
 }
 
 Image::~Image() {

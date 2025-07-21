@@ -12,10 +12,12 @@ using namespace ev;
  */
 CommandBuffer::CommandBuffer(shared_ptr<Device> _device, VkCommandPool command_pool, VkCommandBufferLevel level)
     : device(std::move(_device)), command_pool(command_pool), level(level) {
+    ev::logger::Logger::getInstance().info("[CommandBuffer::CommandBuffer] : Creating CommandBuffer with device: " + std::to_string(reinterpret_cast<uintptr_t>(device.get())) + ", command pool: " + std::to_string(reinterpret_cast<uintptr_t>(command_pool)));
     if (!device) {
         logger::Logger::getInstance().error("[CommandBuffer::CommandBuffer] : Invalid device provided for CommandBuffer creation.");
         exit(EXIT_FAILURE);
     }
+
     
     VkCommandBufferAllocateInfo alloc_info = {};
     alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -24,6 +26,7 @@ CommandBuffer::CommandBuffer(shared_ptr<Device> _device, VkCommandPool command_p
     alloc_info.commandBufferCount = 1;
 
     CHECK_RESULT(vkAllocateCommandBuffers(*device, &alloc_info, &command_buffer));
+    ev::logger::Logger::getInstance().info("[CommandBuffer::CommandBuffer] : CommandBuffer created successfully.");
 }
 
 /**
@@ -434,11 +437,12 @@ VkResult CommandBuffer::end() {
 }
 
 void CommandBuffer::destroy() {
+    ev::logger::Logger::getInstance().info("[CommandBuffer::destroy] : Destroying CommandBuffer.");
     if (command_buffer != VK_NULL_HANDLE) {
-        logger::Logger::getInstance().debug("[CommandBuffer::destroy] : Destroying CommandBuffer...");
         vkFreeCommandBuffers(*device, command_pool, 1, &command_buffer);
         command_buffer = VK_NULL_HANDLE;
     }
+    ev::logger::Logger::getInstance().info("[CommandBuffer::destroy] : CommandBuffer destroyed successfully.");
 }
 
 CommandBuffer::~CommandBuffer() {

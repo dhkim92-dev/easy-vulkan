@@ -68,6 +68,7 @@ Framebuffer::Framebuffer(
 }
 
 void Framebuffer::destroy() {
+    ev::logger::Logger::getInstance().info("[ev::Framebuffer::destroy] Destroying Framebuffer.");
     if (framebuffer != VK_NULL_HANDLE) {
         vkDestroyFramebuffer(*device, framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
@@ -75,6 +76,7 @@ void Framebuffer::destroy() {
     attachments.clear();
     width = 0;
     height = 0;
+    ev::logger::Logger::getInstance().info("[ev::Framebuffer::destroy] Framebuffer destroyed successfully.");
 }
 
 Framebuffer::~Framebuffer() {

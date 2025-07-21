@@ -4,6 +4,7 @@ namespace ev {
 
 ComputePipeline::ComputePipeline(std::shared_ptr<ev::Device> _device)
     : device(std::move(_device)) {
+    ev::logger::Logger::getInstance().info("[ComputePipeline] Creating ComputePipeline with default constructor.");
     if (!device) {
         ev::logger::Logger::getInstance().error("[ComputePipeline::ComputePipeline] : Invalid device provided for ComputePipeline creation.");
         exit(EXIT_FAILURE);
@@ -65,11 +66,13 @@ VkResult ComputePipeline::create_pipeline(
 }
 
 void ComputePipeline::destroy() {
+    ev::logger::Logger::getInstance().info("[ComputePipeline::destroy] : Destroying compute pipeline: " + std::to_string(reinterpret_cast<uintptr_t>(pipeline)));
     if (pipeline != VK_NULL_HANDLE) {
         ev::logger::Logger::getInstance().info("[ComputePipeline::destroy] : Destroying compute pipeline : " + std::to_string(reinterpret_cast<uintptr_t>(pipeline)));
         vkDestroyPipeline(*device, pipeline, nullptr);
         pipeline = VK_NULL_HANDLE;
     }
+    ev::logger::Logger::getInstance().info("[ComputePipeline::destroy] : Compute pipeline destroyed successfully.");
 }
 
 ComputePipeline::~ComputePipeline() {

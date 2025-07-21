@@ -229,6 +229,7 @@ VkResult Buffer::read(void* data, VkDeviceSize size) {
  * 메모리 해제 및 버퍼 파괴를 수행한다.
  */
 void Buffer::destroy() {
+    ev::logger::Logger::getInstance().info("[ev::Buffer::destroy] Destroying buffer with handle: " + std::to_string(reinterpret_cast<uintptr_t>(buffer)));
     if ( is_mapped ) {
         // flush();
         // invalidate();
@@ -248,6 +249,7 @@ void Buffer::destroy() {
 
     size = 0;
     usage_flags = 0;
+    ev::logger::Logger::getInstance().debug("[ev::Buffer::destroy] Buffer destroyed successfully.");
 }
 
 Buffer::~Buffer() {
