@@ -29,8 +29,8 @@ class ExampleBase {
         std::filesystem::path base_path = bin_path.parent_path().parent_path().parent_path();
 
         shader_path = base_path.parent_path() / "shaders";
-
-        resource_path = base_path.parent_path() / "resources";
+        auto build_path = base_path.parent_path();
+        resource_path = build_path.parent_path() /  "resources";
 
         ev::logger::Logger::getInstance().info("Executable path set to: " + executable_path);
         ev::logger::Logger::getInstance().info("Shader path set to: " + shader_path.string());
