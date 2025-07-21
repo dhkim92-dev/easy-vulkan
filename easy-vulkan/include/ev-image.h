@@ -6,6 +6,7 @@
 #include "ev-memory.h"
 #include "ev-device.h"
 #include "ev-logger.h"
+#include "ev-memory_block_metadata.h"
 
 using namespace std;
 
@@ -47,9 +48,15 @@ private:
 
     VkMemoryRequirements memory_requirements = {};
 
+    std::shared_ptr<MemoryBlockMetadata> metadata;
+
     const uint32_t* queue_family_indices = nullptr;
 
     const void* p_next = nullptr;
+
+    void *mapped_ptr = nullptr;
+
+    VkDeviceSize mapped_offset = -1;
 
 public:
 
@@ -79,7 +86,25 @@ public:
 
     VkResult bind_memory(shared_ptr<Memory> memory, VkDeviceSize offset = 0);
 
+    VkResult bind_memory(std::shared_ptr<MemoryBlockMetadata> metadata);
+
     VkResult transient_layout(VkImageLayout new_layout);
+
+    VkResult map(VkDeviceSize offset, VkDeviceSize size = VK_WHOLE_SIZE);
+
+    VkResult write(
+        const void* data,
+        VkDeviceSize size = VK_WHOLE_SIZE
+    );
+
+    VkResult read(
+        void* data,
+        VkDeviceSize size = VK_WHOLE_SIZE
+    );
+
+    VkResult flush();
+
+    VkResult unmap();
 
     VkFormat get_format() {
         return this->format;
