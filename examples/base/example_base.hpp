@@ -42,6 +42,8 @@ class ExampleBase {
     };
 
     virtual ~ExampleBase() {
+        pre_destroy();
+
         if (swapchain) {
             swapchain->destroy();
         }
@@ -162,5 +164,7 @@ class ExampleBase {
     }
 
     virtual void render() = 0;
+
+    virtual void pre_destroy() {};
 
 };
