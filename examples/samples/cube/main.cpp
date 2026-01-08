@@ -10,7 +10,7 @@ private:
 
     // vector<std::shared_ptr<ev::Shader>> shaders;
 
-    vector<std::shared_ptr<ev::PipelineLayout>> pipeline_layouts;
+    std::vector<std::shared_ptr<ev::PipelineLayout>> pipeline_layouts;
 
     std::shared_ptr<ev::RenderPass> render_pass;
 
@@ -24,7 +24,7 @@ private:
 
     std::shared_ptr<ev::CommandPool> command_pool;
 
-    shared_ptr<ev::DescriptorPool> descriptor_pool;
+    std::shared_ptr<ev::DescriptorPool> descriptor_pool;
 
     std::vector<std::shared_ptr<ev::CommandBuffer>> command_buffers;
     
@@ -39,8 +39,8 @@ private:
     } ubo;
 
     struct {
-        shared_ptr<ev::DescriptorSetLayout> layout;
-        vector<shared_ptr<ev::DescriptorSet>> sets;
+        std::shared_ptr<ev::DescriptorSetLayout> layout;
+        std::vector<std::shared_ptr<ev::DescriptorSet>> sets;
     } descriptors;
 
 
@@ -534,7 +534,7 @@ public:
         uniform_update();
     }
 
-    void on_window_resize() {
+    void on_window_resize() override {
         // Handle window resize
         // swapchain->create(swapchain->get_surface(), display.width, display.height);
         ev::logger::Logger::getInstance().debug("Window resized to: " + std::to_string(display.width) + "x" + std::to_string(display.height));

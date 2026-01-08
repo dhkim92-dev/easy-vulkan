@@ -119,6 +119,10 @@ uint32_t Device::get_memory_type_index(
     exit(EXIT_FAILURE);
 }
 
+VkResult Device::wait_idle(uint64_t timeout) const {
+    return vkDeviceWaitIdle(device);
+}
+
 void Device::setup_queue_family_indices(VkQueueFlags flags) {
     queue_family_indices.graphics = get_queue_family_index(VK_QUEUE_GRAPHICS_BIT);
     queue_family_indices.transfer = get_queue_family_index(VK_QUEUE_TRANSFER_BIT);

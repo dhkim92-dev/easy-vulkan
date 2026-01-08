@@ -1,0 +1,284 @@
+[
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/stb",
+  "command": "/usr/bin/c++  -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -o CMakeFiles/stb_impl.dir/stb_impl.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb/stb_impl.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb/stb_impl.cpp",
+  "output": "external/stb/CMakeFiles/stb_impl.dir/stb_impl.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf",
+  "command": "/usr/bin/c++  -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/tiny_gltf_impl.dir/tinygltf_impl.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf/tinygltf_impl.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf/tinygltf_impl.cpp",
+  "output": "external/tiny_gltf/CMakeFiles/tiny_gltf_impl.dir/tinygltf_impl.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-buddy_memory_allocator.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-buddy_memory_allocator.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-buddy_memory_allocator.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-buddy_memory_allocator.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-buffer.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-buffer.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-buffer.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-buffer.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-buffer_memory_barrier.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-buffer_memory_barrier.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-buffer_memory_barrier.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-buffer_memory_barrier.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-command_buffer.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-command_buffer.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-command_buffer.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-command_buffer.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-command_pool.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-command_pool.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-command_pool.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-command_pool.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-compute_pipeline.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-compute_pipeline.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-compute_pipeline.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-compute_pipeline.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-descriptor_pool.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-descriptor_pool.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-descriptor_pool.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-descriptor_pool.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-descriptor_set.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-descriptor_set.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-descriptor_set.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-descriptor_set.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-device.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-device.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-device.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-event.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-event.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-event.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-event.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-fence.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-fence.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-fence.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-fence.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-framebuffer.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-framebuffer.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-framebuffer.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-framebuffer.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-gltf.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-gltf.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-gltf.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-gltf.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-graphics_pipeline.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-graphics_pipeline.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-graphics_pipeline.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-graphics_pipeline.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-graphics_pipeline_blueprint_manager.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-graphics_pipeline_blueprint_manager.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-graphics_pipeline_blueprint_manager.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-graphics_pipeline_blueprint_manager.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-image.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-image.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-image.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-image.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-image_memory_barrier.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-image_memory_barrier.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-image_memory_barrier.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-image_memory_barrier.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-image_view.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-image_view.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-image_view.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-image_view.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-instance.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-instance.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-instance.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-macro.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-macro.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-macro.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-macro.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-memory.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-memory.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-memory.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-memory.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-memory_block_deleter.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-memory_block_deleter.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-memory_block_deleter.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-memory_block_deleter.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-memory_pool.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-memory_pool.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-memory_pool.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-memory_pool.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-pdevice.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-pdevice.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pdevice.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-pipeline_cache.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-pipeline_cache.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-pipeline_cache.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pipeline_cache.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-pipeline_layout.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-pipeline_layout.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-pipeline_layout.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-pipeline_layout.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-queue.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-queue.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-queue.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-queue.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-renderpass.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-renderpass.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-renderpass.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-renderpass.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-sampler.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-sampler.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-sampler.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-sampler.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-sampler_builder.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-sampler_builder.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-sampler_builder.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-sampler_builder.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-semaphore.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-semaphore.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-semaphore.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-semaphore.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-shader.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-shader.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-shader.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-shader.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-swapchain.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-swapchain.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-swapchain.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-texture.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-texture.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-texture.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-texture.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-texture_loader.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-texture_loader.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-texture_loader.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-texture_loader.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/easy-vulkan",
+  "command": "/usr/bin/c++ -Deasy_vulkan_EXPORTS -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -std=gnu++2b -arch arm64 -fPIC -o CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-utility.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/src/ev-utility.cpp",
+  "output": "easy-vulkan/CMakeFiles/easy-vulkan.dir/src/ev-utility.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/examples",
+  "command": "/usr/bin/c++  -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/externals/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -isystem /opt/homebrew/include -std=gnu++2b -arch arm64 -o CMakeFiles/cube_example.dir/samples/cube/main.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples/samples/cube/main.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples/samples/cube/main.cpp",
+  "output": "examples/CMakeFiles/cube_example.dir/samples/cube/main.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/examples",
+  "command": "/usr/bin/c++  -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/externals/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -isystem /opt/homebrew/include -std=gnu++2b -arch arm64 -o CMakeFiles/gaussian-blur_example.dir/samples/gaussian-blur/main.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples/samples/gaussian-blur/main.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples/samples/gaussian-blur/main.cpp",
+  "output": "examples/CMakeFiles/gaussian-blur_example.dir/samples/gaussian-blur/main.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/examples",
+  "command": "/usr/bin/c++  -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/externals/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -isystem /opt/homebrew/include -std=gnu++2b -arch arm64 -o CMakeFiles/gltf-model-loading_example.dir/samples/gltf-model-loading/main.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples/samples/gltf-model-loading/main.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples/samples/gltf-model-loading/main.cpp",
+  "output": "examples/CMakeFiles/gltf-model-loading_example.dir/samples/gltf-model-loading/main.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/examples",
+  "command": "/usr/bin/c++  -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/externals/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -isystem /opt/homebrew/include -std=gnu++2b -arch arm64 -o CMakeFiles/light-cube_example.dir/samples/light-cube/main.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples/samples/light-cube/main.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples/samples/light-cube/main.cpp",
+  "output": "examples/CMakeFiles/light-cube_example.dir/samples/light-cube/main.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/examples",
+  "command": "/usr/bin/c++  -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/externals/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -isystem /opt/homebrew/include -std=gnu++2b -arch arm64 -o CMakeFiles/multi-cube_example.dir/samples/multi-cube/main.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples/samples/multi-cube/main.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples/samples/multi-cube/main.cpp",
+  "output": "examples/CMakeFiles/multi-cube_example.dir/samples/multi-cube/main.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/examples",
+  "command": "/usr/bin/c++  -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/externals/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -isystem /opt/homebrew/include -std=gnu++2b -arch arm64 -o CMakeFiles/outline_example.dir/samples/outline/main.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples/samples/outline/main.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples/samples/outline/main.cpp",
+  "output": "examples/CMakeFiles/outline_example.dir/samples/outline/main.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/examples",
+  "command": "/usr/bin/c++  -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/externals/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -isystem /opt/homebrew/include -std=gnu++2b -arch arm64 -o CMakeFiles/phong-shading_example.dir/samples/phong-shading/main.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples/samples/phong-shading/main.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples/samples/phong-shading/main.cpp",
+  "output": "examples/CMakeFiles/phong-shading_example.dir/samples/phong-shading/main.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/examples",
+  "command": "/usr/bin/c++  -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/externals/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -isystem /opt/homebrew/include -std=gnu++2b -arch arm64 -o CMakeFiles/texture-cube_example.dir/samples/texture-cube/main.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples/samples/texture-cube/main.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples/samples/texture-cube/main.cpp",
+  "output": "examples/CMakeFiles/texture-cube_example.dir/samples/texture-cube/main.cpp.o"
+},
+{
+  "directory": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/examples",
+  "command": "/usr/bin/c++  -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/easy-vulkan/include -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/stb -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/externals/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/external/tiny_gltf -I/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/build/external/tiny_gltf -isystem /opt/homebrew/include -std=gnu++2b -arch arm64 -o CMakeFiles/triangle_example.dir/samples/triangle/main.cpp.o -c /Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples/samples/triangle/main.cpp",
+  "file": "/Users/terrapin/workspace/personal/Graphics/easy-vulkan/easy-vulkan/examples/samples/triangle/main.cpp",
+  "output": "examples/CMakeFiles/triangle_example.dir/samples/triangle/main.cpp.o"
+}
+]

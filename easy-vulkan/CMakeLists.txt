@@ -21,15 +21,17 @@ set_target_properties(${LIBRARY_OUTPUT_NAME} PROPERTIES
     PREFIX "lib-"
 )
 
-# include 디렉토리 공개
-target_include_directories(${LIBRARY_OUTPUT_NAME} PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-)
 
 # Vulkan SDK 찾기 (OS별 지원)
 find_package(Vulkan REQUIRED)
 target_link_libraries(${LIBRARY_OUTPUT_NAME} PUBLIC Vulkan::Vulkan tiny_gltf_headers tiny_gltf_impl stb_headers stb_impl)
+
+# include 디렉토리 공개
+target_include_directories(${LIBRARY_OUTPUT_NAME} PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+    ${Vulkan_INCLUDE_DIRS} 
+)
 
 # 설치 규칙: 라이브러리와 헤더를 함께 배포
 install(TARGETS ${LIBRARY_OUTPUT_NAME}
