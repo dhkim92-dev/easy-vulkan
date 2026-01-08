@@ -49,5 +49,6 @@ add_dependencies(stb_headers copy_stb_header)
 
 # 6. OBJECT 라이브러리 stb_impl 생성 (구현부가 필요하다면)
 add_library(stb_impl OBJECT stb_impl.cpp)
+set_target_properties(stb_impl PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(stb_impl PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 add_dependencies(stb_impl copy_stb_header)
