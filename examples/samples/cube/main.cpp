@@ -12,23 +12,15 @@ private:
 
     std::vector<std::shared_ptr<ev::PipelineLayout>> pipeline_layouts;
 
-    std::shared_ptr<ev::RenderPass> render_pass;
-
     std::shared_ptr<ev::GraphicsPipeline> graphics_pipeline;
 
     std::shared_ptr<ev::PipelineCache> pipeline_cache;
-
-    std::vector<std::shared_ptr<ev::Framebuffer>> framebuffers;
-
-    uint32_t current_frame_index = 0;
 
     std::shared_ptr<ev::CommandPool> command_pool;
 
     std::shared_ptr<ev::DescriptorPool> descriptor_pool;
 
-    std::vector<std::shared_ptr<ev::CommandBuffer>> command_buffers;
-    
-    std::shared_ptr<ev::Queue> queue;
+    // std::vector<std::shared_ptr<ev::CommandBuffer>> command_buffers;
 
     std::shared_ptr<ev::BitmapBuddyMemoryAllocator> memory_allocator;
 
@@ -111,15 +103,7 @@ std::vector<uint32_t> cube_indices = {
     } shaders;
 
     struct {
-        std::shared_ptr<ev::Image> image;
-        std::shared_ptr<ev::Memory> memory;
-        std::shared_ptr<ev::ImageView> view;
-    } depth_stencil;
-
-    struct {
         std::shared_ptr<ev::Fence> copy_complete_fence;
-        std::vector<std::shared_ptr<ev::Semaphore>> render_complete_semaphore;
-        std::vector<std::shared_ptr<ev::Semaphore>> present_complete_semaphore;
         std::vector<shared_ptr<ev::Fence>> frame_fences;
     } sync_objects;
 
@@ -135,18 +119,14 @@ public:
     : ExampleBase(example_name, executable_path, debug) {
         this->title = example_name;
         setup_default_context();
-        setup_synchronize_objects();
-        setup_depth_stencil();
         setup_command_buffers();
         setup_memory_pool();
         setup_uniform_buffer();
         setup_descriptor_sets();
         setup_pipeline_layouts();
         setup_shaders();
-        setup_render_pass();
-        setup_framebuffers();
+        setup_synchronize_objects();
         setup_graphics_pipeline();
-        setup_queue();
         setup_vertex_buffer();
     }
 
@@ -178,17 +158,9 @@ public:
         ev::logger::Logger::getInstance().info("[Setup Synchronization Objects Start]");
         sync_objects.copy_complete_fence = std::make_shared<ev::Fence>(device);
         for (uint32_t i = 0 ; i < swapchain->get_images().size(); ++i) {
-            sync_objects.render_complete_semaphore.push_back(std::make_shared<ev::Semaphore>(device));
-            sync_objects.present_complete_semaphore.push_back(std::make_shared<ev::Semaphore>(device));
             sync_objects.frame_fences.push_back(std::make_shared<ev::Fence>(device));
         }
         ev::logger::Logger::getInstance().info("[Setup Synchronization Objects End]");
-    }
-
-    void setup_queue() {
-        ev::logger::Logger::getInstance().debug("[Setup Queue Start]");
-        queue = std::make_shared<ev::Queue>(device, device->get_queue_index(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT));
-        ev::logger::Logger::getInstance().debug("[Setup Queue End]");
     }
 
     void setup_vertex_buffer() {
@@ -301,40 +273,6 @@ public:
         ev::logger::Logger::getInstance().debug("Descriptor sets created: " + std::to_string(descriptors.sets.size()));
     }
 
-    void setup_depth_stencil() {
-        depth_stencil.image = std::make_shared<ev::Image>(
-            device, 
-            VK_IMAGE_TYPE_2D,
-            VK_FORMAT_D32_SFLOAT_S8_UINT,
-            display.width, 
-            display.height, 
-            1,1,1,
-            VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
-            VK_IMAGE_LAYOUT_UNDEFINED,
-            VK_SAMPLE_COUNT_1_BIT,
-            VK_IMAGE_TILING_OPTIMAL
-        );
-        depth_stencil.memory = std::make_shared<ev::Memory>(
-            device,
-            depth_stencil.image->get_memory_requirements().size,
-            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-            depth_stencil.image->get_memory_requirements()
-        );
-        depth_stencil.image->bind_memory(depth_stencil.memory);
-
-        VkComponentMapping component_mapping = {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY};
-        VkImageSubresourceRange subresource_ranges = {VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT, 0, 1, 0, 1};
-        
-        depth_stencil.view = std::make_shared<ev::ImageView>(
-            device,
-            depth_stencil.image,
-            VK_IMAGE_VIEW_TYPE_2D,
-            VK_FORMAT_D32_SFLOAT_S8_UINT,
-            component_mapping,
-            subresource_ranges
-        );
-    }
-
     void setup_shaders() {
         vector<uint32_t> vertex_shader_code;
         ev::utility::read_spirv_shader_file( (shader_path / this->title / "cube.vert.spv").c_str(), vertex_shader_code);
@@ -352,7 +290,9 @@ public:
         pipeline_layouts.push_back(pipeline_layout);
     }
 
-    void setup_render_pass() {
+
+    void create_renderpass() override {
+        std::printf("Creating render pass...\n");
         VkAttachmentDescription color_attachment = {};
         color_attachment.format = swapchain->get_image_format();
         color_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -412,27 +352,8 @@ public:
             subpasses,
             dependencies
         );
-    }
 
-    void setup_framebuffers() {
-        framebuffers.clear();
-        // sync_objects.frame_fences.clear();
-        ev::logger::Logger::getInstance().debug("Creating framebuffers for swapchain images... with size : " + std::to_string(swapchain->get_image_views().size()));
-        for (const auto& image_view : swapchain->get_image_views()) {
-            vector<VkImageView> attachments = {image_view, *depth_stencil.view};
-            std::shared_ptr<ev::Framebuffer> framebuffer = std::make_shared<ev::Framebuffer>(
-                device, 
-                render_pass, 
-                attachments,
-                display.width,
-                display.height,
-                1
-            );
-            framebuffers.push_back(framebuffer);
-            // sync_objects.frame_fences.push_back(make_shared<ev::Fence>(device));
-        }
-        ev::logger::Logger::getInstance().debug("Framebuffers created successfully with size : " + std::to_string(framebuffers.size()));
-
+        std::printf("Renderpass handler : %lu\n", reinterpret_cast<uintptr_t>(VkRenderPass(*render_pass)));
     }
 
     void setup_graphics_pipeline() {
@@ -493,57 +414,12 @@ public:
     }
 
     void render() override {
-        // Triangle rendering code goes here
-        sync_objects.frame_fences[current_frame_index]->wait();
-        CHECK_RESULT(sync_objects.frame_fences[current_frame_index]->reset());
-
-        uint32_t image_index = 0;
-
-        VkResult result = swapchain->acquire_next_image(image_index, sync_objects.present_complete_semaphore[current_frame_index]);
-        if ( result == VK_ERROR_OUT_OF_DATE_KHR ) {
-            on_window_resize();
-            return;
-        } else if ( (result != VK_SUCCESS) && (result != VK_SUBOPTIMAL_KHR) ) {
-            ev::logger::Logger::getInstance().error("Failed to acquire next image from swapchain: " + std::to_string(result));
-            exit(EXIT_FAILURE);
-        }
-
-        ev::logger::Logger::getInstance().debug("Current frame index: " + std::to_string(current_frame_index));
+        // sync_objects.frame_fences[current_frame_index]->wait();
+        // CHECK_RESULT(sync_objects.frame_fences[current_frame_index]->reset());
+        prepare_frame();
         record_command_buffers();
-        VkPipelineStageFlags waitStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-        queue->submit(command_buffers[current_frame_index], 
-            {sync_objects.present_complete_semaphore[current_frame_index]},
-            {sync_objects.render_complete_semaphore[image_index]},
-            &waitStageMask,
-            sync_objects.frame_fences[current_frame_index]
-        );
-        queue->wait_idle(UINT64_MAX);
-        // queue->wait_idle(UINT64_MAX);
-        result = queue->present(swapchain, current_frame_index, {sync_objects.render_complete_semaphore[current_frame_index]});
-
-        if ((result == VK_ERROR_OUT_OF_DATE_KHR) || (result == VK_SUBOPTIMAL_KHR)) {
-            on_window_resize();
-		}
-		else if (result != VK_SUCCESS) {
-            ev::logger::Logger::getInstance().error("Failed to present image to swapchain: " + std::to_string(result));
-            exit(EXIT_FAILURE);
-		}
-
-        current_frame_index = (current_frame_index + 1) % swapchain->get_images().size();
-        ev::logger::Logger::getInstance().debug("Current frame index updated to: " + std::to_string(current_frame_index));
         uniform_update();
-    }
-
-    void on_window_resize() override {
-        // Handle window resize
-        // swapchain->create(swapchain->get_surface(), display.width, display.height);
-        ev::logger::Logger::getInstance().debug("Window resized to: " + std::to_string(display.width) + "x" + std::to_string(display.height));
-    }
-
-    void pre_destroy() override {
-        ev::logger::Logger::getInstance().info("[Pre Destroy Start]");
-        queue->wait_idle(UINT64_MAX);
-        ev::logger::Logger::getInstance().info("[Pre Destroy End]");
+        submit_frame();
     }
 };
 

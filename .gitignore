@@ -1,7 +1,13 @@
 output
+output/**
 build
+build/**
 valkaninfo.txt
 resources/textures
 resources/models
-resources/glTF-Sample-Models
+# resources/glTF-Sample-Models
 *.spv
+.vscode
+.vscode/**
+.cache/**
+.cache

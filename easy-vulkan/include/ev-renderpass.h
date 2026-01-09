@@ -27,7 +27,8 @@ public:
         shared_ptr<Device> device,
         const vector<VkAttachmentDescription> attachments,
         const vector<VkSubpassDescription> subpasses = {},
-        const vector<VkSubpassDependency> dependencies = {}
+        const vector<VkSubpassDependency> dependencies = {},
+        VkResult* result = nullptr
     );
 
     RenderPass& operator=(const RenderPass&) = delete;

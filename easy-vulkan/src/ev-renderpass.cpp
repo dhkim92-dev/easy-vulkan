@@ -6,7 +6,8 @@ RenderPass::RenderPass(
     shared_ptr<Device> _device,
     const vector<VkAttachmentDescription> attachments,
     const vector<VkSubpassDescription> subpasses,
-    const vector<VkSubpassDependency> dependencies
+    const vector<VkSubpassDependency> dependencies,
+    VkResult *result
 ) : device(std::move(_device)), attachments(attachments), subpasses(subpasses), dependencies(dependencies) {
     logger::Logger::getInstance().info("[ev::RenderPass::RenderPass] Creating RenderPass with device: " + std::to_string(reinterpret_cast<uintptr_t>(device.get())));
     VkRenderPassCreateInfo create_info = {};
@@ -17,7 +18,12 @@ RenderPass::RenderPass(
     create_info.pSubpasses = this->subpasses.data();
     create_info.dependencyCount = static_cast<uint32_t>(this->dependencies.size());
     create_info.pDependencies = this->dependencies.data();
-    CHECK_RESULT(vkCreateRenderPass(*device, &create_info, nullptr, &render_pass));
+    VkResult res = vkCreateRenderPass(*device, &create_info, nullptr, &render_pass);
+    if (result) {
+        *result = res;
+    } else {
+        CHECK_RESULT(res);
+    }
     logger::Logger::getInstance().info("[ev::RenderPass::RenderPass] RenderPass created successfully. VkRenderPass handle: " + std::to_string(reinterpret_cast<uintptr_t>(render_pass)));
 }
 

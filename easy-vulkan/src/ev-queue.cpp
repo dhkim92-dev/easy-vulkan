@@ -15,6 +15,7 @@ ev::Queue::Queue(
 
     bool swapchain_extension_found = false;
     for(const char* ext : enabled_extensions) {
+        std::printf("Enabled Extension: %s\n", ext);    
         if ( strcmp(ext, "VK_KHR_swapchain") == 0 ){
             swapchain_extension_found = true;
             break;
@@ -22,7 +23,7 @@ ev::Queue::Queue(
     }
 
     if ( swapchain_extension_found ) {
-        logger::Logger::getInstance().error("[Queue::Queue] VK_KHR_swapchain extension is enabled.");
+        logger::Logger::getInstance().debug("[Queue::Queue] VK_KHR_swapchain extension is enabled.");
         logger::Logger::getInstance().debug("[Queue::Queue] Loading vkQueuePresentKHR function pointer. before loading : " + std::to_string((uintptr_t)pfn.vkQueuePresentKHR)   
 );
         pfn.vkQueuePresentKHR = (PFN_vkQueuePresentKHR)vkGetDeviceProcAddr(*device, "vkQueuePresentKHR");

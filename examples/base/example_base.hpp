@@ -38,8 +38,6 @@ class ExampleBase {
         if (debug) {
             ev::logger::Logger::getInstance().set_log_level(ev::logger::LogLevel::DEBUG);
         }
-
-        setup_default_context();
     };
 
     virtual ~ExampleBase() {
@@ -89,6 +87,8 @@ class ExampleBase {
 
     std::shared_ptr<ev::Device> device;
 
+    std::shared_ptr<ev::Queue> queue;
+
     struct DepthStencil {
         std::shared_ptr<ev::Image> image;
         std::shared_ptr<ev::Memory> memory;
@@ -102,6 +102,8 @@ class ExampleBase {
     std::vector<DepthStencil> depth_stencils;
 
     std::shared_ptr<ev::RenderPass> render_pass;
+
+    std::vector<std::shared_ptr<ev::Fence>> fences;
 
     VkSurfaceKHR surface = VK_NULL_HANDLE;
 
@@ -122,16 +124,34 @@ class ExampleBase {
 
     uint32_t target_height;
 
-    std::shared_ptr<ev::Semaphore> render_complete;
+    std::vector<std::shared_ptr<ev::CommandBuffer>> command_buffers;
 
-    std::shared_ptr<ev::Semaphore> present_complete;
+    std::vector<std::shared_ptr<ev::Semaphore>> render_completes;
+
+    std::vector<std::shared_ptr<ev::Semaphore>> present_completes;
+
+    uint32_t current_frame_index = 0;
+
+    uint32_t max_frames_in_flight = 2;
 
     virtual void setup_default_context() {
         init_window();
+        create_instance();
+        create_surface();
+        create_physical_device();
+        create_logical_device();
+        create_swapchain();
+        create_queue();
+        create_depth_stencil_buffers();
+        create_renderpass();
+        create_framebuffers();
+        setup_sync();
+    }
+
+    virtual void create_instance() {
         std::vector<const char*> required_extensions = setup_instance_extensions();
         std::vector<const char*> required_layers = setup_instance_layers();
-        std::vector<const char*> device_extensions = setup_device_extensions();
-
+        
         if (debug) {
             required_extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
             required_layers.push_back("VK_LAYER_KHRONOS_validation");
@@ -139,14 +159,15 @@ class ExampleBase {
         }
 
         instance = std::make_shared<ev::Instance>(required_extensions, required_layers, debug);
-        setup_surface();
-        physical_device = std::make_shared<ev::PhysicalDevice>(instance, instance->get_physical_devices()[0]);
-        device = std::make_shared<ev::Device>(instance, physical_device, device_extensions, VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT);
+    }
 
-        create_swapchain();
-        create_depth_stencil_buffers();
-        create_framebuffers();
-        setup_sync();
+    virtual void create_physical_device() {
+        physical_device = std::make_shared<ev::PhysicalDevice>(instance, instance->get_physical_devices()[0]);
+    }
+
+    virtual void create_logical_device() {
+        std::vector<const char*> device_extensions = setup_device_extensions();
+        device = std::make_shared<ev::Device>(instance, physical_device, device_extensions, VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT);
     }
 
     virtual void init_window() {
@@ -164,9 +185,18 @@ class ExampleBase {
             glfwTerminate();
             exit(EXIT_FAILURE);
         }
+
+        glfwSetWindowUserPointer(display.window, this);
+        glfwSetFramebufferSizeCallback(display.window, [](GLFWwindow* window, int width, int height) {
+            std::printf("Framebuffer resize detected: width=%d, height=%d\n", width, height);
+            ExampleBase* app = reinterpret_cast<ExampleBase*>(glfwGetWindowUserPointer(window));
+            app->target_width = static_cast<uint32_t>(width);
+            app->target_height = static_cast<uint32_t>(height);
+            app->on_window_resize();
+        });
     }
 
-    virtual void setup_surface() {
+    virtual void create_surface() {
         ev::logger::Logger::getInstance().debug("Creating Vulkan surface for GLFW window... surface handler current hex : " + std::to_string(reinterpret_cast<uint64_t>(surface)));
         CHECK_RESULT(glfwCreateWindowSurface(*instance, display.window, nullptr, &surface));
         ev::logger::Logger::getInstance().debug("surface create complete surface handler current hex : " + std::to_string(reinterpret_cast<uint64_t>(surface)));
@@ -197,6 +227,11 @@ class ExampleBase {
         return layers;
     }
 
+    virtual void create_queue() {
+        ev::logger::Logger::getInstance().debug("[Setup Queue Start]");
+        queue = std::make_shared<ev::Queue>(device, device->get_queue_index(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT));
+        ev::logger::Logger::getInstance().debug("[Setup Queue End]");
+    }
 
     virtual void on_window_resize() {
         if ( !prepared ) {
@@ -205,16 +240,19 @@ class ExampleBase {
 
         prepared = false;
         resized = true;
-        device->wait_idle(UINT32_MAX);
+
+        device->wait_idle(UINT64_MAX); // 중요, 윈도우 리사이즈 콜백 수행 중에 GPU가 작업 중이면 안되므로 대기 
+        
         display.width = target_width;
         display.height = target_height;
-        destroy_graphics_pipeline();
+
+        destory_depth_stencil_buffers();
         destroy_framebuffers();
         destroy_swapchain();
         create_swapchain();
         create_depth_stencil_buffers();
         create_framebuffers();
-        create_graphics_pipelines();
+
         prepared = true;
     }
 
@@ -272,13 +310,24 @@ class ExampleBase {
         } 
     }
 
+    virtual void destory_depth_stencil_buffers() {
+        depth_stencils.clear();
+    }
+
     virtual void create_swapchain() {
         swapchain = std::make_shared<ev::Swapchain>(instance, physical_device, device);
-        swapchain->create(surface, display.width, display.height, true, false); // 예시로 800x600 크기, VSync 활성화
+        swapchain->create(surface, display.width, display.height, true, false); 
+        max_frames_in_flight = static_cast<uint32_t>(swapchain->get_images().size());
+    }
+
+    virtual void destroy_swapchain() {
+        swapchain.reset();
+        max_frames_in_flight = 2;
     }
 
     virtual void create_framebuffers() {
         // Basically use color and Depth stencil framebuffer creation.
+        std::printf("renderpass address : %lu\n", reinterpret_cast<uintptr_t>(VkRenderPass(*render_pass)));
         for (uint32_t i = 0 ; i < swapchain->get_image_views().size() ; ++i ) {
             VkImageView view = swapchain->get_image_views()[i];
             DepthStencil& depth_stencil = depth_stencils[i];
@@ -297,22 +346,81 @@ class ExampleBase {
 
     virtual void destroy_framebuffers() {
         framebuffers.clear();
-        depth_stencils.clear();
-    }
-
-    virtual void create_graphics_pipelines() = 0;
-
-    virtual void destroy_swapchain() {
-        swapchain.reset();
     }
 
     virtual void setup_sync() {
-        render_complete = std::make_shared<ev::Semaphore>(device);
-        present_complete = std::make_shared<ev::Semaphore>(device);
+        render_completes.resize(max_frames_in_flight);
+        present_completes.resize(max_frames_in_flight);
+        for (uint32_t i = 0; i < max_frames_in_flight; ++i) {
+            render_completes[i] = std::make_shared<ev::Semaphore>(device);
+            present_completes[i] = std::make_shared<ev::Semaphore>(device);
+        }
         prepared = true;
     }
 
-    virtual void destroy_graphics_pipeline() = 0;
+    virtual void prepare_frame(bool wait_fences = false) {
+        if ( wait_fences ) {
+            std::vector<VkFence> vk_fences = {};
+            for ( const auto& fence : fences ) {
+                vk_fences.push_back(*fence);
+            }
+            CHECK_RESULT(vkWaitForFences(*device, static_cast<uint32_t>(vk_fences.size()), vk_fences.data(), VK_TRUE, UINT64_MAX));
+            for ( const auto& fence : fences ) {
+                fence->reset();
+            }
+        }
+
+        VkResult result = swapchain->acquire_next_image(
+            current_frame_index,
+            present_completes[current_frame_index],
+            VK_NULL_HANDLE
+        );
+
+        if ( (result == VK_ERROR_OUT_OF_DATE_KHR ) ||
+             (result == VK_SUBOPTIMAL_KHR) ) {
+                if( result == VK_ERROR_OUT_OF_DATE_KHR ) {
+                    on_window_resize();
+                }
+            return;
+        }
+
+        CHECK_RESULT(result);
+    }
+
+    virtual void submit_frame() {
+        VkPipelineStageFlags wait_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        std::vector<std::shared_ptr<ev::Semaphore>> wait_semaphores = { present_completes[current_frame_index] };
+        std::vector<std::shared_ptr<ev::Semaphore>> signal_semaphores = { render_completes[current_frame_index]  };
+
+        VkResult result = queue->submit(
+            command_buffers[current_frame_index],
+            wait_semaphores,
+            signal_semaphores,
+            &wait_stage_mask,
+            nullptr,
+            nullptr
+        );
+        CHECK_RESULT(result);
+
+        result = queue->present(
+            swapchain,
+            current_frame_index,
+            { render_completes[current_frame_index] }
+        );
+
+        if ( (result == VK_ERROR_OUT_OF_DATE_KHR ) ||
+             (result == VK_SUBOPTIMAL_KHR) ) {
+                on_window_resize();
+                if( result == VK_ERROR_OUT_OF_DATE_KHR ) {
+                    return;
+                }
+        }
+
+        CHECK_RESULT(result);
+        current_frame_index = (current_frame_index + 1) % max_frames_in_flight;
+    }
+
+    virtual void create_renderpass() = 0;
 
     virtual void render() = 0;
 };
