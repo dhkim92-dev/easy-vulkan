@@ -415,4 +415,4 @@ public:
     }
 };
 
-RUN_EXAMPLE_MAIN(ExampleImpl, "cube", true)
+RUN_EXAMPLE_MAIN(ExampleImpl, "cube", false)

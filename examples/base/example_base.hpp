@@ -167,18 +167,23 @@ class ExampleBase {
             ev::logger::Logger::getInstance().error("Failed to initialize GLFW");
             exit(EXIT_FAILURE);
         }
+
+        GLFWmonitor *primary_monitor = glfwGetPrimaryMonitor();
+        const GLFWvidmode *vid_mode = glfwGetVideoMode(primary_monitor);
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); 
         glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
-        display.window = glfwCreateWindow(display.width, display.height, title.c_str(), nullptr, nullptr);
+        display.window = glfwCreateWindow(vid_mode->width, vid_mode->height, title.c_str(), nullptr, nullptr);
 
         if (!display.window) {
             ev::logger::Logger::getInstance().error("Failed to create GLFW window");
             glfwTerminate();
             exit(EXIT_FAILURE);
         }
-
         glfwSetWindowUserPointer(display.window, this);
+        glfwGetFramebufferSize(display.window, (int*)&display.width, (int*)&display.height);
+        ev::logger::Logger::getInstance().info("GLFW window created with dimensions: " + std::to_string(display.width) + "x" + std::to_string(display.height));
+
         glfwSetFramebufferSizeCallback(display.window, [](GLFWwindow* window, int width, int height) {
             std::printf("Framebuffer resize detected: width=%d, height=%d\n", width, height);
             ExampleBase* app = reinterpret_cast<ExampleBase*>(glfwGetWindowUserPointer(window));
@@ -391,9 +396,9 @@ class ExampleBase {
 
     virtual void prepare_frame(bool wait_fences = false) {
         if ( wait_fences ) {
-            logger::Logger::getInstance().info("[prepare_frame] Waiting for fence at index " + std::to_string(current_buffer_index) + " to be signaled.");
+            logger::Logger::getInstance().debug("[prepare_frame] Waiting for fence at index " + std::to_string(current_buffer_index) + " to be signaled.");
             flight_fences[current_buffer_index]->wait(UINT64_MAX);
-            logger::Logger::getInstance().info("[prepare_frame] Fence at index " + std::to_string(current_buffer_index) + " signaled, proceeding.");
+            logger::Logger::getInstance().debug("[prepare_frame] Fence at index " + std::to_string(current_buffer_index) + " signaled, proceeding.");
             flight_fences[current_buffer_index]->reset();
         }
 
@@ -404,7 +409,7 @@ class ExampleBase {
         );
 
         if ( (result == VK_ERROR_OUT_OF_DATE_KHR) || (result == VK_SUBOPTIMAL_KHR) ) {
-            logger::Logger::getInstance().info("[prepare_frame] Swapchain out of date or suboptimal, handling resize...");
+            logger::Logger::getInstance().debug("[prepare_frame] Swapchain out of date or suboptimal, handling resize...");
             if (result == VK_ERROR_OUT_OF_DATE_KHR) {
                 on_window_resize();
             }
@@ -413,14 +418,14 @@ class ExampleBase {
             CHECK_RESULT(result);
         }
 
-        logger::Logger::getInstance().info("[prepare_frame] Acquired image index: " + std::to_string(current_frame_index));
+        logger::Logger::getInstance().debug("[prepare_frame] Acquired image index: " + std::to_string(current_frame_index));
     }
 
     virtual void submit_frame() {
         VkPipelineStageFlags wait_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
         std::vector<std::shared_ptr<ev::Semaphore>> wait_semaphores = { present_completes[current_buffer_index] };
         std::vector<std::shared_ptr<ev::Semaphore>> signal_semaphores = { render_completes[current_frame_index]  };
-        logger::Logger::getInstance().info("[submit_frame] Submitting frame at index: " + std::to_string(current_buffer_index));
+        logger::Logger::getInstance().debug("[submit_frame] Submitting frame at index: " + std::to_string(current_buffer_index));
 
         VkResult result = queue->submit(
             command_buffers[current_buffer_index],
@@ -431,7 +436,7 @@ class ExampleBase {
             nullptr
         );
         CHECK_RESULT(result);
-        logger::Logger::getInstance().info("[submit_frame] Command buffer submitted successfully for frame index: " + std::to_string(current_buffer_index));
+        logger::Logger::getInstance().debug("[submit_frame] Command buffer submitted successfully for frame index: " + std::to_string(current_buffer_index));
         result = queue->present(
             swapchain,
             current_frame_index,
@@ -439,14 +444,14 @@ class ExampleBase {
         );
 
         if ( (result == VK_ERROR_OUT_OF_DATE_KHR) || (result == VK_SUBOPTIMAL_KHR) ) {
-            logger::Logger::getInstance().info("[submit_frame] Swapchain out of date or suboptimal during present, handling resize...");
+            logger::Logger::getInstance().debug("[submit_frame] Swapchain out of date or suboptimal during present, handling resize...");
             on_window_resize();
             if ( result == VK_ERROR_OUT_OF_DATE_KHR ) {
                 return;
             }  
         } else {
             CHECK_RESULT(result);
-            logger::Logger::getInstance().info("[submit_frame] Present operation successful for frame index: " + std::to_string(current_frame_index));
+            logger::Logger::getInstance().debug("[submit_frame] Present operation successful for frame index: " + std::to_string(current_frame_index));
         }
 
         current_buffer_index = (current_buffer_index + 1) % max_frames_in_flight;

@@ -505,12 +505,12 @@ vector<shared_ptr<GraphicsPipeline>> GraphicsPipelineBluePrintManager::create_pi
     }
 
     CHECK_RESULT(vkCreateGraphicsPipelines(*device, *pipeline_cache, static_cast<uint32_t>(pipeline_cis.size()), pipeline_cis.data(), nullptr, vk_pipelines.data()));
-    blue_prints.clear();
 
     for ( size_t i = 0; i < vk_pipelines.size(); ++i ) {
         pipelines.emplace_back(make_shared<GraphicsPipeline>(device, vk_pipelines[i], *blue_prints[i].pipeline_layout));
     }   
 
+    blue_prints.clear();
     return pipelines;
 }
 
