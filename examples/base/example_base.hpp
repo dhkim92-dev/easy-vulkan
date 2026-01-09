@@ -48,18 +48,6 @@ class ExampleBase {
         }
 
         vkDestroySurfaceKHR(instance->get_instance(), surface, nullptr);
-
-        if (device) {
-            device->destroy();
-        }
-        if (instance) {
-            instance->destroy();
-        }
-
-        swapchain.reset();
-        device.reset();
-        physical_device.reset();
-        instance.reset();
     }
 
     void run() {
@@ -67,6 +55,8 @@ class ExampleBase {
             glfwPollEvents();
             render();
         }
+        queue->wait_idle();
+        device->wait_idle();
         glfwDestroyWindow(display.window);
         glfwTerminate();
     }
@@ -103,7 +93,6 @@ class ExampleBase {
 
     std::shared_ptr<ev::RenderPass> render_pass;
 
-    std::vector<std::shared_ptr<ev::Fence>> fences;
 
     VkSurfaceKHR surface = VK_NULL_HANDLE;
 
@@ -120,15 +109,17 @@ class ExampleBase {
 
     bool resized = false;
 
-    uint32_t target_width;
-
-    uint32_t target_height;
+    std::shared_ptr<ev::CommandPool> command_pool;
 
     std::vector<std::shared_ptr<ev::CommandBuffer>> command_buffers;
 
     std::vector<std::shared_ptr<ev::Semaphore>> render_completes;
 
     std::vector<std::shared_ptr<ev::Semaphore>> present_completes;
+
+    std::vector<std::shared_ptr<ev::Fence>> flight_fences;
+
+    uint32_t current_buffer_index = 0;
 
     uint32_t current_frame_index = 0;
 
@@ -145,6 +136,7 @@ class ExampleBase {
         create_depth_stencil_buffers();
         create_renderpass();
         create_framebuffers();
+        create_commandpool();
         setup_sync();
     }
 
@@ -190,9 +182,7 @@ class ExampleBase {
         glfwSetFramebufferSizeCallback(display.window, [](GLFWwindow* window, int width, int height) {
             std::printf("Framebuffer resize detected: width=%d, height=%d\n", width, height);
             ExampleBase* app = reinterpret_cast<ExampleBase*>(glfwGetWindowUserPointer(window));
-            app->target_width = static_cast<uint32_t>(width);
-            app->target_height = static_cast<uint32_t>(height);
-            app->on_window_resize();
+            app->resized = true;
         });
     }
 
@@ -235,25 +225,44 @@ class ExampleBase {
 
     virtual void on_window_resize() {
         if ( !prepared ) {
+            logger::Logger::getInstance().info("[on_window_resize] Swapchain not prepared yet, skipping resize handling.");
             return;
         }
 
         prepared = false;
         resized = true;
 
-        device->wait_idle(UINT64_MAX); // 중요, 윈도우 리사이즈 콜백 수행 중에 GPU가 작업 중이면 안되므로 대기 
-        
-        display.width = target_width;
-        display.height = target_height;
+        int w,h;
+        glfwGetFramebufferSize(display.window, &w, &h);
+        while (w == 0 || h == 0) {
+            glfwGetFramebufferSize(display.window, &w, &h);
+            glfwWaitEvents();
+        }
+
+        display.width = w;
+        display.height = h;
+
+        logger::Logger::getInstance().info("[on_window_resize] Waiting for device to be idle before resizing...");
+        device->wait_idle(); // 중요, 윈도우 리사이즈 콜백 수행 중에 GPU가 작업 중이면 안되므로 대기 
+        logger::Logger::getInstance().info("[on_window_resize] Device is now idle. Proceeding with resize...");
 
         destory_depth_stencil_buffers();
         destroy_framebuffers();
         destroy_swapchain();
+        logger::Logger::getInstance().info("Recreating swapchain with new dimensions: width=" + std::to_string(display.width) + ", height=" + std::to_string(display.height));
         create_swapchain();
         create_depth_stencil_buffers();
         create_framebuffers();
+        logger::Logger::getInstance().info("Recreation complete.");
+        
+        logger::Logger::getInstance().info("[on_window_resize] Recreating synchronization primitives...");
+        destroy_sync();
+        logger::Logger::getInstance().info("[on_window_resize] Synchronization primitives destroyed.");
+        setup_sync();
+        logger::Logger::getInstance().info("[on_window_resize] Synchronization primitives recreated.");
 
         prepared = true;
+        resized = false;
     }
 
     virtual void pre_destroy() {};
@@ -318,16 +327,20 @@ class ExampleBase {
         swapchain = std::make_shared<ev::Swapchain>(instance, physical_device, device);
         swapchain->create(surface, display.width, display.height, true, false); 
         max_frames_in_flight = static_cast<uint32_t>(swapchain->get_images().size());
+        
+        // current_frame_index = 0;
     }
 
     virtual void destroy_swapchain() {
+        ev::logger::Logger::getInstance().info("[destroy_swapchain] Destroying swapchain... reference count before reset: " + std::to_string(swapchain.use_count()));
         swapchain.reset();
-        max_frames_in_flight = 2;
+        ev::logger::Logger::getInstance().info("[destroy_swapchain] Swapchain destroyed. Reference count after reset: " + std::to_string(swapchain.use_count()));
+        // max_frames_in_flight = 2;
     }
 
     virtual void create_framebuffers() {
         // Basically use color and Depth stencil framebuffer creation.
-        std::printf("renderpass address : %lu\n", reinterpret_cast<uintptr_t>(VkRenderPass(*render_pass)));
+        // std::printf("renderpass address : %lu\n", reinterpret_cast<uintptr_t>(VkRenderPass(*render_pass)));
         for (uint32_t i = 0 ; i < swapchain->get_image_views().size() ; ++i ) {
             VkImageView view = swapchain->get_image_views()[i];
             DepthStencil& depth_stencil = depth_stencils[i];
@@ -344,6 +357,14 @@ class ExampleBase {
         } 
     }
 
+    virtual void create_commandpool() {
+        command_pool = std::make_shared<ev::CommandPool>(device, device->get_queue_index(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT));
+        command_buffers.resize(max_frames_in_flight);
+        for ( uint32_t i = 0 ; i < max_frames_in_flight ; ++i ) {
+            command_buffers[i] = command_pool->allocate(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+        }
+    }
+
     virtual void destroy_framebuffers() {
         framebuffers.clear();
     }
@@ -351,73 +372,84 @@ class ExampleBase {
     virtual void setup_sync() {
         render_completes.resize(max_frames_in_flight);
         present_completes.resize(max_frames_in_flight);
+        flight_fences.resize(max_frames_in_flight);
+
         for (uint32_t i = 0; i < max_frames_in_flight; ++i) {
             render_completes[i] = std::make_shared<ev::Semaphore>(device);
             present_completes[i] = std::make_shared<ev::Semaphore>(device);
+            flight_fences[i] = std::make_shared<ev::Fence>(device, VK_FENCE_CREATE_SIGNALED_BIT);
         }
         prepared = true;
+        resized = false;
+    }
+
+    virtual void destroy_sync() {
+        render_completes.clear();
+        present_completes.clear();
+        flight_fences.clear();
     }
 
     virtual void prepare_frame(bool wait_fences = false) {
         if ( wait_fences ) {
-            std::vector<VkFence> vk_fences = {};
-            for ( const auto& fence : fences ) {
-                vk_fences.push_back(*fence);
-            }
-            CHECK_RESULT(vkWaitForFences(*device, static_cast<uint32_t>(vk_fences.size()), vk_fences.data(), VK_TRUE, UINT64_MAX));
-            for ( const auto& fence : fences ) {
-                fence->reset();
-            }
+            logger::Logger::getInstance().info("[prepare_frame] Waiting for fence at index " + std::to_string(current_buffer_index) + " to be signaled.");
+            flight_fences[current_buffer_index]->wait(UINT64_MAX);
+            logger::Logger::getInstance().info("[prepare_frame] Fence at index " + std::to_string(current_buffer_index) + " signaled, proceeding.");
+            flight_fences[current_buffer_index]->reset();
         }
 
         VkResult result = swapchain->acquire_next_image(
             current_frame_index,
-            present_completes[current_frame_index],
+            present_completes[current_buffer_index],
             VK_NULL_HANDLE
         );
 
-        if ( (result == VK_ERROR_OUT_OF_DATE_KHR ) ||
-             (result == VK_SUBOPTIMAL_KHR) ) {
-                if( result == VK_ERROR_OUT_OF_DATE_KHR ) {
-                    on_window_resize();
-                }
+        if ( (result == VK_ERROR_OUT_OF_DATE_KHR) || (result == VK_SUBOPTIMAL_KHR) ) {
+            logger::Logger::getInstance().info("[prepare_frame] Swapchain out of date or suboptimal, handling resize...");
+            if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+                on_window_resize();
+            }
             return;
+        } else {
+            CHECK_RESULT(result);
         }
 
-        CHECK_RESULT(result);
+        logger::Logger::getInstance().info("[prepare_frame] Acquired image index: " + std::to_string(current_frame_index));
     }
 
     virtual void submit_frame() {
         VkPipelineStageFlags wait_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-        std::vector<std::shared_ptr<ev::Semaphore>> wait_semaphores = { present_completes[current_frame_index] };
+        std::vector<std::shared_ptr<ev::Semaphore>> wait_semaphores = { present_completes[current_buffer_index] };
         std::vector<std::shared_ptr<ev::Semaphore>> signal_semaphores = { render_completes[current_frame_index]  };
+        logger::Logger::getInstance().info("[submit_frame] Submitting frame at index: " + std::to_string(current_buffer_index));
 
         VkResult result = queue->submit(
-            command_buffers[current_frame_index],
+            command_buffers[current_buffer_index],
             wait_semaphores,
             signal_semaphores,
             &wait_stage_mask,
-            nullptr,
+            flight_fences[current_buffer_index],
             nullptr
         );
         CHECK_RESULT(result);
-
+        logger::Logger::getInstance().info("[submit_frame] Command buffer submitted successfully for frame index: " + std::to_string(current_buffer_index));
         result = queue->present(
             swapchain,
             current_frame_index,
             { render_completes[current_frame_index] }
         );
 
-        if ( (result == VK_ERROR_OUT_OF_DATE_KHR ) ||
-             (result == VK_SUBOPTIMAL_KHR) ) {
-                on_window_resize();
-                if( result == VK_ERROR_OUT_OF_DATE_KHR ) {
-                    return;
-                }
+        if ( (result == VK_ERROR_OUT_OF_DATE_KHR) || (result == VK_SUBOPTIMAL_KHR) ) {
+            logger::Logger::getInstance().info("[submit_frame] Swapchain out of date or suboptimal during present, handling resize...");
+            on_window_resize();
+            if ( result == VK_ERROR_OUT_OF_DATE_KHR ) {
+                return;
+            }  
+        } else {
+            CHECK_RESULT(result);
+            logger::Logger::getInstance().info("[submit_frame] Present operation successful for frame index: " + std::to_string(current_frame_index));
         }
 
-        CHECK_RESULT(result);
-        current_frame_index = (current_frame_index + 1) % max_frames_in_flight;
+        current_buffer_index = (current_buffer_index + 1) % max_frames_in_flight;
     }
 
     virtual void create_renderpass() = 0;

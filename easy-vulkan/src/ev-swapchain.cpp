@@ -325,8 +325,11 @@ void Swapchain::destroy_swapchain(VkSwapchainKHR& sc) {
 }
 
 void Swapchain::destroy() {
+    logger::Logger::getInstance().debug("[ev::Swapchain::destroy] Destroying swapchain...");
     if (swapchain != VK_NULL_HANDLE) {
+        logger::Logger::getInstance().info("[ev::Swapchain::destroy] Destroying swapchain...");
         for (auto image_view : views) {
+            logger::Logger::getInstance().info("[ev::Swapchain::destroy] Destroying image view: " + std::to_string(reinterpret_cast<uint64_t>(image_view)));
             vkDestroyImageView(*device, image_view, nullptr);
         }
         views.clear();
@@ -337,5 +340,7 @@ void Swapchain::destroy() {
 }
 
 Swapchain::~Swapchain() {
-    destroy_swapchain(swapchain);
+    ev::logger::Logger::getInstance().info("[ev::Swapchain] Destructor called, destroying swapchain...");
+    destroy();
+    ev::logger::Logger::getInstance().info("[ev::Swapchain] Swapchain destroyed in destructor.");
 }

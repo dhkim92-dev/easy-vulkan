@@ -119,7 +119,7 @@ uint32_t Device::get_memory_type_index(
     exit(EXIT_FAILURE);
 }
 
-VkResult Device::wait_idle(uint64_t timeout) const {
+VkResult Device::wait_idle() const {
     return vkDeviceWaitIdle(device);
 }
 

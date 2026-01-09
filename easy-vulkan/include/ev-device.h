@@ -76,7 +76,7 @@ class Device {
         bool check_sampling_support = false
     ) const;
 
-    VkResult wait_idle(uint64_t timeout = UINT64_MAX) const;
+    VkResult wait_idle() const;
 
     operator VkDevice() const {
         return device;

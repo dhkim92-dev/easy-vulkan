@@ -56,10 +56,11 @@ VkResult Fence::reset() {
 }
 
 void Fence::destroy() {
-    ev::logger::Logger::getInstance().info("[ev::Fence::destroy] Destroying fence.");
     if (fence != VK_NULL_HANDLE) {
+        ev::logger::Logger::getInstance().info("[ev::Fence::destroy] Destroying fence.");
         vkDestroyFence(*device, fence, nullptr);
-        logger::Logger::getInstance().debug("Fence destroyed successfully");
+        ev::logger::Logger::getInstance().debug("[ev::Fence::destroy] Fence destroyed successfully");
+        fence = VK_NULL_HANDLE;
     }
     ev::logger::Logger::getInstance().debug("[ev::Fence::destroy] Fence already destroyed or not initialized.");
 }

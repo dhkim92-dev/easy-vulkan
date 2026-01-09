@@ -16,8 +16,6 @@ private:
 
     std::shared_ptr<ev::PipelineCache> pipeline_cache;
 
-    std::shared_ptr<ev::CommandPool> command_pool;
-
     std::shared_ptr<ev::DescriptorPool> descriptor_pool;
 
     // std::vector<std::shared_ptr<ev::CommandBuffer>> command_buffers;
@@ -102,10 +100,7 @@ std::vector<uint32_t> cube_indices = {
         std::shared_ptr<ev::Shader> fragment;
     } shaders;
 
-    struct {
-        std::shared_ptr<ev::Fence> copy_complete_fence;
-        std::vector<shared_ptr<ev::Fence>> frame_fences;
-    } sync_objects;
+    std::shared_ptr<ev::Fence> copy_complete_fence;
 
     VkPipeline pipeline;
 
@@ -119,7 +114,6 @@ public:
     : ExampleBase(example_name, executable_path, debug) {
         this->title = example_name;
         setup_default_context();
-        setup_command_buffers();
         setup_memory_pool();
         setup_uniform_buffer();
         setup_descriptor_sets();
@@ -128,6 +122,12 @@ public:
         setup_synchronize_objects();
         setup_graphics_pipeline();
         setup_vertex_buffer();
+    }
+
+    ~ExampleImpl() override {
+        device->wait_idle();
+        // 동기화 오브젝트 삭제
+        copy_complete_fence.reset();
     }
 
     void setup_memory_pool() {
@@ -156,10 +156,7 @@ public:
 
     void setup_synchronize_objects() {
         ev::logger::Logger::getInstance().info("[Setup Synchronization Objects Start]");
-        sync_objects.copy_complete_fence = std::make_shared<ev::Fence>(device);
-        for (uint32_t i = 0 ; i < swapchain->get_images().size(); ++i) {
-            sync_objects.frame_fences.push_back(std::make_shared<ev::Fence>(device));
-        }
+        copy_complete_fence = std::make_shared<ev::Fence>(device);
         ev::logger::Logger::getInstance().info("[Setup Synchronization Objects End]");
     }
 
@@ -167,7 +164,7 @@ public:
         ev::logger::Logger::getInstance().info("[Setup Vertex Buffers Start]");
         ev::logger::Logger::getInstance().debug("Setting up vertex buffer...");
         // ev::logger::Logger::getInstance().debug("Vertex buffer size: " + std::to_string(sizeof(vertices)) + " bytes");
-        sync_objects.copy_complete_fence->reset();
+        copy_complete_fence->reset();
         buffers.cube_vertices= std::make_shared<ev::Buffer>(
             device, 
             cube_vertices.size() * sizeof(Vertex), 
@@ -211,8 +208,8 @@ public:
         staging_command->copy_buffer(buffers.cube_vertices, staging_buffer, cube_vertices.size() * sizeof(Vertex));
         staging_command->copy_buffer(buffers.cube_indices, index_staging_buffer, cube_indices.size() * sizeof(uint32_t));
         staging_command->end();
-        CHECK_RESULT(queue->submit(staging_command, {}, {}, nullptr, sync_objects.copy_complete_fence, nullptr));
-        sync_objects.copy_complete_fence->wait(UINT64_MAX);
+        CHECK_RESULT(queue->submit(staging_command, {}, {}, nullptr, copy_complete_fence, nullptr));
+        copy_complete_fence->wait(UINT64_MAX);
         queue->wait_idle(UINT64_MAX);
         staging_buffer.reset();
         index_staging_buffer.reset();
@@ -241,14 +238,6 @@ public:
         command_buffers[current_frame_index]->draw_indexed(cube_indices.size(), 1, 0, 0, 0);
         command_buffers[current_frame_index]->end_render_pass();
         CHECK_RESULT(command_buffers[current_frame_index]->end());
-    }
-
-    void setup_command_buffers() {
-        command_pool = std::make_shared<ev::CommandPool>(device, VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT);
-        command_buffers.resize(swapchain->get_images().size());
-        for (size_t i = 0; i < command_buffers.size(); ++i){
-            command_buffers[i] = command_pool->allocate(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-        }
     }
 
     void setup_descriptor_sets() {
@@ -416,11 +405,14 @@ public:
     void render() override {
         // sync_objects.frame_fences[current_frame_index]->wait();
         // CHECK_RESULT(sync_objects.frame_fences[current_frame_index]->reset());
-        prepare_frame();
+        if (!prepared ) {
+            return;
+        }
+        prepare_frame(true);
         record_command_buffers();
         uniform_update();
         submit_frame();
     }
 };
 
-RUN_EXAMPLE_MAIN(ExampleImpl, "cube", false)
+RUN_EXAMPLE_MAIN(ExampleImpl, "cube", true)

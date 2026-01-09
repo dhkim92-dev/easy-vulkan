@@ -17,7 +17,6 @@ CommandBuffer::CommandBuffer(shared_ptr<Device> _device, VkCommandPool command_p
         logger::Logger::getInstance().error("[CommandBuffer::CommandBuffer] : Invalid device provided for CommandBuffer creation.");
         exit(EXIT_FAILURE);
     }
-
     
     VkCommandBufferAllocateInfo alloc_info = {};
     alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -437,14 +436,16 @@ VkResult CommandBuffer::end() {
 }
 
 void CommandBuffer::destroy() {
-    ev::logger::Logger::getInstance().info("[CommandBuffer::destroy] : Destroying CommandBuffer.");
     if (command_buffer != VK_NULL_HANDLE) {
+        ev::logger::Logger::getInstance().info("[CommandBuffer::destroy] : Destroying CommandBuffer.");
         vkFreeCommandBuffers(*device, command_pool, 1, &command_buffer);
         command_buffer = VK_NULL_HANDLE;
+        ev::logger::Logger::getInstance().info("[CommandBuffer::destroy] : CommandBuffer destroyed successfully.");
     }
-    ev::logger::Logger::getInstance().info("[CommandBuffer::destroy] : CommandBuffer destroyed successfully.");
 }
 
 CommandBuffer::~CommandBuffer() {
+    ev::logger::Logger::getInstance().info("[CommandBuffer::~CommandBuffer] : Destroying CommandBuffer in destructor.");
     destroy();
+    ev::logger::Logger::getInstance().info("[CommandBuffer::~CommandBuffer] : CommandBuffer destructor completed.");
 }

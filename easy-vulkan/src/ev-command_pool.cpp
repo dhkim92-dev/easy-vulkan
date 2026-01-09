@@ -59,14 +59,17 @@ vector<shared_ptr<CommandBuffer>> CommandPool::allocate(size_t nr_commands, VkCo
 
 void CommandPool::destroy() {
     if (command_pool != VK_NULL_HANDLE) {
+        ev::logger::Logger::getInstance().info("[CommandPool::destroy] : Destroying CommandPool.");
         vkDestroyCommandPool(*device, command_pool, nullptr);
         command_pool = VK_NULL_HANDLE;
-        logger::Logger::getInstance().debug("CommandPool destroyed successfully.");
+        ev::logger::Logger::getInstance().info("[CommandPool::destroy] : CommandPool destroyed successfully.");
     } else {
-        logger::Logger::getInstance().debug("CommandPool is already null, no action taken.");
+        ev::logger::Logger::getInstance().debug("[CommandPool::destroy] : CommandPool already destroyed or not initialized.");
     }
 }
 
 CommandPool::~CommandPool() {
+    ev::logger::Logger::getInstance().info("[CommandPool::~CommandPool] : Destroying CommandPool in destructor.");
     destroy();
+    ev::logger::Logger::getInstance().info("[CommandPool::~CommandPool] : CommandPool destructor completed.");
 }
