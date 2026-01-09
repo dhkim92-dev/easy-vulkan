@@ -254,7 +254,7 @@ public:
     Material(std::shared_ptr<ev::Device> device)
         : device(std::move(device)) {
         if (!this->device) {
-            ev::logger::Logger::getInstance().error("[ev::tools::gltf::Material] Device is null");
+            ev_log_error("[ev::tools::gltf::Material] Device is null");
             exit(EXIT_FAILURE);
         }
     }
@@ -676,7 +676,7 @@ public:
     explicit Model(std::shared_ptr<ev::Device> device)
         : device(std::move(device)) {
         if (!this->device) {
-            ev::logger::Logger::getInstance().error("[ev::tools::gltf::Model] Device is null");
+            ev_log_error("[ev::tools::gltf::Model] Device is null");
             exit(EXIT_FAILURE);
         }
     }

@@ -30,11 +30,11 @@ void create_default_test_context(
     vector<const char*> required_layers;
 
     if ( debug == true ) {
-        ev::logger::Logger::getInstance().set_log_level(ev::logger::LogLevel::DEBUG);
+        ev_log_set_log_level(ev::logger::LogLevel::DEBUG);
         required_layers.push_back("VK_LAYER_KHRONOS_validation");
         required_extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     } else {
-        ev::logger::Logger::getInstance().set_log_level(ev::logger::LogLevel::INFO);
+        ev_log_set_log_level(ev::logger::LogLevel::INFO);
     }
     instance = std::make_shared<ev::Instance>(required_extensions, required_layers, debug);
     auto physical_devices = instance->get_physical_devices();

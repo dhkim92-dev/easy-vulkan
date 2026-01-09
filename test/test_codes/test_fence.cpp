@@ -17,7 +17,7 @@ protected:
 };
 
 TEST_F(FenceTest, CreateAndDestroy) {
-    ev::logger::Logger::getInstance().debug("Creating fence...");
+    ev_log_debug("Creating fence...");
     Fence fence(device);
     EXPECT_NE(VkFence(fence), VK_NULL_HANDLE) << "Failed to create fence";
     fence.destroy();

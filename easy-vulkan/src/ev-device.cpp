@@ -1,7 +1,6 @@
 #include "ev-device.h"
 #include <string>
 using namespace ev;
-using namespace ev::logger;
 
 Device::Device(
     std::shared_ptr<Instance> _instance,
@@ -10,7 +9,7 @@ Device::Device(
     VkQueueFlags queue_flags,
     bool use_swapchain
 ) : instance(std::move(_instance)), pdevice(std::move(_pdevice)), use_swapchain(use_swapchain) {
-    Logger::getInstance().info("[ev::Device] Creating Vulkan device...");
+    ev_log_info("[ev::Device] Creating Vulkan device...");
 
     if ( use_swapchain ) {
         enabled_extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
@@ -36,7 +35,7 @@ Device::Device(
     device_ci.ppEnabledLayerNames = nullptr; // No layers enabled
     device_ci.pEnabledFeatures = &pdevice->get_features(); // Use physical device features
     CHECK_RESULT(vkCreateDevice(*pdevice, &device_ci, nullptr, &device));
-    Logger::getInstance().info("[ev::Device] Vulkan device created successfully.");
+    ev_log_info("[ev::Device] Vulkan device created successfully.");
 }
 
 uint32_t Device::get_queue_family_index(VkQueueFlags flags) const {
@@ -45,7 +44,7 @@ uint32_t Device::get_queue_family_index(VkQueueFlags flags) const {
         for (uint32_t i = 0; i < queue_family_properties.size(); ++i) {
             if ((queue_family_properties[i].queueFlags & flags) && 
                 (queue_family_properties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0) {
-                Logger::getInstance().debug("Queue family index found: " + std::to_string(i));
+                ev_log_debug("Queue family index found: %d", static_cast<int>(i));
                 return i;
             }
         }
@@ -56,7 +55,7 @@ uint32_t Device::get_queue_family_index(VkQueueFlags flags) const {
             if ((queue_family_properties[i].queueFlags & flags) && 
                 (queue_family_properties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0 &&
                 (queue_family_properties[i].queueFlags & VK_QUEUE_COMPUTE_BIT) == 0) {
-                Logger::getInstance().debug("Queue family index found: " + std::to_string(i));
+                ev_log_debug("Queue family index found: %d", static_cast<int>(i));
                 return i;
             }
         }
@@ -64,12 +63,12 @@ uint32_t Device::get_queue_family_index(VkQueueFlags flags) const {
 
     for (uint32_t i = 0; i < queue_family_properties.size(); ++i) {
         if (queue_family_properties[i].queueFlags & flags) {
-            Logger::getInstance().debug("Queue family index found: " + std::to_string(i));
+            ev_log_debug("Queue family index found: %d", static_cast<int>(i));
             return i;
         }
     }
 
-    Logger::getInstance().error("No suitable queue family found for the requested flags: " + std::to_string(flags));
+    ev_log_error("No suitable queue family found for the requested flags: %u", flags);
     exit(EXIT_FAILURE);
 }
 
@@ -85,7 +84,7 @@ uint32_t Device::get_queue_index(VkQueueFlags flags) const {
             return queue_family_indices.graphics;
         }     
     }
-    Logger::getInstance().error("No suitable queue index found for the requested flags: " + std::to_string(flags));
+    ev_log_error("No suitable queue index found for the requested flags: %u", flags);
     exit(EXIT_FAILURE);
 }
 
@@ -103,7 +102,7 @@ uint32_t Device::get_memory_type_index(
                 if ( found ) {
                     *found = VK_TRUE;
                 }
-                Logger::getInstance().debug("Memory type index found: " + std::to_string(static_cast<int>(i)));
+                ev_log_debug("Memory type index found: %d", static_cast<int>(i));
                 return i;
             }
         }
@@ -115,7 +114,7 @@ uint32_t Device::get_memory_type_index(
         return 0;
     }
 
-    Logger::getInstance().error("No suitable memory type index found for the requested size and property flags.");
+    ev_log_error("No suitable memory type index found for the requested size and property flags.");
     exit(EXIT_FAILURE);
 }
 
@@ -128,17 +127,18 @@ void Device::setup_queue_family_indices(VkQueueFlags flags) {
     queue_family_indices.transfer = get_queue_family_index(VK_QUEUE_TRANSFER_BIT);
     queue_family_indices.compute = get_queue_family_index(VK_QUEUE_COMPUTE_BIT);
 
-    Logger::getInstance().debug("Queue family indices set: "
-        "Graphics: " + std::to_string(queue_family_indices.graphics) +
-        ", Transfer: " + std::to_string(queue_family_indices.transfer) +
-        ", Compute: " + std::to_string(queue_family_indices.compute));
+    ev_log_debug("Queue family indices set: Graphics: %d, Transfer: %d, Compute: %d",
+        static_cast<int>(queue_family_indices.graphics),
+        static_cast<int>(queue_family_indices.transfer),
+        static_cast<int>(queue_family_indices.compute)
+    );
 }
 
 void Device::setup_queue_family_properties() {
     uint32_t count = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(*pdevice, &count, nullptr);
     if (count == 0) {
-        Logger::getInstance().error("No queue family properties found.");
+        ev_log_error("No queue family properties found.");
         exit(EXIT_FAILURE);
     }
     queue_family_properties.resize(count);
@@ -154,15 +154,15 @@ void Device::check_required_extensions(vector<const char*>& required_extensions)
     for (const auto& ext_name : required_extensions) {
         bool found = false;
         for (const auto& ext : available_extensions) {
-            // Logger::getInstance().info("Checking extension: " + std::string(ext.extensionName));
+            // ev_log_info("Checking extension: " + std::string(ext.extensionName));
             if (strcmp(ext.extensionName, ext_name) == 0) {
                 found = true;
-                Logger::getInstance().debug("Required extension supported: " + std::string(ext_name));
+                ev_log_debug("Required extension supported: %s", ext_name);
                 break;
             }
         }
         if (!found) {
-            Logger::getInstance().error("Required device extension not supported: " + std::string(ext_name));
+            ev_log_error("Required device extension not supported: %s", ext_name);
             exit(EXIT_FAILURE);
         }
 
@@ -185,23 +185,23 @@ VkFormat Device::get_supported_depth_format(bool check_sampling_support) const {
         
         if (props.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
             if (!check_sampling_support || (props.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT)) {
-                Logger::getInstance().debug("Supported depth format found: " + std::to_string(format));
+                ev_log_debug("Supported depth format found: %d", static_cast<int>(format));
                 return format;
             }
         }
     }
 
-    Logger::getInstance().error("No suitable depth format found.");
+    ev_log_error("No suitable depth format found.");
     exit(EXIT_FAILURE);
 }
 
 void Device::destroy() {
-    Logger::getInstance().info("[ev::Device] Destroying Vulkan device.");
+    ev_log_info("[ev::Device] Destroying Vulkan device.");
     if (device != VK_NULL_HANDLE) {
         vkDestroyDevice(device, nullptr);
         device = VK_NULL_HANDLE;
     }
-    Logger::getInstance().info("[ev::Device] Vulkan device destroyed.");
+    ev_log_info("[ev::Device] Vulkan device destroyed.");
 }
 
 Device::~Device() {

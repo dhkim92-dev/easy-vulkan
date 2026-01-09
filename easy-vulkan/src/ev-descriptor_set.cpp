@@ -6,7 +6,7 @@ using namespace ev;
 DescriptorSetLayout::DescriptorSetLayout(shared_ptr<Device> _device, VkDescriptorSetLayoutCreateFlags _flags)
     : device(std::move(_device)) {
     if (!device) {
-        logger::Logger::getInstance().error("[ev::DescriptorSetLayout] Invalid device provided for DescriptorSetLayout creation.");
+        ev_log_error("[ev::DescriptorSetLayout] Invalid device provided for DescriptorSetLayout creation.");
         exit(EXIT_FAILURE);
     }
 }
@@ -16,13 +16,10 @@ void DescriptorSetLayout::add_binding(VkShaderStageFlags flags,
     uint32_t binding, 
     uint32_t count) {
 
-    ev::logger::Logger::getInstance().debug("[ev::DescriptorSetLayout] Adding binding: " + std::to_string(binding) + 
-        ", type: " + std::to_string(type) + 
-        ", count: " + std::to_string(count) + 
-        ", flags: " + std::to_string(flags));
+    ev_log_debug("[ev::DescriptorSetLayout] Adding binding: %d, type: %d, count: %d, flags: %d", static_cast<int>(binding), static_cast<int>(type), static_cast<int>(count), static_cast<int>(flags));
 
     if ( layout != VK_NULL_HANDLE ) {
-        logger::Logger::getInstance().warn("[ev::DescriptorSetLayout] DescriptorSetLayout already created. can not add new binding.");
+        ev_log_warn("[ev::DescriptorSetLayout] DescriptorSetLayout already created. can not add new binding.");
         return;
     }
     
@@ -35,25 +32,22 @@ void DescriptorSetLayout::add_binding(VkShaderStageFlags flags,
 
     for (const auto& existing_binding : bindings) {
         if (existing_binding.binding == binding) {
-            logger::Logger::getInstance().warn("[ev::DescriptorSetLayout] Binding " + std::to_string(binding) + " already exists, updating descriptor count.");
+            ev_log_warn("[ev::DescriptorSetLayout] Binding %d already exists, updating descriptor count.", static_cast<int>(binding));
             return;
         }
     }
     bindings.push_back(layout_binding);
-    logger::Logger::getInstance().debug("[ev::DescriptorSetLayout] Binding added: " + std::to_string(binding) + 
-        ", type: " + std::to_string(type) + 
-        ", count: " + std::to_string(count) + 
-        ", flags: " + std::to_string(flags));   
+    ev_log_debug("[ev::DescriptorSetLayout] Binding added: %d, type: %d, count: %d, flags: %d", static_cast<int>(binding), static_cast<int>(type), static_cast<int>(count), static_cast<int>(flags));
 }
 
 VkResult DescriptorSetLayout::create_layout() {
     if (layout != VK_NULL_HANDLE) {
-        logger::Logger::getInstance().warn("[ev::DescriptorSetLayout] DescriptorSetLayout already created, destroying the old layout.");
+        ev_log_warn("[ev::DescriptorSetLayout] DescriptorSetLayout already created, destroying the old layout.");
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
     if (bindings.empty()) {
-        logger::Logger::getInstance().error("[ev::DescriptorSetLayout] No bindings added to the DescriptorSetLayout.");
+        ev_log_error("[ev::DescriptorSetLayout] No bindings added to the DescriptorSetLayout.");
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
@@ -65,20 +59,20 @@ VkResult DescriptorSetLayout::create_layout() {
 
     VkResult result = vkCreateDescriptorSetLayout(*device, &layout_info, nullptr, &layout);
     if (result != VK_SUCCESS) {
-        logger::Logger::getInstance().error("[ev::DescriptorSetLayout] Failed to create DescriptorSetLayout: " + std::to_string(result));
+        ev_log_error("[ev::DescriptorSetLayout] Failed to create DescriptorSetLayout: %d", static_cast<int>(result));
         return result;
     }
-    logger::Logger::getInstance().debug("[ev::DescriptorSetLayout] DescriptorSetLayout created successfully with handle: " + std::to_string(reinterpret_cast<uintptr_t>(layout)));
+    ev_log_debug("[ev::DescriptorSetLayout] DescriptorSetLayout created successfully with handle: %p", reinterpret_cast<void*>(layout));
     return VK_SUCCESS;
 }
 
 void DescriptorSetLayout::destroy() {
-    ev::logger::Logger::getInstance().info("[ev::DescriptorSetLayout] Destroying DescriptorSetLayout.");
+    ev_log_info("[ev::DescriptorSetLayout] Destroying DescriptorSetLayout.");
     if (layout != VK_NULL_HANDLE) {
         vkDestroyDescriptorSetLayout(*device, layout, nullptr);
         layout = VK_NULL_HANDLE;
     }
-    ev::logger::Logger::getInstance().info("[ev::DescriptorSetLayout] DescriptorSetLayout destroyed successfully.");
+    ev_log_info("[ev::DescriptorSetLayout] DescriptorSetLayout destroyed successfully.");
 }
 
 DescriptorSetLayout::~DescriptorSetLayout() {
@@ -88,12 +82,12 @@ DescriptorSetLayout::~DescriptorSetLayout() {
 DescriptorSet::DescriptorSet(shared_ptr<Device> _device, VkDescriptorSet _descriptor_set)
     : device(std::move(_device)),  descriptor_set(_descriptor_set) {
     if (!device) {
-        logger::Logger::getInstance().error("[ev::DescriptorSet] Invalid device provided for DescriptorSet creation.");
+        ev_log_error("[ev::DescriptorSet] Invalid device provided for DescriptorSet creation.");
         exit(EXIT_FAILURE);
     }
 
     if (descriptor_set == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[ev::DescriptorSet] Invalid descriptor set provided for DescriptorSet creation.");
+        ev_log_error("[ev::DescriptorSet] Invalid descriptor set provided for DescriptorSet creation.");
         exit(EXIT_FAILURE);
     }
 }
@@ -103,18 +97,18 @@ void DescriptorSet::write_buffer(uint32_t binding,
     VkDescriptorType type
 ) {
     if (!buffer) {
-        logger::Logger::getInstance().error("[ev::DescriptorSet::write_buffer] Invalid buffer provided for DescriptorSet write.");
+        ev_log_error("[ev::DescriptorSet::write_buffer] Invalid buffer provided for DescriptorSet write.");
         return;
     }
     buffer_infos.emplace_back(buffer->get_descriptor());
     WriteInfo write_info = {binding, type, static_cast<uint32_t>(buffer_infos.size() - 1)};
     buffer_write_infos.emplace_back(write_info);
-    logger::Logger::getInstance().debug("[ev::DescriptorSet::write_buffer] Buffer info added for binding: " 
-        + std::to_string(reinterpret_cast<uintptr_t>(buffer->get_descriptor().buffer))
-        + ", offset: " + std::to_string(buffer->get_descriptor().offset)
-        + ", range: " + std::to_string(buffer->get_descriptor().range)
+    ev_log_debug("[ev::DescriptorSet::write_buffer] Buffer info added for binding: %p, offset: %llu, range: %llu", 
+        reinterpret_cast<void*>(buffer->get_descriptor().buffer),
+        static_cast<unsigned long long>(buffer->get_descriptor().offset),
+        static_cast<unsigned long long>(buffer->get_descriptor().range)
     );
-    logger::Logger::getInstance().debug("[ev::DescriptorSet::write_buffer] Writing buffer to descriptor set with binding: " + std::to_string(binding) + ", type: " + std::to_string(type));
+    ev_log_debug("[ev::DescriptorSet::write_buffer] Writing buffer to descriptor set with binding: %d, type: %d", static_cast<int>(binding), static_cast<int>(type));
 }
 
 void DescriptorSet::write_texture(uint32_t binding, 
@@ -122,17 +116,14 @@ void DescriptorSet::write_texture(uint32_t binding,
     VkDescriptorType type
 ) {
     if (!texture->image || !texture->image_view || !texture->sampler) {
-        logger::Logger::getInstance().error("[ev::DescriptorSet::write_texture] Invalid image, view, or sampler provided for DescriptorSet texture write.");
+        ev_log_error("[ev::DescriptorSet::write_texture] Invalid image, view, or sampler provided for DescriptorSet texture write.");
         return;
     }
 
     image_infos.emplace_back( texture->get_descriptor() );
     WriteInfo write_info = {binding, type, static_cast<uint32_t>(image_infos.size() - 1)};
     image_write_infos.emplace_back(write_info);
-    logger::Logger::getInstance().debug("[ev::DescriptorSet::write_texture] Writing texture to descriptor set with binding: " 
-        + std::to_string(binding) 
-        + ", type: " + std::to_string(type)
-    );
+    ev_log_debug("[ev::DescriptorSet::write_texture] Writing texture to descriptor set with binding: %d, type: %d", static_cast<int>(binding), static_cast<int>(type));
 }
 
 void DescriptorSet::write_texture(uint32_t binding, 
@@ -141,7 +132,7 @@ void DescriptorSet::write_texture(uint32_t binding,
     VkImageLayout layout
 ) {
     if (!texture->image || !texture->image_view || !texture->sampler) {
-        logger::Logger::getInstance().error("[ev::DescriptorSet::write_texture] Invalid image, view, or sampler provided for DescriptorSet texture write.");
+        ev_log_error("[ev::DescriptorSet::write_texture] Invalid image, view, or sampler provided for DescriptorSet texture write.");
         return;
     }
 
@@ -152,16 +143,11 @@ void DescriptorSet::write_texture(uint32_t binding,
     WriteInfo write_info = {binding, type, static_cast<uint32_t>(image_infos.size() - 1)};
     image_write_infos.emplace_back(write_info);
 
-    logger::Logger::getInstance().debug("[ev::DescriptorSet::write_texture] Writing texture to descriptor set with binding: " 
-        + std::to_string(binding) 
-        + ", type: " + std::to_string(type)
-    );
+    ev_log_debug("[ev::DescriptorSet::write_texture] Writing texture to descriptor set with binding: %d, type: %d", static_cast<int>(binding), static_cast<int>(type));
 }
 
 VkResult DescriptorSet::update() {
-    ev::logger::Logger::getInstance().debug("[ev::DescriptorSet::update] Updating DescriptorSet with " 
-        + std::to_string(buffer_write_infos.size()) + " buffer writes and " 
-        + std::to_string(image_write_infos.size()) + " image writes.");
+    ev_log_debug("[ev::DescriptorSet::update] Updating DescriptorSet with %d buffer writes and %d image writes.", static_cast<int>(buffer_write_infos.size()), static_cast<int>(image_write_infos.size()));
 
     for ( const auto& buffer_write_info : buffer_write_infos ) {
         VkWriteDescriptorSet write_set = {};
@@ -173,11 +159,11 @@ VkResult DescriptorSet::update() {
         write_set.pBufferInfo = &buffer_infos[buffer_write_info.resource_index];
         write_registry.emplace_back(write_set);
 
-        logger::Logger::getInstance().debug("[ev::DescriptorSet::update] Writing to descriptor set with binding: " 
-            + std::to_string(write_set.dstBinding) 
-            + ", type: " + std::to_string(write_set.descriptorType)
-            + ", count: " + std::to_string(write_set.descriptorCount)
-            + ", buffer info: " + (write_set.pBufferInfo ? std::to_string(reinterpret_cast<uintptr_t>(write_set.pBufferInfo->buffer)) : "null")
+        ev_log_debug("[ev::DescriptorSet::update] Writing to descriptor set with binding: %d, type: %d, count: %d, buffer info: %p",    
+             static_cast<int>(write_set.dstBinding),
+             static_cast<int>(write_set.descriptorType),
+             static_cast<int>(write_set.descriptorCount),
+             reinterpret_cast<void*>(write_set.pBufferInfo->buffer)
         );
     }
 
@@ -190,7 +176,7 @@ VkResult DescriptorSet::update() {
         write_set.descriptorType = image_write_info.type;
         write_set.pImageInfo = &image_infos[image_write_info.resource_index];
         write_registry.emplace_back(write_set);
-        // logger::Logger::getInstance().debug("[ev::DescriptorSet::update] Writing to descriptor set with binding: " 
+        // ev_log_debug("[ev::DescriptorSet::update] Writing to descriptor set with binding: " 
         //     + std::to_string(write_set.dstBinding) 
         //     + ", type: " + std::to_string(write_set.descriptorType)
         //     + ", count: " + std::to_string(write_set.descriptorCount)
@@ -199,7 +185,7 @@ VkResult DescriptorSet::update() {
     }
 
     // for ( const auto& write : write_registry ) {
-    //     logger::Logger::getInstance().debug("[ev::DescriptorSet::update] Writing to descriptor set with binding: " 
+    //     ev_log_debug("[ev::DescriptorSet::update] Writing to descriptor set with binding: " 
     //         + std::to_string(write.dstBinding) 
     //         + ", type: " + std::to_string(write.descriptorType)
     //         + ", count: " + std::to_string(write.descriptorCount)
@@ -209,12 +195,12 @@ VkResult DescriptorSet::update() {
     // }
 
     if (  write_registry.empty() ) {
-        logger::Logger::getInstance().warn("[ev::DescriptorSet::update] No valid writes to flush to DescriptorSet.");
+        ev_log_warn("[ev::DescriptorSet::update] No valid writes to flush to DescriptorSet.");
         return VK_SUCCESS; // Nothing to do
     }
 
     vkUpdateDescriptorSets(*device, static_cast<uint32_t>(write_registry.size()), write_registry.data(), 0, nullptr);
-    logger::Logger::getInstance().debug("[ev::DescriptorSet::update] Flushed " + std::to_string(write_registry.size()) + " writes to DescriptorSet.");
+    ev_log_debug("[ev::DescriptorSet::update] Flushed %d writes to DescriptorSet.", static_cast<int>(write_registry.size()));
     write_registry.clear(); // Clear the registry after flushing
     image_infos.clear();
     buffer_write_infos.clear();
@@ -228,7 +214,7 @@ VkResult DescriptorSet::update() {
 //     VkDescriptorType type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE // Default to storage image type
 // ) {
 //     if (!image_view || !image_view->get_image()) {
-//         logger::Logger::getInstance().error("[ev::DescriptorSet::write_image] Invalid image view or image provided for DescriptorSet image write.");
+//         ev_log_error("[ev::DescriptorSet::write_image] Invalid image view or image provided for DescriptorSet image write.");
 //         return;
 //     }
 //     WriteInfo write_info = {
@@ -238,7 +224,7 @@ VkResult DescriptorSet::update() {
 //     };
 //     image_write_infos.emplace_back(write_info);
 //     // write_registry.emplace_back(write_set);
-//     logger::Logger::getInstance().debug("[ev::DescriptorSet::write_image] Writing image to descriptor set with binding: " 
+//     ev_log_debug("[ev::DescriptorSet::write_image] Writing image to descriptor set with binding: " 
 //         + std::to_string(binding) 
 //         + ", type: " + std::to_string(type)
 //     );

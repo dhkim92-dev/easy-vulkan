@@ -19,7 +19,7 @@ TEST(DebuggerTest, setup_debug_mode_on) {
         "VK_LAYER_KHRONOS_validation"
     };
 
-    ev::logger::Logger::getInstance().set_log_level(ev::logger::LogLevel::DEBUG);
+    ev_log_set_log_level(ev::logger::LogLevel::DEBUG);
 
     ev::Instance instance(required_instance_extensions, required_layers, true);
     ASSERT_TRUE(instance.is_valid());

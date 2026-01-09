@@ -82,8 +82,7 @@ VkPipelineVertexInputStateCreateInfo* Vertex::get_pipeline_vertex_input_state(co
     vertex_input_state_create_info.pVertexBindingDescriptions = &Vertex::vertex_binding_description;
     vertex_input_state_create_info.vertexAttributeDescriptionCount = static_cast<uint32_t>(Vertex::vertex_attribute_descriptions.size());
     vertex_input_state_create_info.pVertexAttributeDescriptions = Vertex::vertex_attribute_descriptions.data();
-    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::Vertex] Vertex input state created with " +
-        std::to_string(vertex_input_state_create_info.vertexAttributeDescriptionCount) + " attributes.");
+    ev_log_debug("[ev::tools::gltf::Vertex] Vertex input state created with %u attributes.", vertex_input_state_create_info.vertexAttributeDescriptionCount);
     return &vertex_input_state_create_info;
 }
 
@@ -100,14 +99,14 @@ void Primitive::set_dimensions(glm::vec3 min_pos, glm::vec3 max_pos) {
 }
 
 void Model::bind_buffers(std::shared_ptr<ev::CommandBuffer> command_buffer) {
-    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::Model] Binding vertex and index buffers");
+    ev_log_debug("[ev::tools::gltf::Model] Binding vertex and index buffers");
     if (vertex_buffer) {
         command_buffer->bind_vertex_buffers(
             0,
             {this->vertex_buffer},
             {0}
         );
-        ev::logger::Logger::getInstance().debug("[ev::tools::gltf::Model] Vertex buffer bound successfully.");
+        ev_log_debug("[ev::tools::gltf::Model] Vertex buffer bound successfully.");
     }
     if (index_buffer) {
         command_buffer->bind_index_buffers(
@@ -115,7 +114,7 @@ void Model::bind_buffers(std::shared_ptr<ev::CommandBuffer> command_buffer) {
             0,
             VK_INDEX_TYPE_UINT32
         );
-        ev::logger::Logger::getInstance().debug("[ev::tools::gltf::Model] Index buffer bound successfully.");
+        ev_log_debug("[ev::tools::gltf::Model] Index buffer bound successfully.");
     }
     // buffer_bound = true;
 }
@@ -210,23 +209,23 @@ GLTFModelManager::GLTFModelManager(
     // resource_path(resource_path) {
 
     if (!this->device) {
-        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager] Device is null");
+        ev_log_error("[ev::tools::gltf::GLTFModelManager] Device is null");
         exit(EXIT_FAILURE);
     }
     if (!this->memory_allocator) {
-        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager] MemoryAllocator is null");
+        ev_log_error("[ev::tools::gltf::GLTFModelManager] MemoryAllocator is null");
         exit(EXIT_FAILURE); 
     }
     if (!this->descriptor_pool) {
-        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager] DescriptorPool is null");
+        ev_log_error("[ev::tools::gltf::GLTFModelManager] DescriptorPool is null");
         exit(EXIT_FAILURE);
     }
     if (!this->command_pool) {
-        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager] CommandPool is null");
+        ev_log_error("[ev::tools::gltf::GLTFModelManager] CommandPool is null");
         exit(EXIT_FAILURE);
     }
     if (!this->transfer_queue) {
-        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager] TransferQueue is null");
+        ev_log_error("[ev::tools::gltf::GLTFModelManager] TransferQueue is null");
         exit(EXIT_FAILURE);
     }
 }
@@ -239,13 +238,13 @@ std::shared_ptr<ev::tools::gltf::Model> GLTFModelManager::load_model(const std::
     bool file_loaded = ctx.LoadASCIIFromFile(&gltf_model, nullptr, nullptr, file_path);
 
     resource_path = std::filesystem::path(file_path).parent_path();
-    ev::logger::Logger::getInstance().info("[ev::tools::gltf::GLTFModelManager] Resource path set to: " + resource_path.string());
+    ev_log_info("[ev::tools::gltf::GLTFModelManager] Resource path set to: %s", resource_path.string().c_str());
 
     if (!file_loaded) {
-        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager] Failed to load glTF model from file: " + file_path);
+        ev_log_error("[ev::tools::gltf::GLTFModelManager] Failed to load glTF model from file: %s", file_path.c_str());
         exit(EXIT_FAILURE);
     }
-    ev::logger::Logger::getInstance().info("[ev::tools::gltf::GLTFModelManager] Successfully loaded glTF model from file: " + file_path);
+    ev_log_info("[ev::tools::gltf::GLTFModelManager] Successfully loaded glTF model from file: %s", file_path.c_str());
 
     std::shared_ptr<ev::tools::gltf::Model> model = std::make_shared<ev::tools::gltf::Model>(
         device
@@ -276,7 +275,7 @@ void GLTFModelManager::load_animations(
     std::shared_ptr<ev::tools::gltf::Model> model
 ) {
 
-    ev::logger::Logger::getInstance().info("[ev::tools::gltf::GLTFModelManager::load_animations] Loading animations...");
+    ev_log_info("[ev::tools::gltf::GLTFModelManager::load_animations] Loading animations...");
     for (const auto& anim : gltf_model.animations) {
         auto animation = std::make_shared<ev::tools::gltf::Animation>(anim.name);
         if ( anim.name.empty() ) {
@@ -346,7 +345,7 @@ void GLTFModelManager::load_animations(
                         break;
                     }
                     default: 
-                        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager::load_animations] Unsupported accessor type: " + std::to_string(accessor.type));
+                        ev_log_error("[ev::tools::gltf::GLTFModelManager::load_animations] Unsupported accessor type: %d", accessor.type);
                         break;
                 }
                 animation->add_sampler(sampler);
@@ -364,7 +363,7 @@ void GLTFModelManager::load_animations(
                     } else if ( chan.target_path == "scale" ) {
                         channel.path_type = Animation::AnimationChannel::PathType::SCALE;
                     } else if (chan.target_path == "weights") {
-                        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager::load_animations] Unsupported animation channel path: " + chan.target_path);
+                        ev_log_error("[ev::tools::gltf::GLTFModelManager::load_animations] Unsupported animation channel path: %s", chan.target_path.c_str());
                         continue;
                     }
 
@@ -381,14 +380,14 @@ void GLTFModelManager::load_animations(
         }
     }
 
-    ev::logger::Logger::getInstance().info("[ev::tools::gltf::GLTFModelManager::load_animations] Finished loading animations.");
+    ev_log_info("[ev::tools::gltf::GLTFModelManager::load_animations] Finished loading animations.");
 }
 
 void GLTFModelManager::load_skins(
     tinygltf::Model &gltf_model, 
     std::shared_ptr<ev::tools::gltf::Model> model
 ) {
-    ev::logger::Logger::getInstance().info("[ev::tools::gltf::GLTFModelManager::load_skins] Loading skins...");
+    ev_log_info("[ev::tools::gltf::GLTFModelManager::load_skins] Loading skins...");
     for (const auto& skin : gltf_model.skins) {
         auto new_skin = std::make_shared<ev::tools::gltf::Skin>(skin.name);
 
@@ -402,7 +401,7 @@ void GLTFModelManager::load_skins(
             if (node) {
                 new_skin->add_joint(node);
             } else {
-                ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager::load_skins] Joint node not found: " + std::to_string(joint));
+                ev_log_error("[ev::tools::gltf::GLTFModelManager::load_skins] Joint node not found: %u", joint);
             }
         }
 
@@ -423,13 +422,13 @@ void GLTFModelManager::load_skins(
         model->add_skin(new_skin);
     }
 
-    ev::logger::Logger::getInstance().info("[ev::tools::gltf::GLTFModelManager::load_skins] Finished loading skins.");
+    ev_log_info("[ev::tools::gltf::GLTFModelManager::load_skins] Finished loading skins.");
 }
 
 std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &image, std::string& file_path) {
-    ev::logger::Logger::getInstance().info("[ev::tools::gltf::GLTFModelManager::load_texture] Loading image file: " + file_path);
+    ev_log_info("[ev::tools::gltf::GLTFModelManager::load_texture] Loading image file: %s", file_path.c_str());
     if (!std::filesystem::exists(file_path)) {
-        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager::load_texture] Image file does not exist: " + file_path);
+        ev_log_error("[ev::tools::gltf::GLTFModelManager::load_texture] Image file does not exist: %s", file_path.c_str());
         exit(EXIT_FAILURE);
     }
     // Load the image data from the file using stb_image
@@ -468,7 +467,7 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
 
     if ( !(props.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT) 
          || !(props.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) ) {
-        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager::load_texture] Format not supported for blit or sampled image: " + std::to_string(format));
+        ev_log_error("[ev::tools::gltf::GLTFModelManager::load_texture] Format not supported for blit or sampled image: %d", format);
         exit(EXIT_FAILURE);
     }
 
@@ -483,32 +482,32 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
         1,
         VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT
     );
-    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager::load_texture] Texture image created with size: " + std::to_string(width) + "x" + std::to_string(height) + ", mip levels: " + std::to_string(mip_levels));
+    ev_log_debug("[ev::tools::gltf::GLTFModelManager::load_texture] Texture image created with size: %ux%u, mip levels: %u", width, height, mip_levels);
 
     std::shared_ptr<ev::Buffer> staging_buffer = std::make_shared<ev::Buffer>(
         device,
         buffer_size,
         ev::buffer_type::STAGING_BUFFER
     );
-    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager::load_texture] Staging buffer created with size: " + std::to_string(buffer_size));
+    ev_log_debug("[ev::tools::gltf::GLTFModelManager::load_texture] Staging buffer created with size: %u", buffer_size);
 
     if ( memory_allocator->allocate_image(texture_image, ev::memory_type::GPU_ONLY ) != VK_SUCCESS ) {
-        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager::load_texture] Failed to allocate image memory for texture.");
+        ev_log_error("[ev::tools::gltf::GLTFModelManager::load_texture] Failed to allocate image memory for texture.");
         exit(EXIT_FAILURE);
     }
-    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager::load_texture] Image memory allocated for texture.");
+    ev_log_debug("[ev::tools::gltf::GLTFModelManager::load_texture] Image memory allocated for texture.");
 
     if ( memory_allocator->allocate_buffer(staging_buffer, ev::memory_type::HOST_READABLE) != VK_SUCCESS ) {
-        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager::load_texture] Failed to allocate buffer memory for staging buffer.");
+        ev_log_error("[ev::tools::gltf::GLTFModelManager::load_texture] Failed to allocate buffer memory for staging buffer.");
         exit(EXIT_FAILURE);
     }
-    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager::load_texture] Buffer memory allocated for staging buffer.");
+    ev_log_debug("[ev::tools::gltf::GLTFModelManager::load_texture] Buffer memory allocated for staging buffer.");
 
     staging_buffer->map(buffer_size);
     staging_buffer->write(buffer, buffer_size);
     staging_buffer->flush();
     staging_buffer->unmap();
-    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager::load_texture] Staging buffer created with size: " + std::to_string(buffer_size));
+    ev_log_debug("[ev::tools::gltf::GLTFModelManager::load_texture] Staging buffer created with size: %u", buffer_size);
 
     std::shared_ptr<ev::CommandBuffer> command_buffer = command_pool->allocate();
     command_buffer->begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
@@ -567,7 +566,7 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
         VK_NULL_HANDLE
     );
     this->transfer_queue->wait_idle(UINT32_MAX);
-    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager::load_texture] Image transfer completed.");
+    ev_log_debug("[ev::tools::gltf::GLTFModelManager::load_texture] Image transfer completed.");
     staging_buffer.reset();
 
     std::shared_ptr<ev::CommandBuffer> blit_command = command_pool->allocate();
@@ -655,7 +654,7 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
     );
     this->transfer_queue->wait_idle(UINT32_MAX);
 
-    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager::load_texture] Mipmaps generated for texture image.");
+    ev_log_debug("[ev::tools::gltf::GLTFModelManager::load_texture] Mipmaps generated for texture image.");
 
     if ( delete_buffer ) {
         delete[] buffer;
@@ -681,7 +680,7 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
     );
 
     if (!sampler) {
-        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager] Failed to create sampler.");
+        ev_log_error("[ev::tools::gltf::GLTFModelManager] Failed to create sampler.");
         exit(EXIT_FAILURE);
     }
 
@@ -707,7 +706,7 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
     );
 
     if (!image_view) {
-        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager] Failed to create image view.");
+        ev_log_error("[ev::tools::gltf::GLTFModelManager] Failed to create image view.");
         exit(EXIT_FAILURE);
     }
 
@@ -718,7 +717,7 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
     );
 
     if (!texture) {
-        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager] Failed to create texture.");
+        ev_log_error("[ev::tools::gltf::GLTFModelManager] Failed to create texture.");
         exit(EXIT_FAILURE);
     }
     return texture;
@@ -727,10 +726,10 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
 void GLTFModelManager::load_textures(tinygltf::Model& gltf_model, 
     std::shared_ptr<Model> model
 ) {
-    ev::logger::Logger::getInstance().info("[ev::tools::gltf::GLTFModelManager] Loading textures...");  
+    ev_log_info("[ev::tools::gltf::GLTFModelManager] Loading textures...");  
     for (tinygltf::Image& gltf_image : gltf_model.images) {
         if (gltf_image.uri.empty() && gltf_image.bufferView < 0) {
-            ev::logger::Logger::getInstance().warn("[ev::tools::gltf::GLTFModelManager] Image has no URI or buffer view, skipping.");
+            ev_log_warn("[ev::tools::gltf::GLTFModelManager] Image has no URI or buffer view, skipping.");
             continue;
         }
 
@@ -741,7 +740,7 @@ void GLTFModelManager::load_textures(tinygltf::Model& gltf_model,
         model->add_texture(texture);
     }
 
-    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager] Number of textures: " + std::to_string(gltf_model.textures.size()));
+    ev_log_debug("[ev::tools::gltf::GLTFModelManager] Number of textures: %u", static_cast<uint32_t>(gltf_model.textures.size()));
 }
 
 std::shared_ptr<ev::Texture> GLTFModelManager::get_texture(
@@ -749,7 +748,7 @@ std::shared_ptr<ev::Texture> GLTFModelManager::get_texture(
     uint32_t idx
 ) {
     if (idx >= model->get_textures().size()) {
-        ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager] Texture index out of bounds: " + std::to_string(idx));
+        ev_log_error("[ev::tools::gltf::GLTFModelManager] Texture index out of bounds:  %u", idx);
         return nullptr;
     }
 
@@ -760,37 +759,37 @@ void GLTFModelManager::load_materials(
     tinygltf::Model& gltf_model, 
     std::shared_ptr<Model> model
 ) {
-    ev::logger::Logger::getInstance().info("[ev::tools::gltf::GLTFModelManager] Loading materials...");
+    ev_log_info("[ev::tools::gltf::GLTFModelManager] Loading materials...");
 
     for (tinygltf::Material& mat : gltf_model.materials) {
         std::shared_ptr<Material> material = std::make_shared<Material>(device);
 
         if ( mat.values.find("baseColorTexture") != mat.values.end() ) {
-            ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager] Base color factor found in material: " + mat.name);
+            ev_log_debug("[ev::tools::gltf::GLTFModelManager] Base color factor found in material: %s", mat.name.c_str());
             uint32_t texture_idx = mat.values["baseColorTexture"].TextureIndex();
             uint32_t idx = gltf_model.textures[texture_idx].source;
             material->set_base_color_texture(get_texture(model, idx));
         }
 
         if ( mat.values.find("metallicRoughnessTexture") != mat.values.end() ) {
-            ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager] Metallic roughness texture found in material: " + mat.name);
+            ev_log_debug("[ev::tools::gltf::GLTFModelManager] Metallic roughness texture found in material: %s", mat.name.c_str());
             uint32_t texture_idx = mat.values["metallicRoughnessTexture"].TextureIndex();
             uint32_t idx = gltf_model.textures[texture_idx].source;
             material->set_metallic_roughness_texture(get_texture(model, idx));
         }
 
         if ( mat.values.find("roughnessFactor") != mat.values.end() ) {
-            ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager] Roughness factor found in material: " + mat.name);
+            ev_log_debug("[ev::tools::gltf::GLTFModelManager] Roughness factor found in material: %s", mat.name.c_str());
             material->set_roughness_factor(static_cast<float>(mat.values["roughnessFactor"].Factor()));
         }
 
         if ( mat.values.find("metallicFactor") != mat.values.end() ) {
-            ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager] Metallic factor found in material: " + mat.name);
+            ev_log_debug("[ev::tools::gltf::GLTFModelManager] Metallic factor found in material: %s", mat.name.c_str());
             material->set_metallic_factor(static_cast<float>(mat.values["metallicFactor"].Factor()));
         }
 
         if ( mat.values.find("baseColorFactor") != mat.values.end() ) {
-            ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager] Base color factor found in material: " + mat.name);
+            ev_log_debug("[ev::tools::gltf::GLTFModelManager] Base color factor found in material: %s", mat.name.c_str());
             const auto& color = mat.values["baseColorFactor"].ColorFactor();
             material->set_base_color_factor(glm::vec4(
                 static_cast<float>(color[0]),
@@ -801,14 +800,14 @@ void GLTFModelManager::load_materials(
         }
 
         if ( mat.values.find("normalTexture") != mat.values.end() ) {
-            ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager] Normal texture found in material: " + mat.name);
+            ev_log_debug("[ev::tools::gltf::GLTFModelManager] Normal texture found in material: %s", mat.name.c_str());
             uint32_t texture_idx = mat.values["normalTexture"].TextureIndex();
             uint32_t idx = gltf_model.textures[texture_idx].source;
             material->set_normal_texture(get_texture(model, idx));
         }
         
         if ( mat.values.find("emissiveTexture") != mat.values.end() ) {
-            ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager] Emissive texture found in material: " + mat.name);
+            ev_log_debug("[ev::tools::gltf::GLTFModelManager] Emissive texture found in material: %s", mat.name.c_str());
             // Check if the material has an emissive texture
             uint32_t texture_idx = mat.values["emissiveTexture"].TextureIndex();
             uint32_t idx = gltf_model.textures[texture_idx].source;
@@ -816,14 +815,14 @@ void GLTFModelManager::load_materials(
         }
 
         if ( mat.values.find("occlusionTexture") != mat.values.end() ) {
-            ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager] Occlusion texture found in material: " + mat.name);
+            ev_log_debug("[ev::tools::gltf::GLTFModelManager] Occlusion texture found in material: %s", mat.name.c_str());
             uint32_t texture_idx = mat.values["occlusionTexture"].TextureIndex();
             uint32_t idx = gltf_model.textures[texture_idx].source;
             material->set_occlusion_texture(get_texture(model, idx));
         }
 
         if ( mat.values.find("alphaMode") != mat.values.end() ) {
-            ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager] Alpha mode found in material: " + mat.name);
+            ev_log_debug("[ev::tools::gltf::GLTFModelManager] Alpha mode found in material: %s", mat.name.c_str());
             tinygltf::Parameter param = mat.additionalValues["alphaMode"];
             std::string alpha_mode = param.string_value;
             if (alpha_mode == "OPAQUE") {
@@ -836,7 +835,7 @@ void GLTFModelManager::load_materials(
         }
 
         if ( mat.additionalValues.find("alphaCutoff") != mat.additionalValues.end() ) {
-            ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager] Alpha cutoff found in material: " + mat.name);
+            ev_log_debug("[ev::tools::gltf::GLTFModelManager] Alpha cutoff found in material: %s", mat.name.c_str());
             // Check if
             material->set_alpha_cutoff(static_cast<float>(mat.additionalValues["alphaCutoff"].Factor()));
         }
@@ -844,7 +843,7 @@ void GLTFModelManager::load_materials(
         model->add_material(material);
     }
     model->add_material(std::make_shared<Material>(device)); // Default material
-    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager] Number of materials: " + std::to_string(gltf_model.materials.size()));
+    ev_log_debug("[ev::tools::gltf::GLTFModelManager] Number of materials: %zu", gltf_model.materials.size());
 }
 
 void GLTFModelManager::load_nodes(
@@ -854,7 +853,7 @@ void GLTFModelManager::load_nodes(
     std::vector<uint32_t> &h_indices,
     float scale_factor
 ) {
-    ev::logger::Logger::getInstance().info("[ev::tools::gltf::GLTFModelManager] Loading nodes...");
+    ev_log_info("[ev::tools::gltf::GLTFModelManager] Loading nodes...");
 
     const tinygltf::Scene& scene = gltf_model.scenes[gltf_model.defaultScene > -1 ? gltf_model.defaultScene : 0];
     for ( size_t i = 0 ; i < scene.nodes.size() ; ++i ) {
@@ -872,7 +871,7 @@ void GLTFModelManager::load_nodes(
         );
     }
 
-    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager] Number of nodes: " + std::to_string(gltf_model.nodes.size()));
+    ev_log_debug("[ev::tools::gltf::GLTFModelManager] Number of nodes: %zu", gltf_model.nodes.size());
 }
 
 void GLTFModelManager::load_node(
@@ -885,7 +884,7 @@ void GLTFModelManager::load_node(
     std::vector<uint32_t> &h_indices,
     float scale_factor
 ) {
-    ev::logger::Logger::getInstance().info("[ev::tools::gltf::GLTFModelManager] Loading node: " + node.name);
+    ev_log_info("[ev::tools::gltf::GLTFModelManager] Loading node: %s", node.name.c_str());
 
     std::shared_ptr<ev::tools::gltf::Node> new_node = std::make_shared<ev::tools::gltf::Node>(node_idx);
     new_node->set_name(node.name);
@@ -955,8 +954,7 @@ void GLTFModelManager::load_node_meshes(
     }
 
     tinygltf::Mesh& mesh = gltf_model.meshes[node.mesh];
-    ev::logger::Logger::getInstance()
-        .info("[ev::tools::gltf::GLTFModelManager] Loading mesh: " + mesh.name);
+    ev_log_info("[ev::tools::gltf::GLTFModelManager] Loading mesh: %s", mesh.name.c_str());
     std::shared_ptr<ev::tools::gltf::Mesh> new_mesh
         = std::make_shared<ev::tools::gltf::Mesh>();
     new_mesh->set_name(mesh.name);
@@ -1060,7 +1058,7 @@ void GLTFModelManager::add_mesh_indices(
             break;
         }
         default:
-            ev::logger::Logger::getInstance().error("[ev::tools::gltf::GLTFModelManager] Unsupported index component type.");
+            ev_log_error("[ev::tools::gltf::GLTFModelManager] Unsupported index component type.");
             return;
     }
 
@@ -1182,8 +1180,7 @@ void GLTFModelManager::setup_vertex_buffer(
     std::shared_ptr<ev::tools::gltf::Model> model,
     std::vector<Vertex> &h_vertices
 ) {
-    ev::logger::Logger::getInstance().info("[ev::tools::gltf::GLTFModelManager] Setting up vertex buffer...");
-    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager] Number of vertices: " + std::to_string(h_vertices.size()));
+    ev_log_info("[ev::tools::gltf::GLTFModelManager] Setting up vertex buffer...");
 
     std::shared_ptr<ev::Buffer> staging_buffer = std::make_shared<ev::Buffer>(
         device,
@@ -1228,15 +1225,14 @@ void GLTFModelManager::setup_vertex_buffer(
 
     model->set_vertex_buffer(vertex_buffer);
 
-    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager] Vertex buffer setup complete.");
+    ev_log_debug("[ev::tools::gltf::GLTFModelManager] Vertex buffer setup complete.");
 }
 
 void GLTFModelManager::setup_index_buffer(
     std::shared_ptr<ev::tools::gltf::Model> model,
     std::vector<uint32_t> &h_indices
 ) {
-    ev::logger::Logger::getInstance().info("[ev::tools::gltf::GLTFModelManager] Setting up index buffer...");
-    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager] Number of indices: " + std::to_string(h_indices.size()));
+    ev_log_info("[ev::tools::gltf::GLTFModelManager] Setting up index buffer...");
 
     std::shared_ptr<ev::Buffer> staging_buffer = std::make_shared<ev::Buffer>(
         device,
@@ -1279,19 +1275,19 @@ void GLTFModelManager::setup_index_buffer(
     transfer_queue->wait_idle(UINT32_MAX);
     model->set_index_buffer(index_buffer);
 
-    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager] Index buffer setup complete.");
+    ev_log_debug("[ev::tools::gltf::GLTFModelManager] Index buffer setup complete.");
 }
 
 void GLTFModelManager::prepare_material_descriptor_sets(
     std::shared_ptr<ev::tools::gltf::Model> model
 ) {
-    ev::logger::Logger::getInstance().info("[ev::tools::gltf::GLTFModelManager::prepare_material_descriptor_sets] Preparing material descriptor sets...");
+    ev_log_info("[ev::tools::gltf::GLTFModelManager::prepare_material_descriptor_sets] Preparing material descriptor sets...");
 
     std::shared_ptr<ev::DescriptorSetLayout> texture_layout
         = std::make_shared<ev::DescriptorSetLayout>(device);
 
     if ( descriptor_binding_flags & DescriptorBindingFlags::ImageBaseColor ) {
-        ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager::prepare_material_descriptor_sets] Adding base color image binding.");
+        ev_log_debug("[ev::tools::gltf::GLTFModelManager::prepare_material_descriptor_sets] Adding base color image binding.");
         texture_layout->add_binding(
             VK_SHADER_STAGE_FRAGMENT_BIT,
             VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
@@ -1301,7 +1297,7 @@ void GLTFModelManager::prepare_material_descriptor_sets(
     }
 
     if ( descriptor_binding_flags & DescriptorBindingFlags::ImageNormalMap ) {
-        ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager::prepare_material_descriptor_sets] Adding normal map image binding.");
+        ev_log_debug("[ev::tools::gltf::GLTFModelManager::prepare_material_descriptor_sets] Adding normal map image binding.");
         texture_layout->add_binding(
             VK_SHADER_STAGE_FRAGMENT_BIT,
             VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
@@ -1313,7 +1309,6 @@ void GLTFModelManager::prepare_material_descriptor_sets(
     CHECK_RESULT(texture_layout->create_layout());
     model->add_descriptor_set_layout(texture_layout);
 
-    ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager::prepare_material_descriptor_sets] material size = " + std::to_string(model->get_materials().size()));
     for ( auto& material : model->get_materials() ) {
         if ( material->get_base_color_texture() == nullptr ) continue;
 
@@ -1322,14 +1317,14 @@ void GLTFModelManager::prepare_material_descriptor_sets(
         );
 
         if ( descriptor_binding_flags & DescriptorBindingFlags::ImageBaseColor ) {
-            ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager::prepare_material_descriptor_sets] Writing base color texture to descriptor set.");
+            ev_log_debug("[ev::tools::gltf::GLTFModelManager::prepare_material_descriptor_sets] Writing base color texture to descriptor set.");
             material->get_descriptor_set()->write_texture(
                 material->get_descriptor_set()->registry_size(),
                 material->get_base_color_texture(),
                 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
             );
         } else if ( material->get_normal_texture() != nullptr && descriptor_binding_flags & DescriptorBindingFlags::ImageNormalMap ) {
-            ev::logger::Logger::getInstance().debug("[ev::tools::gltf::GLTFModelManager::prepare_material_descriptor_sets] Writing normal map texture to descriptor set.");
+            ev_log_debug("[ev::tools::gltf::GLTFModelManager::prepare_material_descriptor_sets] Writing normal map texture to descriptor set.");
             material->get_descriptor_set()->write_texture(
                 material->get_descriptor_set()->registry_size(),
                 material->get_normal_texture(),
@@ -1340,13 +1335,13 @@ void GLTFModelManager::prepare_material_descriptor_sets(
         material->get_descriptor_set()->update();
     }
 
-    ev::logger::Logger::getInstance().info("[ev::tools::gltf::GLTFModelManager::prepare_material_descriptor_sets] Material descriptor sets prepared successfully.");
+    ev_log_info("[ev::tools::gltf::GLTFModelManager::prepare_material_descriptor_sets] Material descriptor sets prepared successfully.");
 }
 
 void GLTFModelManager::prepare_node_descriptor_sets(
     std::shared_ptr<ev::tools::gltf::Model> model
 ) {
-    ev::logger::Logger::getInstance().info("[ev::tools::gltf::GLTFModelManager::prepare_node_descriptor_sets] Preparing node descriptor sets...");
+    ev_log_info("[ev::tools::gltf::GLTFModelManager::prepare_node_descriptor_sets] Preparing node descriptor sets...");
     std::shared_ptr<ev::DescriptorSetLayout> node_layout
         = std::make_shared<ev::DescriptorSetLayout>(device);
 
@@ -1364,7 +1359,7 @@ void GLTFModelManager::prepare_node_descriptor_sets(
         prepare_node_descriptor_set(model, node, node_layout);
     }
 
-    ev::logger::Logger::getInstance().info("[ev::tools::gltf::GLTFModelManager::prepare_node_descriptor_sets] Node descriptor sets prepared successfully.");
+    ev_log_info("[ev::tools::gltf::GLTFModelManager::prepare_node_descriptor_sets] Node descriptor sets prepared successfully.");
 }
 
 void GLTFModelManager::prepare_node_descriptor_set(

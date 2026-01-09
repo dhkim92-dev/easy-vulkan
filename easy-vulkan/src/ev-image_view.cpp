@@ -10,7 +10,7 @@ ImageView::ImageView(shared_ptr<Device> _device,
     VkComponentMapping components,
     VkImageSubresourceRange subresource_range
 ): device(std::move(_device)), image(std::move(_image)), view_format(view_format), view_type(view_type) {
-    logger::Logger::getInstance().info("[ev::ImageView] Creating image view...");
+    ev_log_info("[ev::ImageView] Creating image view...");
     CHECK_RESULT(check_format_compatibility());
     CHECK_RESULT(check_view_type_compatibility());
 
@@ -23,7 +23,6 @@ ImageView::ImageView(shared_ptr<Device> _device,
     ci.subresourceRange = subresource_range;
 
     CHECK_RESULT(vkCreateImageView(*device, &ci, nullptr, &view));
-    ev::logger::Logger::getInstance().debug("[ev::ImageView] Image view created successfully with handle: " + std::to_string(reinterpret_cast<uintptr_t>(view)));
 }
 
 VkResult ImageView::check_format_compatibility() {
@@ -35,10 +34,9 @@ VkResult ImageView::check_format_compatibility() {
         return VK_SUCCESS;
     }
 
-    logger::Logger::getInstance().debug("[ev::ImageView] image flags ; " + std::to_string(image->get_flags()));
 
     if ( !(image->get_flags() & VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT) ) {
-        logger::Logger::getInstance().error("[ev::ImageView] Image was not created with VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT, but view format is different from image format.");
+        ev_log_error("[ev::ImageView] Image was not created with VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT, but view format is different from image format.");
         return VK_ERROR_FORMAT_NOT_SUPPORTED;
     }
 
@@ -54,7 +52,7 @@ VkResult ImageView::check_format_compatibility() {
     );
 
     if (result != VK_SUCCESS) {
-        logger::Logger::getInstance().error("[ev::ImageView] vkGetPhysicalDeviceImageFormatProperties failed for the view format.");
+        ev_log_error("[ev::ImageView] vkGetPhysicalDeviceImageFormatProperties failed for the view format.");
     }
 
     return result;
@@ -78,7 +76,7 @@ VkResult ImageView::check_view_type_compatibility() {
                 this->view_type = VK_IMAGE_VIEW_TYPE_3D;
                 break;
             default:
-                logger::Logger::getInstance().error("[ev::ImageView] Invalid image type for deducing view type.");
+                ev_log_error("[ev::ImageView] Invalid image type for deducing view type.");
                 return VK_ERROR_INITIALIZATION_FAILED;
         }
     }
@@ -104,19 +102,19 @@ VkResult ImageView::check_view_type_compatibility() {
     }
 
     if (!compatible) {
-        logger::Logger::getInstance().error("[ev::ImageView] Image type and view type are not compatible.");
+        ev_log_error("[ev::ImageView] Image type and view type are not compatible.");
         return VK_ERROR_INITIALIZATION_FAILED;
     }
     return VK_SUCCESS;
 }
 
 void ImageView::destroy() {
-    ev::logger::Logger::getInstance().info("[ev::ImageView::destroy] Destroying ImageView.");
+    ev_log_info("[ev::ImageView::destroy] Destroying ImageView.");
     if (view != VK_NULL_HANDLE) {
         vkDestroyImageView(*device, view, nullptr);
         view = VK_NULL_HANDLE;
     }
-    ev::logger::Logger::getInstance().info("[ev::ImageView::destroy] ImageView destroyed successfully.");
+    ev_log_info("[ev::ImageView::destroy] ImageView destroyed successfully.");
 }
 
 ImageView::~ImageView() {

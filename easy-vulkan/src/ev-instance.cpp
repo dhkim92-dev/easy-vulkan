@@ -3,16 +3,15 @@
 #include "ev-macro.h"
 
 using namespace ev;
-using namespace ev::logger;
 
 ev::Instance::Instance(
     VkInstance instance,
     const bool enable_debug_messenger
 ) : enable_debug_messenger(enable_debug_messenger) {
-    Logger::getInstance().info("Creating Vulkan instance from existing instance...");
+    ev_log_info("Creating Vulkan instance from existing instance...");
     this->instance = instance;
     if (instance == VK_NULL_HANDLE) {
-        Logger::getInstance().error("Invalid Vulkan instance provided.");
+        ev_log_error("Invalid Vulkan instance provided.");
         exit(EXIT_FAILURE);
     }
     
@@ -29,7 +28,7 @@ ev::Instance::Instance(
     const vector<const char*>& required_layers,
     const bool enable_debug_messenger
 ): enable_debug_messenger(enable_debug_messenger) {
-    Logger::getInstance().info("Creating Vulkan instance...");
+    ev_log_info("Creating Vulkan instance...");
     this->instance_extensions = ev::utility::list_instance_extensions();
     this->instance_layers = ev::utility::list_instance_layers();
 
@@ -41,19 +40,19 @@ ev::Instance::Instance(
 
     for (const auto& ext_name : required_extensions) {
         if (!is_support_extension(ext_name)) {
-            Logger::getInstance().error("Required instance extension not supported: " + std::string(ext_name));
+            ev_log_error("Required instance extension not supported: %s", ext_name);
             exit(EXIT_FAILURE);
         }
-        Logger::getInstance().debug("Extension supported: " + std::string(ext_name));
+        ev_log_debug("Extension supported: %s", ext_name);
         enabled_extensions.push_back(ext_name);
     }
 
     for (const auto& layer_name : required_layers) {
         if (!is_support_layer(layer_name)) {
-            Logger::getInstance().error("Required instance layer not supported: " + std::string(layer_name));
+            ev_log_error("Required instance layer not supported: %s", layer_name);
             exit(EXIT_FAILURE);
         }
-        Logger::getInstance().debug("Layer supported: " + std::string(layer_name));
+        ev_log_debug("Layer supported: %s", layer_name);
         enabled_layers.push_back(layer_name);
     }
 
@@ -84,7 +83,7 @@ ev::Instance::Instance(
     #endif
 
     CHECK_RESULT(vkCreateInstance(&create_info, nullptr, &instance));
-    Logger::getInstance().info("Vulkan instance created successfully.");
+    ev_log_info("Vulkan instance created successfully.");
     if ( enable_debug_messenger ) {
         create_debug_messenger();
     }
@@ -94,7 +93,7 @@ void ev::Instance::create_debug_messenger() {
     if (!enable_debug_messenger) {
         return;
     }
-    Logger::getInstance().info("Creating debug messenger...");
+    ev_log_info("Creating debug messenger...");
 
     VkDebugUtilsMessengerCreateInfoEXT debug_create_info = {};
     debug_create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -107,16 +106,16 @@ void ev::Instance::create_debug_messenger() {
 
     auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
     if (!func) {
-        Logger::getInstance().error("Failed to retrieve vkCreateDebugUtilsMessengerEXT function pointer.");
+        ev_log_error("Failed to retrieve vkCreateDebugUtilsMessengerEXT function pointer.");
         exit(EXIT_FAILURE);
     }
 
     VkResult result = func(instance, &debug_create_info, nullptr, &debug_messenger);
     if (result != VK_SUCCESS) {
-        Logger::getInstance().error("Failed to create debug messenger: " + std::to_string(result));
+        ev_log_error("Failed to create debug messenger: %d", result);
         exit(EXIT_FAILURE);
     } else {
-        Logger::getInstance().info("Debug messenger created successfully.");
+        ev_log_info("Debug messenger created successfully.");
     }
 }
 
@@ -135,7 +134,7 @@ bool ev::Instance::is_support_layer(const char* layer_name) const {
             return true;
         }
     }
-    Logger::getInstance().warn("Layer not supported: " + std::string(layer_name));
+    ev_log_warn("Layer not supported: %s", layer_name);
     return false;
 }
 
@@ -153,15 +152,15 @@ void ev::Instance::destroy() {
         if (func) {
             func(instance, debug_messenger, nullptr);
             debug_messenger = VK_NULL_HANDLE;
-            Logger::getInstance().info("Debug messenger destroyed.");
+            ev_log_info("Debug messenger destroyed.");
         } else {
-            Logger::getInstance().error("Failed to get vkDestroyDebugUtilsMessengerEXT function pointer.");
+            ev_log_error("Failed to get vkDestroyDebugUtilsMessengerEXT function pointer.");
         }
     }
 
     vkDestroyInstance(instance, nullptr);
     instance = VK_NULL_HANDLE;
-    Logger::getInstance().info("Vulkan instance destroyed.");
+    ev_log_info("Vulkan instance destroyed.");
 }
 
 Instance::~Instance() {

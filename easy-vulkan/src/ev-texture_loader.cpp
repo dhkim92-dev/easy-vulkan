@@ -3,21 +3,21 @@
 using namespace ev::tools;
 
 std::vector<uint8_t> TextureLoader::load_data(std::filesystem::path file_path, int& width, int& height, int& channels) {
-    ev::logger::Logger::getInstance().info("[TextureLoader::load_data] Loading texture data from file: " + file_path.string());
+    ev_log_info("[TextureLoader::load_data] Loading texture data from file: %s", file_path.string().c_str());
     
     // Use stb_image to load the image data
     std::vector<uint8_t> data;
     unsigned char* img_data = stbi_load(file_path.string().c_str(), &width, &height, &channels, 0);
     
     if (!img_data) {
-        ev::logger::Logger::getInstance().error("[TextureLoader::load_data] Failed to load image: " + file_path.string());
+        ev_log_error("[TextureLoader::load_data] Failed to load image: %s", file_path.string().c_str());
         return data;
     }
 
     data.assign(img_data, img_data + (width * height * channels));
     stbi_image_free(img_data);
     
-    ev::logger::Logger::getInstance().info("[TextureLoader::load_data] Texture data loaded successfully from file: " + file_path.string());
+    ev_log_info("[TextureLoader::load_data] Texture data loaded successfully from file: %s", file_path.string().c_str());
     return data;
 }
 
@@ -27,14 +27,14 @@ Texture2DLoader::Texture2DLoader(
     std::shared_ptr<ev::Queue> transfer_queue,
     std::shared_ptr<ev::MemoryAllocator> memory_allocator
 ) : TextureLoader(std::move(device), std::move(command_pool), std::move(transfer_queue), std::move(memory_allocator)) {
-    ev::logger::Logger::getInstance().info("[Texture2DLoader::Texture2DLoader] Created Texture2DLoader.");
+    ev_log_info("[Texture2DLoader::Texture2DLoader] Created Texture2DLoader.");
 
     if (!m_device || !m_command_pool || !m_transfer_queue || !m_memory_allocator) {
-        ev::logger::Logger::getInstance().error("[Texture2DLoader::Texture2DLoader] Invalid parameters provided for Texture2DLoader creation.");
+        ev_log_error("[Texture2DLoader::Texture2DLoader] Invalid parameters provided for Texture2DLoader creation.");
         exit(EXIT_FAILURE);
     }
 
-    ev::logger::Logger::getInstance().info("[Texture2DLoader::Texture2DLoader] Created Texture2DLoader completed");
+    ev_log_info("[Texture2DLoader::Texture2DLoader] Created Texture2DLoader completed");
 }
 
 std::shared_ptr<ev::Texture> Texture2DLoader::__load_from_file(
@@ -44,13 +44,13 @@ std::shared_ptr<ev::Texture> Texture2DLoader::__load_from_file(
     VkImageLayout final_layout,
     uint32_t mip_levels
 ) {
-    ev::logger::Logger::getInstance().info("[Texture2DLoader::load_from_file] Loading texture from file: " + file_path.string());
+    ev_log_info("[Texture2DLoader::load_from_file] Loading texture from file: %s", file_path.string().c_str());
 
     int width, height, channels;
     std::vector<uint8_t> data = load_data(file_path, width, height, channels);
     
     if (data.empty()) {
-        ev::logger::Logger::getInstance().error("[Texture2DLoader::load_from_file] Failed to load texture data from file: " + file_path.string());
+        ev_log_error("[Texture2DLoader::load_from_file] Failed to load texture data from file: %s", file_path.string().c_str());
         return nullptr;
     }
 
@@ -103,7 +103,7 @@ std::shared_ptr<ev::Texture> Texture2DLoader::__load_from_file(
     VkResult result = m_memory_allocator->allocate_image(image, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
     if (result != VK_SUCCESS) {
-        ev::logger::Logger::getInstance().error("[Texture2DLoader::load_from_file] Failed to allocate memory for image: " + file_path.string());
+        ev_log_error("[Texture2DLoader::load_from_file] Failed to allocate memory for image: %s", file_path.string().c_str());
         exit(EXIT_FAILURE);
     }
 
@@ -115,18 +115,18 @@ std::shared_ptr<ev::Texture> Texture2DLoader::__load_from_file(
 
     result = m_memory_allocator->allocate_buffer(staging_buffer, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     if (result != VK_SUCCESS) {
-        ev::logger::Logger::getInstance().error("[Texture2DLoader::load_from_file] Failed to allocate staging buffer for image: " + file_path.string());
+        ev_log_error("[Texture2DLoader::load_from_file] Failed to allocate staging buffer for image: %s", file_path.string().c_str());
         exit(EXIT_FAILURE);
     }
     staging_buffer->map();
     staging_buffer->write(data.data(), data.size());
     staging_buffer->flush();
     staging_buffer->unmap();
-    ev::logger::Logger::getInstance().debug("[Texture2DLoader::load_from_file] Staging buffer created and data written successfully.");
+    ev_log_debug("[Texture2DLoader::load_from_file] Staging buffer created and data written successfully.");
 
     std::shared_ptr<ev::CommandBuffer> command_buffer = m_command_pool->allocate(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
     if (!command_buffer) {
-        ev::logger::Logger::getInstance().error("[Texture2DLoader::load_from_file] Failed to allocate command buffer for image: " + file_path.string());
+        ev_log_error("[Texture2DLoader::load_from_file] Failed to allocate command buffer for image: %s", file_path.string().c_str());
         exit(EXIT_FAILURE);
     }
     command_buffer->begin();
@@ -175,7 +175,7 @@ std::shared_ptr<ev::Texture> Texture2DLoader::__load_from_file(
     command_buffer->end();
     std::shared_ptr<ev::Fence> fence = std::make_shared<ev::Fence>(m_device);
     if (!fence) {
-        ev::logger::Logger::getInstance().error("[Texture2DLoader::load_from_file] Failed to create fence for command buffer execution: " + file_path.string());
+        ev_log_error("[Texture2DLoader::load_from_file] Failed to create fence for command buffer execution: %s", file_path.string().c_str());
         exit(EXIT_FAILURE);
     }
     VkPipelineStageFlags wait_stages = VK_PIPELINE_STAGE_TRANSFER_BIT;
@@ -183,7 +183,7 @@ std::shared_ptr<ev::Texture> Texture2DLoader::__load_from_file(
     fence->wait();
     fence->destroy();
 
-    ev::logger::Logger::getInstance().info("[Texture2DLoader::load_from_file] Texture loaded successfully from file: " + file_path.string());
+    ev_log_info("[Texture2DLoader::load_from_file] Texture loaded successfully from file: %s", file_path.string().c_str());
 
     VkComponentMapping components = {
         VK_COMPONENT_SWIZZLE_IDENTITY, // r
@@ -260,14 +260,14 @@ std::shared_ptr<ev::Texture> Texture2DLoader::load_from_file_as_uniform(
     VkImageUsageFlags usage_flags,
     VkImageLayout final_layout
 ) {
-    ev::logger::Logger::getInstance().info("[Texture2DLoader::load_from_file_as_uniform] Loading texture as uniform from file: " + file_path.string());
-ev::logger::Logger::getInstance().info("[Texture2DLoader::load_from_file] Loading texture from file: " + file_path.string());
+    ev_log_info("[Texture2DLoader::load_from_file_as_uniform] Loading texture as uniform from file: %s", file_path.string().c_str());
+ev_log_info("[Texture2DLoader::load_from_file] Loading texture from file: %s", file_path.string().c_str());
 
     int width, height, channels;
     std::vector<uint8_t> data = load_data(file_path, width, height, channels);
     
     if (data.empty()) {
-        ev::logger::Logger::getInstance().error("[Texture2DLoader::load_from_file] Failed to load texture data from file: " + file_path.string());
+        ev_log_error("[Texture2DLoader::load_from_file] Failed to load texture data from file: %s", file_path.string().c_str());
         return nullptr;
     }
 
@@ -294,7 +294,7 @@ ev::logger::Logger::getInstance().info("[Texture2DLoader::load_from_file] Loadin
     VkResult result = m_memory_allocator->allocate_image(image, ev::memory_type::HOST_READABLE);
 
     if (result != VK_SUCCESS) {
-        ev::logger::Logger::getInstance().error("[Texture2DLoader::load_from_file] Failed to allocate memory for image: " + file_path.string());
+        ev_log_error("[Texture2DLoader::load_from_file] Failed to allocate memory for image: %s", file_path.string().c_str());
         exit(EXIT_FAILURE);
     }
 

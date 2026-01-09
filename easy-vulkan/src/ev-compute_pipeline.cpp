@@ -4,9 +4,9 @@ namespace ev {
 
 ComputePipeline::ComputePipeline(std::shared_ptr<ev::Device> _device)
     : device(std::move(_device)) {
-    ev::logger::Logger::getInstance().info("[ComputePipeline] Creating ComputePipeline with default constructor.");
+    ev_log_info("[ComputePipeline] Creating ComputePipeline with default constructor.");
     if (!device) {
-        ev::logger::Logger::getInstance().error("[ComputePipeline::ComputePipeline] : Invalid device provided for ComputePipeline creation.");
+        ev_log_error("[ComputePipeline::ComputePipeline] : Invalid device provided for ComputePipeline creation.");
         exit(EXIT_FAILURE);
     }
 }
@@ -17,21 +17,21 @@ ComputePipeline::ComputePipeline(std::shared_ptr<ev::Device> _device,
 )
     : device(std::move(_device)), layout(std::move(layout)), shader(std::move(shader)) {
     if (!device) {
-        ev::logger::Logger::getInstance().error("[ComputePipeline::ComputePipeline] : Invalid device provided for ComputePipeline creation.");
+        ev_log_error("[ComputePipeline::ComputePipeline] : Invalid device provided for ComputePipeline creation.");
         exit(EXIT_FAILURE);
     }
     if (!layout) {
-        ev::logger::Logger::getInstance().error("[ComputePipeline::ComputePipeline] : Invalid pipeline layout provided for ComputePipeline creation.");
+        ev_log_error("[ComputePipeline::ComputePipeline] : Invalid pipeline layout provided for ComputePipeline creation.");
         exit(EXIT_FAILURE);
     }
 
     if ( !shader ) {
-        ev::logger::Logger::getInstance().error("[ComputePipeline::ComputePipeline] : Invalid shader provided for ComputePipeline creation.");
+        ev_log_error("[ComputePipeline::ComputePipeline] : Invalid shader provided for ComputePipeline creation.");
         exit(EXIT_FAILURE);
     }
 
     if ( shader->get_stage() != VK_SHADER_STAGE_COMPUTE_BIT ) {
-        ev::logger::Logger::getInstance().error("[ComputePipeline::ComputePipeline] : Shader stage must be VK_SHADER_STAGE_COMPUTE_BIT for ComputePipeline.");
+        ev_log_error("[ComputePipeline::ComputePipeline] : Shader stage must be VK_SHADER_STAGE_COMPUTE_BIT for ComputePipeline.");
         exit(EXIT_FAILURE);
     }
 }
@@ -42,7 +42,7 @@ VkResult ComputePipeline::create_pipeline(
     void* next
 ) {
     if ( !device || !layout || !shader ) {
-        ev::logger::Logger::getInstance().error("[ComputePipeline::create_pipeline] : Device, layout or shader is not set.");
+        ev_log_error("[ComputePipeline::create_pipeline] : Device, layout or shader is not set.");
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
@@ -66,13 +66,13 @@ VkResult ComputePipeline::create_pipeline(
 }
 
 void ComputePipeline::destroy() {
-    ev::logger::Logger::getInstance().info("[ComputePipeline::destroy] : Destroying compute pipeline: " + std::to_string(reinterpret_cast<uintptr_t>(pipeline)));
+    ev_log_info("[ComputePipeline::destroy] : Destroying compute pipeline:  %p", reinterpret_cast<void*>(pipeline));
     if (pipeline != VK_NULL_HANDLE) {
-        ev::logger::Logger::getInstance().info("[ComputePipeline::destroy] : Destroying compute pipeline : " + std::to_string(reinterpret_cast<uintptr_t>(pipeline)));
+        ev_log_info("[ComputePipeline::destroy] : Destroying compute pipeline : %p", reinterpret_cast<void*>(pipeline));
         vkDestroyPipeline(*device, pipeline, nullptr);
         pipeline = VK_NULL_HANDLE;
     }
-    ev::logger::Logger::getInstance().info("[ComputePipeline::destroy] : Compute pipeline destroyed successfully.");
+    ev_log_info("[ComputePipeline::destroy] : Compute pipeline destroyed successfully.");
 }
 
 ComputePipeline::~ComputePipeline() {

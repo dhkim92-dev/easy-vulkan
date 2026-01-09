@@ -6,16 +6,15 @@
 
 using namespace std;
 using namespace ev;
-using namespace ev::logger;
 
 Swapchain::Swapchain(
     std::shared_ptr<Instance> _instance,
     std::shared_ptr<PhysicalDevice> _pdevice,
     std::shared_ptr<Device> _device
 ) : instance(std::move(_instance)), pdevice(std::move(_pdevice)), device(std::move(_device)) {
-    Logger::getInstance().debug("Creating Swapchain...");
+    ev_log_debug("Creating Swapchain...");
     if (!instance || !pdevice || !device) {
-        Logger::getInstance().error("Invalid instance, physical device, or device provided for Swapchain creation.");
+        ev_log_error("Invalid instance, physical device, or device provided for Swapchain creation.");
         exit(EXIT_FAILURE);
     }
 
@@ -29,16 +28,16 @@ Swapchain::Swapchain(
     pfn.vkCreateSwapchainKHR = (PFN_vkCreateSwapchainKHR)vkGetDeviceProcAddr(*device, "vkCreateSwapchainKHR");
     pfn.vkDestroySwapchainKHR = (PFN_vkDestroySwapchainKHR)vkGetDeviceProcAddr(*device, "vkDestroySwapchainKHR");
 
-    Logger::getInstance().debug("Swapchain created successfully.");
+    ev_log_debug("Swapchain created successfully.");
 }
 
 void Swapchain::find_present_queue() {
-    Logger::getInstance().debug("Finding present queue for the surface...");
+    ev_log_debug("Finding present queue for the surface...");
     vector<VkQueueFamilyProperties> queue_family_properties = device->get_queue_family_properties();
     uint32_t queue_count = static_cast<uint32_t>(queue_family_properties.size());
 
     if (queue_count == 0) {
-        Logger::getInstance().error("No queue families available for the physical device.");
+        ev_log_error("No queue families available for the physical device.");
         exit(EXIT_FAILURE);
     }
 
@@ -75,28 +74,28 @@ void Swapchain::find_present_queue() {
     }
 
     if ( graphics_queue == UINT32_MAX || present_queue == UINT32_MAX ) {
-        Logger::getInstance().error("No suitable graphics or present queue found for the surface.");
+        ev_log_error("No suitable graphics or present queue found for the surface.");
         exit(EXIT_FAILURE);
     }
 
     if ( graphics_queue != present_queue ) {
-        Logger::getInstance().warn("Graphics and present queue are different, and it not be supported by this library");
+        ev_log_warn("Graphics and present queue are different, and it not be supported by this library");
         exit(EXIT_FAILURE);
     }
 
     queue_index = graphics_queue;
-    Logger::getInstance().debug("Present queue found successfully at index: " + std::to_string(queue_index));
+    // ev_log_debug("Present queue found successfully at index: " + std::to_string(queue_index));
 }
 
 void Swapchain::find_color_format_and_space() {
     // 스왑체인에서 사용할 이미지 포맷과 색상 공간을 결정한다.
-    Logger::getInstance().debug("Finding color format and color space for the surface...");
+    ev_log_debug("Finding color format and color space for the surface...");
     // auto vkGetPhysicalDeviceSurfaceFormatsKHR = (PFN_vkGetPhysicalDeviceSurfaceFormatsKHR)vkGetInstanceProcAddr(*instance, "vkGetPhysicalDeviceSurfaceFormatsKHR");
     uint32_t format_count = 0;
     CHECK_RESULT(pfn.vkGetPhysicalDeviceSurfaceFormatsKHR(*pdevice, surface, &format_count, nullptr));
     
     if (format_count == 0) {
-        Logger::getInstance().error("No surface formats available for the physical device.");
+        ev_log_error("No surface formats available for the physical device.");
         exit(EXIT_FAILURE);
     }
 
@@ -113,32 +112,32 @@ void Swapchain::find_color_format_and_space() {
         if ( std::find(prefered_formats.begin(), prefered_formats.end(), available.format) != prefered_formats.end() ) {
             image_format = available.format;
             color_space = available.colorSpace;
-            Logger::getInstance().debug("Preferred image format found: " + std::to_string(image_format) + ", color space: " + std::to_string(color_space));
+            ev_log_debug("Preferred image format found: %u, color space: %u", static_cast<uint32_t>(image_format), static_cast<uint32_t>(color_space));
             break;
         }
     }
 
     if (image_format == VK_FORMAT_UNDEFINED ) { 
-        Logger::getInstance().error("No suitable image format found for the surface.");
+        ev_log_error("No suitable image format found for the surface.");
         exit(EXIT_FAILURE);
     }
 
-    Logger::getInstance().debug("Image format and color space determined successfully: " + std::to_string(image_format) + ", " + std::to_string(color_space));
+    ev_log_debug("Image format and color space determined successfully: %u, %u", static_cast<uint32_t>(image_format), static_cast<uint32_t>(color_space));
 }
 
 void Swapchain::register_surface(VkSurfaceKHR surface) {
-    Logger::getInstance().debug("Registering surface for the swapchain...");
+    ev_log_debug("Registering surface for the swapchain...");
     // 스왑체인 객체에서 사용할 surface를 등록한다. 이 때 이미 등록된 Surface가 있다면 에러가 발생한다.
     if (this->surface != VK_NULL_HANDLE) {
-        Logger::getInstance().error("Surface already registered, replacing with new surface.");
+        ev_log_error("Surface already registered, replacing with new surface.");
         exit(EXIT_FAILURE);
     }
     this->surface = surface;
-    Logger::getInstance().debug("Surface registered successfully.");
+    ev_log_debug("Surface registered successfully.");
     // Present 모드를 확인하고, Present Queue를 설정한다.
     find_present_queue();
     find_color_format_and_space();
-    Logger::getInstance().debug("Surface registration completed successfully.");
+    ev_log_debug("Surface registration completed successfully.");
 }
 
 void Swapchain::create(
@@ -148,10 +147,9 @@ void Swapchain::create(
     bool enable_vsync,
     bool fullscreen
 ) {
-    Logger::getInstance().debug("Creating swapchain with surface...");
+    ev_log_debug("Creating swapchain with surface...");
     register_surface(surface);
     VkSwapchainKHR old_swapchain = swapchain;
-    logger::Logger::getInstance().debug("Old swapchain: " + std::to_string(reinterpret_cast<uint64_t>(old_swapchain)));
 
     VkSurfaceCapabilitiesKHR surface_capabilities;
     // auto vkGetPhysicalDeviceSurfaceCapabilitiesKHR = (PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR)vkGetInstanceProcAddr(*instance, "vkGetPhysicalDeviceSurfaceCapabilitiesKHR");
@@ -170,7 +168,7 @@ void Swapchain::create(
     // auto vkGetPhysicalDeviceSurfacePresentModesKHR = (PFN_vkGetPhysicalDeviceSurfacePresentModesKHR)vkGetInstanceProcAddr(*instance, "vkGetPhysicalDeviceSurfacePresentModesKHR");
     CHECK_RESULT(pfn.vkGetPhysicalDeviceSurfacePresentModesKHR(*pdevice, surface, &present_mode_count, nullptr));
     if (present_mode_count == 0) {
-        Logger::getInstance().error("No present modes available for the surface.");
+        ev_log_error("No present modes available for the surface.");
         exit(EXIT_FAILURE);
     }
     std::vector<VkPresentModeKHR> present_modes(present_mode_count);
@@ -197,7 +195,7 @@ void Swapchain::create(
     }
     image_count = target_swapchain_image_count;
 
-    logger::Logger::getInstance().debug("Target swapchain image count: " + std::to_string(target_swapchain_image_count));
+    ev_log_debug("Target swapchain image count: %u", target_swapchain_image_count);
 
     // surface transformation 설정
     VkSurfaceTransformFlagsKHR preferred_transform;
@@ -249,11 +247,11 @@ void Swapchain::create(
 
     CHECK_RESULT(pfn.vkCreateSwapchainKHR(*device, &swapchain_ci, nullptr, &swapchain));
 
-    logger::Logger::getInstance().debug("Swapchain created with format: " + std::to_string(image_format) + ", color space: " + std::to_string(color_space) + ", present mode: " + std::to_string(present_mode));
+    ev_log_debug("Swapchain created with format: %u, color space: %u, present mode: %u", static_cast<uint32_t>(image_format), static_cast<uint32_t>(color_space), static_cast<uint32_t>(present_mode));
 
     if ( old_swapchain != VK_NULL_HANDLE ) {
         destroy_swapchain(old_swapchain);
-        logger::Logger::getInstance().debug("Old swapchain destroyed successfully.");
+        ev_log_debug("Old swapchain destroyed successfully.");
     }
     images.clear();
     views.clear();
@@ -267,11 +265,11 @@ void Swapchain::create(
         create_image_view(images[i], views[i]);
     }
 
-    Logger::getInstance().debug("Swapchain created successfully with " + std::to_string(image_count) + " images.");
+    ev_log_debug("Swapchain created successfully with %u images.", static_cast<uint32_t>(image_count));
 }
 
 void Swapchain::create_image_view(VkImage& image, VkImageView &view) {
-    logger::Logger::getInstance().debug("Image view created for swapchain image: " + std::to_string(reinterpret_cast<uint64_t>(image)));
+    ev_log_debug("Image view created for swapchain image: %llu", static_cast<unsigned long long>(reinterpret_cast<uint64_t>(image)));
     VkImageViewCreateInfo view_ci = {};
     view_ci.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     view_ci.image = image;
@@ -290,10 +288,10 @@ void Swapchain::create_image_view(VkImage& image, VkImageView &view) {
     view_ci.pNext = nullptr; // No additional structure
     VkResult result = vkCreateImageView(*device, &view_ci, nullptr, &view);
     if (result != VK_SUCCESS) {
-        Logger::getInstance().error("Failed to create image view for swapchain image: " + std::to_string(result));
+        ev_log_error("Failed to create image view for swapchain image: %d", result);
         exit(EXIT_FAILURE);
     }
-    Logger::getInstance().debug("Image view created successfully for swapchain image.");
+    ev_log_debug("Image view created successfully for swapchain image.");
 }
 
 VkResult Swapchain::acquire_next_image(
@@ -301,12 +299,12 @@ VkResult Swapchain::acquire_next_image(
     std::shared_ptr<ev::Semaphore> wait_semaphore,
     VkFence fence
 ) {
-    Logger::getInstance().debug("Acquiring next image from swapchain...");
+    ev_log_debug("Acquiring next image from swapchain...");
     VkResult result = pfn.vkAcquireNextImageKHR(*device, swapchain, UINT64_MAX, *wait_semaphore, fence, &image_index);
     if( result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR && result != VK_ERROR_OUT_OF_DATE_KHR ) {
-        Logger::getInstance().error("Failed to acquire next image from swapchain: " + std::to_string(result));
+        ev_log_error("Failed to acquire next image from swapchain: %d", result);
     } else {
-        Logger::getInstance().debug("Next image acquired successfully at index: " + std::to_string(image_index));
+        ev_log_debug("Next image acquired successfully at index: %u", image_index);
     }
     return result;
 }
@@ -316,20 +314,20 @@ void Swapchain::destroy_swapchain(VkSwapchainKHR& sc) {
         for (VkImageView view : views) {
             vkDestroyImageView(*device, view, nullptr);
             view = VK_NULL_HANDLE;
-            logger::Logger::getInstance().debug("Destroyed image view: " + std::to_string(reinterpret_cast<uint64_t>(view)));
+            ev_log_debug("Destroyed image view: %llu", static_cast<unsigned long long>(reinterpret_cast<uint64_t>(view)));
         }
         pfn.vkDestroySwapchainKHR(*device, sc, nullptr);
         sc = VK_NULL_HANDLE;
-        logger::Logger::getInstance().debug("Destroyed swapchain");
+        ev_log_debug("Destroyed swapchain");
     }
 }
 
 void Swapchain::destroy() {
-    logger::Logger::getInstance().debug("[ev::Swapchain::destroy] Destroying swapchain...");
+    ev_log_debug("[ev::Swapchain::destroy] Destroying swapchain...");
     if (swapchain != VK_NULL_HANDLE) {
-        logger::Logger::getInstance().info("[ev::Swapchain::destroy] Destroying swapchain...");
+        ev_log_info("[ev::Swapchain::destroy] Destroying swapchain...");
         for (auto image_view : views) {
-            logger::Logger::getInstance().info("[ev::Swapchain::destroy] Destroying image view: " + std::to_string(reinterpret_cast<uint64_t>(image_view)));
+            ev_log_info("[ev::Swapchain::destroy] Destroying image view: %llu", static_cast<unsigned long long>(reinterpret_cast<uint64_t>(image_view)));
             vkDestroyImageView(*device, image_view, nullptr);
         }
         views.clear();
@@ -340,7 +338,7 @@ void Swapchain::destroy() {
 }
 
 Swapchain::~Swapchain() {
-    ev::logger::Logger::getInstance().info("[ev::Swapchain] Destructor called, destroying swapchain...");
+    ev_log_info("[ev::Swapchain] Destructor called, destroying swapchain...");
     destroy();
-    ev::logger::Logger::getInstance().info("[ev::Swapchain] Swapchain destroyed in destructor.");
+    ev_log_info("[ev::Swapchain] Swapchain destroyed in destructor.");
 }

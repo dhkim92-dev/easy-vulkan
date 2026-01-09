@@ -22,11 +22,11 @@ Sampler::Sampler(
     void* next
 ) : device(device) {
     if (!device) {
-        logger::Logger::getInstance().error("[ev::Sampler] Invalid device provided for Sampler creation.");
+        ev_log_error("[ev::Sampler] Invalid device provided for Sampler creation.");
         exit(EXIT_FAILURE);
     }
 
-    logger::Logger::getInstance().info("[ev::Sampler] Creating sampler with device: " + to_string(reinterpret_cast<uintptr_t>(device.get())));
+    ev_log_info("[ev::Sampler] Creating sampler with device: %llu", static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(device.get())));
     VkSamplerCreateInfo sampler_info = {};
     sampler_info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
     sampler_info.magFilter = mag_filter;
@@ -47,7 +47,7 @@ Sampler::Sampler(
     sampler_info.flags = flags;
     sampler_info.pNext = next;
     CHECK_RESULT(vkCreateSampler(*device, &sampler_info, nullptr, &sampler));
-    logger::Logger::getInstance().info("[ev::Sampler] Sampler created successfully with handle: " + to_string(reinterpret_cast<uintptr_t>(sampler)));
+    ev_log_info("[ev::Sampler] Sampler created successfully with handle: %llu", static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(sampler)));
 }
 
 Sampler::~Sampler() {
@@ -55,10 +55,10 @@ Sampler::~Sampler() {
 }
 
 void Sampler::destroy() {
-    ev::logger::Logger::getInstance().info("[ev::Sampler::destroy] Destroying sampler.");
+    ev_log_info("[ev::Sampler::destroy] Destroying sampler.");
     if (sampler != VK_NULL_HANDLE) {
         vkDestroySampler(*device, sampler, nullptr);
         sampler = VK_NULL_HANDLE;
     }
-    ev::logger::Logger::getInstance().info("[ev::Sampler::destroy] Sampler destroyed successfully.");
+    ev_log_info("[ev::Sampler::destroy] Sampler destroyed successfully.");
 }

@@ -6,14 +6,14 @@ using namespace ev;
 PipelineCache::PipelineCache(shared_ptr<Device> _device,
     VkPipelineCacheCreateFlags flags,
     void* next ): device(std::move(_device)) {
-    ev::logger::Logger::getInstance().info("[ev::PipelineCache] Creating PipelineCache with device: " + std::to_string(reinterpret_cast<uintptr_t>(device.get())));
+    ev_log_info("[ev::PipelineCache] Creating PipelineCache with device: %llu", static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(device.get())));
     if (!device) {
-        logger::Logger::getInstance().error("Invalid device provided for PipelineCache creation.");
+        ev_log_error("Invalid device provided for PipelineCache creation.");
         exit(EXIT_FAILURE);
     }
 
     if (cache != VK_NULL_HANDLE) {
-        logger::Logger::getInstance().warn("PipelineCache already created, destroying the old cache.");
+        ev_log_warn("PipelineCache already created, destroying the old cache.");
         return;
     }
 
@@ -24,20 +24,20 @@ PipelineCache::PipelineCache(shared_ptr<Device> _device,
 
     VkResult result = vkCreatePipelineCache(*device, &cache_info, nullptr, &cache);
     if (result != VK_SUCCESS) {
-        logger::Logger::getInstance().error("Failed to create pipeline cache: " + std::to_string(result));
+        ev_log_error("Failed to create pipeline cache: %d", result);
         exit(EXIT_FAILURE);
     } else {
-        logger::Logger::getInstance().debug("PipelineCache created successfully.");
+        ev_log_debug("PipelineCache created successfully.");
     }
-    ev::logger::Logger::getInstance().info("[ev::PipelineCache] PipelineCache created successfully with handle: " + std::to_string(reinterpret_cast<uintptr_t>(cache)));
+    ev_log_info("[ev::PipelineCache] PipelineCache created successfully with handle: %llu", static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(cache)));
 }
 
 void PipelineCache::destroy() {
     if (cache != VK_NULL_HANDLE) {
-        ev::logger::Logger::getInstance().info("[ev::PipelineCache::destroy] Destroying PipelineCache.");
+        ev_log_info("[ev::PipelineCache::destroy] Destroying PipelineCache.");
         vkDestroyPipelineCache(*device, cache, nullptr);
         cache = VK_NULL_HANDLE;
-        ev::logger::Logger::getInstance().info("[ev::PipelineCache::destroy] PipelineCache destroyed successfully.");
+        ev_log_info("[ev::PipelineCache::destroy] PipelineCache destroyed successfully.");
     }
 }
 

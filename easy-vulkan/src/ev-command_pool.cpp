@@ -8,7 +8,7 @@ CommandPool::CommandPool(shared_ptr<Device> _device, VkQueueFlags queue_flags, V
       queue_flags(queue_flags), 
       flags(flags) {
     if (!this->device) {
-        logger::Logger::getInstance().error("Invalid device provided for CommandPool creation.");
+        ev_log_error("Invalid device provided for CommandPool creation.");
         exit(EXIT_FAILURE);
     }
 
@@ -18,12 +18,12 @@ CommandPool::CommandPool(shared_ptr<Device> _device, VkQueueFlags queue_flags, V
     pool_ci.queueFamilyIndex = this->queue_family_index;
     pool_ci.flags = flags;
     CHECK_RESULT(vkCreateCommandPool(*this->device, &pool_ci, nullptr, &command_pool));
-    logger::Logger::getInstance().debug("CommandPool created successfully.");
+    ev_log_debug("CommandPool created successfully.");
 }
 
 shared_ptr<CommandBuffer> CommandPool::allocate(VkCommandBufferLevel level) {
     if (command_pool == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("Command pool is not created.");
+        ev_log_error("Command pool is not created.");
         return nullptr;
     }
 
@@ -32,10 +32,10 @@ shared_ptr<CommandBuffer> CommandPool::allocate(VkCommandBufferLevel level) {
 
 vector<shared_ptr<CommandBuffer>> CommandPool::allocate(size_t nr_commands, VkCommandBufferLevel level) {
     if (command_pool == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("Command pool is not created.");
+        ev_log_error("Command pool is not created.");
         return {};
     }
-    logger::Logger::getInstance().debug("Allocating " + std::to_string(nr_commands) + " command buffers of level " + std::to_string(level) + ".");
+    ev_log_debug("Allocating  %d command buffers of level %d.", static_cast<int>(nr_commands), static_cast<int>(level));
 
     if (nr_commands == 0) {
         return {};
@@ -59,17 +59,17 @@ vector<shared_ptr<CommandBuffer>> CommandPool::allocate(size_t nr_commands, VkCo
 
 void CommandPool::destroy() {
     if (command_pool != VK_NULL_HANDLE) {
-        ev::logger::Logger::getInstance().info("[CommandPool::destroy] : Destroying CommandPool.");
+        ev_log_info("[CommandPool::destroy] : Destroying CommandPool.");
         vkDestroyCommandPool(*device, command_pool, nullptr);
         command_pool = VK_NULL_HANDLE;
-        ev::logger::Logger::getInstance().info("[CommandPool::destroy] : CommandPool destroyed successfully.");
+        ev_log_info("[CommandPool::destroy] : CommandPool destroyed successfully.");
     } else {
-        ev::logger::Logger::getInstance().debug("[CommandPool::destroy] : CommandPool already destroyed or not initialized.");
+        ev_log_debug("[CommandPool::destroy] : CommandPool already destroyed or not initialized.");
     }
 }
 
 CommandPool::~CommandPool() {
-    ev::logger::Logger::getInstance().info("[CommandPool::~CommandPool] : Destroying CommandPool in destructor.");
+    ev_log_info("[CommandPool::~CommandPool] : Destroying CommandPool in destructor.");
     destroy();
-    ev::logger::Logger::getInstance().info("[CommandPool::~CommandPool] : CommandPool destructor completed.");
+    ev_log_info("[CommandPool::~CommandPool] : CommandPool destructor completed.");
 }

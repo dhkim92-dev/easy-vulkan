@@ -23,7 +23,6 @@ class ExampleBase {
 
     ExampleBase(std::string example_name, std::string executable_path, bool debug = false) 
     : title(example_name), executable_path(executable_path), debug(debug) {
-        ev::logger::Logger::getInstance().set_log_level(ev::logger::LogLevel::INFO);
         std::filesystem::path bin_path = std::filesystem::canonical(executable_path);
         std::filesystem::path base_path = bin_path.parent_path().parent_path().parent_path();
 
@@ -31,13 +30,9 @@ class ExampleBase {
         auto build_path = base_path.parent_path();
         resource_path = build_path.parent_path() /  "resources";
 
-        ev::logger::Logger::getInstance().info("Executable path set to: " + executable_path);
-        ev::logger::Logger::getInstance().info("Shader path set to: " + shader_path.string());
-        ev::logger::Logger::getInstance().info("Resource path set to: " + resource_path.string());
-
-        if (debug) {
-            ev::logger::Logger::getInstance().set_log_level(ev::logger::LogLevel::DEBUG);
-        }
+        ev_log_info("Executable path set to: %s", executable_path.c_str());
+        ev_log_info("Shader path set to: %s", shader_path.string().c_str());
+        ev_log_info("Resource path set to: %s", resource_path.string().c_str());
     };
 
     virtual ~ExampleBase() {
@@ -147,7 +142,6 @@ class ExampleBase {
         if (debug) {
             required_extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
             required_layers.push_back("VK_LAYER_KHRONOS_validation");
-            ev::logger::Logger::getInstance().set_log_level(ev::logger::LogLevel::DEBUG);
         }
 
         instance = std::make_shared<ev::Instance>(required_extensions, required_layers, debug);
@@ -164,7 +158,7 @@ class ExampleBase {
 
     virtual void init_window() {
         if (!glfwInit()) {
-            ev::logger::Logger::getInstance().error("Failed to initialize GLFW");
+            ev_log_error("Failed to initialize GLFW");
             exit(EXIT_FAILURE);
         }
 
@@ -176,25 +170,26 @@ class ExampleBase {
         display.window = glfwCreateWindow(vid_mode->width, vid_mode->height, title.c_str(), nullptr, nullptr);
 
         if (!display.window) {
-            ev::logger::Logger::getInstance().error("Failed to create GLFW window");
+            ev_log_error("Failed to create GLFW window");
             glfwTerminate();
             exit(EXIT_FAILURE);
         }
         glfwSetWindowUserPointer(display.window, this);
         glfwGetFramebufferSize(display.window, (int*)&display.width, (int*)&display.height);
-        ev::logger::Logger::getInstance().info("GLFW window created with dimensions: " + std::to_string(display.width) + "x" + std::to_string(display.height));
+        ev_log_info("GLFW window created with dimensions: %ux%u", display.width, display.height);
 
         glfwSetFramebufferSizeCallback(display.window, [](GLFWwindow* window, int width, int height) {
-            std::printf("Framebuffer resize detected: width=%d, height=%d\n", width, height);
+            // std::printf("Framebuffer resize detected: width=%d, height=%d\n", width, height);
+            ev_log_debug("Framebuffer resize detected: width=%d, height=%d", width, height);
             ExampleBase* app = reinterpret_cast<ExampleBase*>(glfwGetWindowUserPointer(window));
             app->resized = true;
         });
     }
 
     virtual void create_surface() {
-        ev::logger::Logger::getInstance().debug("Creating Vulkan surface for GLFW window... surface handler current hex : " + std::to_string(reinterpret_cast<uint64_t>(surface)));
+        ev_log_debug("Creating Vulkan surface for GLFW window... surface handler current hex : %llu", static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(surface)));
         CHECK_RESULT(glfwCreateWindowSurface(*instance, display.window, nullptr, &surface));
-        ev::logger::Logger::getInstance().debug("surface create complete surface handler current hex : " + std::to_string(reinterpret_cast<uint64_t>(surface)));
+        ev_log_debug("surface create complete surface handler current hex : %llu", static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(surface)));
     }
 
     virtual vector<const char*> setup_instance_extensions() {
@@ -223,14 +218,14 @@ class ExampleBase {
     }
 
     virtual void create_queue() {
-        ev::logger::Logger::getInstance().debug("[Setup Queue Start]");
+        ev_log_debug("[Setup Queue Start]");
         queue = std::make_shared<ev::Queue>(device, device->get_queue_index(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT));
-        ev::logger::Logger::getInstance().debug("[Setup Queue End]");
+        ev_log_debug("[Setup Queue End]");
     }
 
     virtual void on_window_resize() {
         if ( !prepared ) {
-            logger::Logger::getInstance().info("[on_window_resize] Swapchain not prepared yet, skipping resize handling.");
+            ev_log_info("[on_window_resize] Swapchain not prepared yet, skipping resize handling.");
             return;
         }
 
@@ -247,24 +242,24 @@ class ExampleBase {
         display.width = w;
         display.height = h;
 
-        logger::Logger::getInstance().info("[on_window_resize] Waiting for device to be idle before resizing...");
+        ev_log_info("[on_window_resize] Waiting for device to be idle before resizing...");
         device->wait_idle(); // 중요, 윈도우 리사이즈 콜백 수행 중에 GPU가 작업 중이면 안되므로 대기 
-        logger::Logger::getInstance().info("[on_window_resize] Device is now idle. Proceeding with resize...");
+        ev_log_info("[on_window_resize] Device is now idle. Proceeding with resize...");
 
         destory_depth_stencil_buffers();
         destroy_framebuffers();
         destroy_swapchain();
-        logger::Logger::getInstance().info("Recreating swapchain with new dimensions: width=" + std::to_string(display.width) + ", height=" + std::to_string(display.height));
+        ev_log_info("Recreating swapchain with new dimensions: width=%u, height=%u", display.width, display.height);
         create_swapchain();
         create_depth_stencil_buffers();
         create_framebuffers();
-        logger::Logger::getInstance().info("Recreation complete.");
+        ev_log_info("Recreation complete.");
         
-        logger::Logger::getInstance().info("[on_window_resize] Recreating synchronization primitives...");
+        ev_log_info("[on_window_resize] Recreating synchronization primitives...");
         destroy_sync();
-        logger::Logger::getInstance().info("[on_window_resize] Synchronization primitives destroyed.");
+        ev_log_info("[on_window_resize] Synchronization primitives destroyed.");
         setup_sync();
-        logger::Logger::getInstance().info("[on_window_resize] Synchronization primitives recreated.");
+        ev_log_info("[on_window_resize] Synchronization primitives recreated.");
 
         prepared = true;
         resized = false;
@@ -337,15 +332,15 @@ class ExampleBase {
     }
 
     virtual void destroy_swapchain() {
-        ev::logger::Logger::getInstance().info("[destroy_swapchain] Destroying swapchain... reference count before reset: " + std::to_string(swapchain.use_count()));
+        ev_log_info("[destroy_swapchain] Destroying swapchain... reference count before reset: %zu", swapchain.use_count());
         swapchain.reset();
-        ev::logger::Logger::getInstance().info("[destroy_swapchain] Swapchain destroyed. Reference count after reset: " + std::to_string(swapchain.use_count()));
+        ev_log_info("[destroy_swapchain] Swapchain destroyed. Reference count after reset: %zu", swapchain.use_count());
         // max_frames_in_flight = 2;
     }
 
     virtual void create_framebuffers() {
         // Basically use color and Depth stencil framebuffer creation.
-        // std::printf("renderpass address : %lu\n", reinterpret_cast<uintptr_t>(VkRenderPass(*render_pass)));
+        // std::printf("renderpass address : %llu\n", static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(VkRenderPass(*render_pass))));
         for (uint32_t i = 0 ; i < swapchain->get_image_views().size() ; ++i ) {
             VkImageView view = swapchain->get_image_views()[i];
             DepthStencil& depth_stencil = depth_stencils[i];
@@ -396,9 +391,9 @@ class ExampleBase {
 
     virtual void prepare_frame(bool wait_fences = false) {
         if ( wait_fences ) {
-            logger::Logger::getInstance().debug("[prepare_frame] Waiting for fence at index " + std::to_string(current_buffer_index) + " to be signaled.");
+            ev_log_debug("[prepare_frame] Waiting for fence at index %u to be signaled.", current_buffer_index);
             flight_fences[current_buffer_index]->wait(UINT64_MAX);
-            logger::Logger::getInstance().debug("[prepare_frame] Fence at index " + std::to_string(current_buffer_index) + " signaled, proceeding.");
+            ev_log_debug("[prepare_frame] Fence at index %u signaled, proceeding.", current_buffer_index);
             flight_fences[current_buffer_index]->reset();
         }
 
@@ -409,7 +404,7 @@ class ExampleBase {
         );
 
         if ( (result == VK_ERROR_OUT_OF_DATE_KHR) || (result == VK_SUBOPTIMAL_KHR) ) {
-            logger::Logger::getInstance().debug("[prepare_frame] Swapchain out of date or suboptimal, handling resize...");
+            ev_log_debug("[prepare_frame] Swapchain out of date or suboptimal, handling resize...");
             if (result == VK_ERROR_OUT_OF_DATE_KHR) {
                 on_window_resize();
             }
@@ -418,14 +413,14 @@ class ExampleBase {
             CHECK_RESULT(result);
         }
 
-        logger::Logger::getInstance().debug("[prepare_frame] Acquired image index: " + std::to_string(current_frame_index));
+        ev_log_debug("[prepare_frame] Acquired image index:  %u", current_frame_index);
     }
 
     virtual void submit_frame() {
         VkPipelineStageFlags wait_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
         std::vector<std::shared_ptr<ev::Semaphore>> wait_semaphores = { present_completes[current_buffer_index] };
         std::vector<std::shared_ptr<ev::Semaphore>> signal_semaphores = { render_completes[current_frame_index]  };
-        logger::Logger::getInstance().debug("[submit_frame] Submitting frame at index: " + std::to_string(current_buffer_index));
+        ev_log_debug("[submit_frame] Submitting frame at index: %u", current_buffer_index);
 
         VkResult result = queue->submit(
             command_buffers[current_buffer_index],
@@ -436,7 +431,7 @@ class ExampleBase {
             nullptr
         );
         CHECK_RESULT(result);
-        logger::Logger::getInstance().debug("[submit_frame] Command buffer submitted successfully for frame index: " + std::to_string(current_buffer_index));
+        ev_log_debug("[submit_frame] Command buffer submitted successfully for frame index: %u", current_buffer_index);
         result = queue->present(
             swapchain,
             current_frame_index,
@@ -444,14 +439,14 @@ class ExampleBase {
         );
 
         if ( (result == VK_ERROR_OUT_OF_DATE_KHR) || (result == VK_SUBOPTIMAL_KHR) ) {
-            logger::Logger::getInstance().debug("[submit_frame] Swapchain out of date or suboptimal during present, handling resize...");
+            ev_log_debug("[submit_frame] Swapchain out of date or suboptimal during present, handling resize...");
             on_window_resize();
             if ( result == VK_ERROR_OUT_OF_DATE_KHR ) {
                 return;
             }  
         } else {
             CHECK_RESULT(result);
-            logger::Logger::getInstance().debug("[submit_frame] Present operation successful for frame index: " + std::to_string(current_frame_index));
+            ev_log_debug("[submit_frame] Present operation successful for frame index: %u", current_frame_index);
         }
 
         current_buffer_index = (current_buffer_index + 1) % max_frames_in_flight;

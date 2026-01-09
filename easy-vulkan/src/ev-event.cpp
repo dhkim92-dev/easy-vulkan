@@ -5,9 +5,9 @@ using namespace ev;
 
 Event::Event(std::shared_ptr<Device> device, VkEventCreateFlags flags, void* next)
     : device(std::move(device)) {
-    ev::logger::Logger::getInstance().info("[ev::Event] Creating event with flags: " + std::to_string(flags));
+    ev_log_info("[ev::Event] Creating event with flags: %u", flags);
     if (!this->device) {
-        ev::logger::Logger::getInstance().error("[ev::Event] Device is null. Cannot create event.");
+        ev_log_error("[ev::Event] Device is null. Cannot create event.");
         exit(EXIT_FAILURE);
     }
 
@@ -18,19 +18,19 @@ Event::Event(std::shared_ptr<Device> device, VkEventCreateFlags flags, void* nex
 
     VkResult result = vkCreateEvent(*this->device, &event_info, nullptr, &event);
     if (result != VK_SUCCESS) {
-        logger::Logger::getInstance().error("Failed to create event: " + std::to_string(result));
+        ev_log_error("Failed to create event: %d", static_cast<int>(result));
         exit(EXIT_FAILURE);
     }
-    logger::Logger::getInstance().info("[ev::Event] Event created successfully");
+    ev_log_info("[ev::Event] Event created successfully");
 }
 
 void Event::destroy() {
-    ev::logger::Logger::getInstance().info("[ev::Event::destroy] Destroying event.");
+    ev_log_info("[ev::Event::destroy] Destroying event.");
     if (event != VK_NULL_HANDLE) {
         vkDestroyEvent(*device, event, nullptr);
         event = VK_NULL_HANDLE;
     }
-    ev::logger::Logger::getInstance().info("[ev::Event] Event destroyed successfully");
+    ev_log_info("[ev::Event] Event destroyed successfully");
 }
 
 Event::~Event() {

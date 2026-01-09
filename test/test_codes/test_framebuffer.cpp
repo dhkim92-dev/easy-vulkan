@@ -15,7 +15,7 @@ protected:
     shared_ptr<ImageView> attachment;
 
     void SetUp() override {
-        ev::logger::Logger::getInstance().set_log_level(ev::logger::LogLevel::DEBUG);
+        ev_log_set_log_level(ev::logger::LogLevel::DEBUG);
 	vector<const char*> instance_extension = {VK_KHR_SURFACE_EXTENSION_NAME, VK_EXT_DEBUG_UTILS_EXTENSION_NAME };
 	vector<const char*> layers = {"VK_LAYER_KHRONOS_validation"};
 	vector<const char*> device_extension = {"VK_KHR_swapchain"};

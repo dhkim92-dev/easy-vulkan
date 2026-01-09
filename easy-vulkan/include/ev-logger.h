@@ -5,7 +5,7 @@
 #include <string>
 #include <mutex>
 
-namespace ev::logger {
+namespace ev::log {
 
     enum class LogLevel {
         DEBUG = 0,
@@ -14,63 +14,61 @@ namespace ev::logger {
         ERROR,
     };
 
-    // Should Be Singleton
-class Logger {
+    #ifndef EV_LOG_LEVEL
+        #define EV_LOG_LEVEL 1
+    #endif
 
-private :
-
-    Logger() = default; // Private constructor to prevent instantiation
-
-    ~Logger() = default; // Default destructor
-
-    Logger(const Logger&) = delete; // Prevent copy construction
-
-    Logger& operator=(const Logger&) = delete; // Prevent assignment
-
-    LogLevel log_level = LogLevel::DEBUG; // Set log level to DEBUG in debug mode
-        // std::mutex mtx;
-public:
-    static Logger& getInstance() {
-        static Logger* instance = new Logger(); // Create a static instance of Logger
-        return *instance;
+    constexpr bool is_level_enabled(LogLevel level) {
+        return static_cast<int>(level) >= EV_LOG_LEVEL;
     }
 
-    void set_log_level(LogLevel level) {
-        // std::lock_guard<std::mutex> lock(mtx);
-        log_level = level;
-    }
-
-    bool check_level(LogLevel level) {
-        return static_cast<int>(level) >= static_cast<int>(log_level);
-    }
-
-    void info(std::string message) {
-        if (check_level(LogLevel::INFO)) {
-            // std::lock_guard<std::mutex> lock(mtx);
-            printf("[INFO] %s\n", message.c_str());
+    constexpr const char* level_to_string(LogLevel level) {
+        switch (level) {
+            case LogLevel::DEBUG: return "DEBUG";
+            case LogLevel::INFO: return "INFO";
+            case LogLevel::WARNING: return "WARNING";
+            case LogLevel::ERROR: return "ERROR";
+            default: return "UNKNOWN";
         }
     }
 
-    void warn(std::string message) {
-        if ( check_level(LogLevel::WARNING) ) {
-            // std::lock_guard<std::mutex> lock(mtx);
-            printf("[WARN]: %s\n", message.c_str());
-        }
-    }
+    #define ev_log_debug(fmt, ...) \
+        do { \
+            if constexpr (ev::log::is_level_enabled(ev::log::LogLevel::DEBUG)) { \
+                fprintf(stderr, "[DEBUG][%s:%d] : ", __FILE__, __LINE__); \
+                fprintf(stderr, fmt __VA_OPT__(,) __VA_ARGS__); \
+                fprintf(stderr, "\n"); \
+                fflush(stderr); \
+            } \
+        } while(0)
 
-    void error(std::string message) {
-        if (check_level(LogLevel::ERROR)) {
-            // std::lock_guard<std::mutex> lock(mtx);
-            printf("[ERROR]: %s\n", message.c_str());
-        }
-    }
+    #define ev_log_info(fmt, ...) \
+        do { \
+            if constexpr (ev::log::is_level_enabled(ev::log::LogLevel::INFO)) { \
+                fprintf(stderr, "[INFO][%s:%d] : ", __FILE__, __LINE__); \
+                fprintf(stderr, fmt __VA_OPT__(,) __VA_ARGS__); \
+                fprintf(stderr, "\n"); \
+                fflush(stderr); \
+            } \
+        } while(0)
 
-    void debug(std::string message) {
-        if (check_level(LogLevel::DEBUG)) {
-            // std::lock_guard<std::mutex> lock(mtx);
-            printf("[DEBUG] : %s\n", message.c_str());
-        }
-    }
-};
+    #define ev_log_warn(fmt, ...) \
+        do { \
+            if constexpr (ev::log::is_level_enabled(ev::log::LogLevel::WARNING)) { \
+                fprintf(stderr, "[WARNING][%s:%d] : ", __FILE__, __LINE__); \
+                fprintf(stderr, fmt __VA_OPT__(,) __VA_ARGS__); \
+                fprintf(stderr, "\n"); \
+                fflush(stderr); \
+            } \
+        } while(0)
 
+    #define ev_log_error(fmt, ...) \
+        do { \
+            if constexpr (ev::log::is_level_enabled(ev::log::LogLevel::ERROR)) { \
+                fprintf(stderr, "[ERROR][%s:%d] : ", __FILE__, __LINE__); \
+                fprintf(stderr, fmt __VA_OPT__(,) __VA_ARGS__); \
+                fprintf(stderr, "\n"); \
+                fflush(stderr); \
+            } \
+        } while(0)
 }

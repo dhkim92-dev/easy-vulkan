@@ -17,7 +17,7 @@ protected:
 };
 
 TEST_F(EventTest, CreateAndDestroy) {
-    ev::logger::Logger::getInstance().debug("Creating event...");
+    ev_log_debug("Creating event...");
     Event event(device);
     EXPECT_NE(VkEvent(event), VK_NULL_HANDLE) << "Failed to create event";
     event.destroy();

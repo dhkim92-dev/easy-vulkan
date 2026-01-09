@@ -15,7 +15,7 @@ protected:
 
     void SetUp() override {
         vector<const char*> extensions = {};
-        logger::Logger::getInstance().set_log_level(logger::LogLevel::ERROR);
+        ev_log_set_log_level(logger::LogLevel::ERROR);
         instance = std::make_shared<Instance>(extensions, extensions, false);
         physical_device = std::make_shared<PhysicalDevice>(instance, instance->get_physical_devices()[0]);
         device = std::make_shared<Device>(instance, physical_device, extensions);

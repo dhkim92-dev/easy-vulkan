@@ -17,7 +17,7 @@ Framebuffer::Framebuffer(
     height(height),
     layers(layers) {
     if (!this->device || !this->render_pass) {
-        logger::Logger::getInstance().error("Invalid device or render pass provided for Framebuffer creation.");
+        ev_log_error("Invalid device or render pass provided for Framebuffer creation.");
         exit(EXIT_FAILURE);
     }
 
@@ -47,7 +47,7 @@ Framebuffer::Framebuffer(
     layers(layers) {
     
     if (!this->device || !this->render_pass) {
-        logger::Logger::getInstance().error("Invalid device or render pass provided for Framebuffer creation.");
+        ev_log_error("Invalid device or render pass provided for Framebuffer creation.");
         exit(EXIT_FAILURE);
     }
 
@@ -68,7 +68,7 @@ Framebuffer::Framebuffer(
 }
 
 void Framebuffer::destroy() {
-    ev::logger::Logger::getInstance().info("[ev::Framebuffer::destroy] Destroying Framebuffer.");
+    ev_log_info("[ev::Framebuffer::destroy] Destroying Framebuffer.");
     if (framebuffer != VK_NULL_HANDLE) {
         vkDestroyFramebuffer(*device, framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
@@ -76,7 +76,7 @@ void Framebuffer::destroy() {
     attachments.clear();
     width = 0;
     height = 0;
-    ev::logger::Logger::getInstance().info("[ev::Framebuffer::destroy] Framebuffer destroyed successfully.");
+    ev_log_info("[ev::Framebuffer::destroy] Framebuffer destroyed successfully.");
 }
 
 Framebuffer::~Framebuffer() {

@@ -13,7 +13,7 @@ protected:
     shared_ptr<RenderPass> render_pass;
 
     void SetUp() override {
-        logger::Logger::getInstance().set_log_level(logger::LogLevel::DEBUG);
+        ev_log_set_log_level(logger::LogLevel::DEBUG);
         vector<const char*> required_instance_extensions = {
             VK_KHR_SURFACE_EXTENSION_NAME,
             VK_EXT_DEBUG_UTILS_EXTENSION_NAME,

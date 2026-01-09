@@ -6,9 +6,9 @@ namespace ev {
 
 Fence::Fence(shared_ptr<Device> device, VkFenceCreateFlags flags, void* next) 
     : device(std::move(device)) {
-    ev::logger::Logger::getInstance().info("[ev::Fence] Creating fence with flags: " + std::to_string(flags));
+    ev_log_info("[ev::Fence] Creating fence with flags: %u", flags);
     if (!this->device) {
-        ev::logger::Logger::getInstance().error("[ev::Fence] Device is null. Cannot create fence.");
+        ev_log_error("[ev::Fence] Device is null. Cannot create fence.");
         exit(EXIT_FAILURE);
     }
 
@@ -19,50 +19,50 @@ Fence::Fence(shared_ptr<Device> device, VkFenceCreateFlags flags, void* next)
 
     VkResult result = vkCreateFence(*this->device, &fence_info, nullptr, &fence);
     if (result != VK_SUCCESS) {
-        logger::Logger::getInstance().error("[ev::Fence] Failed to create fence: " + std::to_string(result));
+        ev_log_error("[ev::Fence] Failed to create fence: %d", static_cast<int>(result));
         exit(EXIT_FAILURE);
     }
-    logger::Logger::getInstance().info("[ev::Fence] Fence created successfully");
+    ev_log_info("[ev::Fence] Fence created successfully");
 }
 
 VkResult Fence::wait(uint64_t timeout) {
     if (fence == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[ev::Fence] Fence is not initialized");
+        ev_log_error("[ev::Fence] Fence is not initialized");
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
     VkResult result = vkWaitForFences(*device, 1, &fence, VK_TRUE, timeout);
     if (result != VK_SUCCESS) {
-        logger::Logger::getInstance().error("[ev::Fence] Failed to wait for fence: " + std::to_string(result));
+        ev_log_error("[ev::Fence] Failed to wait for fence: %d", static_cast<int>(result));
     } else {
-        logger::Logger::getInstance().debug("[ev::Fence] Fence waited successfully");
+        ev_log_debug("[ev::Fence] Fence waited successfully");
     }
     return result;
 }
 
 VkResult Fence::reset() {
     if (fence == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("Fence is not initialized");
+        ev_log_error("Fence is not initialized");
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
     VkResult result = vkResetFences(*device, 1, &fence);
     if (result != VK_SUCCESS) {
-        logger::Logger::getInstance().error("Failed to reset fence: " + std::to_string(result));
+        ev_log_error("Failed to reset fence: %d", static_cast<int>(result));
     } else {
-        logger::Logger::getInstance().debug("Fence reset successfully");
+        ev_log_debug("Fence reset successfully");
     }
     return result;
 }
 
 void Fence::destroy() {
     if (fence != VK_NULL_HANDLE) {
-        ev::logger::Logger::getInstance().info("[ev::Fence::destroy] Destroying fence.");
+        ev_log_info("[ev::Fence::destroy] Destroying fence.");
         vkDestroyFence(*device, fence, nullptr);
-        ev::logger::Logger::getInstance().debug("[ev::Fence::destroy] Fence destroyed successfully");
+        ev_log_debug("[ev::Fence::destroy] Fence destroyed successfully");
         fence = VK_NULL_HANDLE;
     }
-    ev::logger::Logger::getInstance().debug("[ev::Fence::destroy] Fence already destroyed or not initialized.");
+    ev_log_debug("[ev::Fence::destroy] Fence already destroyed or not initialized.");
 }
 
 Fence::~Fence() {

@@ -3,28 +3,27 @@
 
 using namespace std;
 using namespace ev;
-using namespace ev::logger;
 
 Buffer::Buffer(
     std::shared_ptr<Device> _device,
     VkDeviceSize size,
     VkBufferUsageFlags usage_flags
 ) : device(std::move(_device)), size(size), usage_flags(usage_flags) {
-    Logger::getInstance().debug("[ev::Buffer::Buffer] Creating Buffer with size: " + std::to_string(size));
+    // ev_log_debug("[ev::Buffer::Buffer] Creating Buffer with size: " + std::to_string(size));
     alignment = device->get_properties().limits.minUniformBufferOffsetAlignment;
     if (!device) {
-        Logger::getInstance().error("[ev::Buffer::Buffer] Invalid device provided for Buffer creation.");
+        ev_log_error("[ev::Buffer::Buffer] Invalid device provided for Buffer creation.");
         exit(EXIT_FAILURE);
     }
     VkResult result = create_buffer(size, usage_flags);
-    Logger::getInstance().debug("[ev::Buffer::Buffer] Buffer created successfully.");
+    ev_log_debug("[ev::Buffer::Buffer] Buffer created successfully.");
 }
 
 VkResult Buffer::create_buffer(
     VkDeviceSize size,
     VkBufferUsageFlags usage_flags
 ) {
-    Logger::getInstance().debug("[ev::Buffer::create_buffer] Creating Vulkan buffer...");
+    ev_log_debug("[ev::Buffer::create_buffer] Creating Vulkan buffer...");
     this->size = size;
     this->usage_flags = usage_flags;
     // this->memory_flags = memory_flags;
@@ -44,7 +43,6 @@ VkResult Buffer::create_buffer(
 }
 
 VkResult Buffer::bind_memory(shared_ptr<ev::Memory> memory, VkDeviceSize offset, VkDeviceSize size) {
-    Logger::getInstance().debug("[ev::Buffer::bind_memory] Binding buffer : " + std::to_string(reinterpret_cast<uintptr_t>(buffer)) + " to memory: " + std::to_string(reinterpret_cast<uintptr_t>(VkDeviceMemory(*memory))) + " with offset: " + std::to_string(offset));
     VkBindBufferMemoryInfo bind_info = {};
     bind_info.sType = VK_STRUCTURE_TYPE_BIND_BUFFER_MEMORY_INFO;
     bind_info.buffer = buffer;
@@ -56,21 +54,19 @@ VkResult Buffer::bind_memory(shared_ptr<ev::Memory> memory, VkDeviceSize offset,
     VkResult result = vkBindBufferMemory(*device, buffer, *memory, offset);
     if (result == VK_SUCCESS) {
         this->memory = *memory;
-        Logger::getInstance().debug("[ev::Buffer::bind_memory] Buffer memory bound successfully offset : " + std::to_string(offset));
     }  
     return result;
 }
 
 VkResult Buffer::bind_memory(std::shared_ptr<ev::MemoryBlockMetadata> block_metadata) {
-    Logger::getInstance().debug("[ev::Buffer::bind_memory] Binding buffer : " + std::to_string(reinterpret_cast<uintptr_t>(buffer)) + " to memory block metadata: " + std::to_string(reinterpret_cast<uintptr_t>(block_metadata.get())));
     if (!block_metadata || !block_metadata->get_memory()) {
-        Logger::getInstance().error("[ev::Buffer::bind_memory] Invalid memory block metadata provided for binding.");
+        ev_log_error("[ev::Buffer::bind_memory] Invalid memory block metadata provided for binding.");
         return VK_ERROR_INVALID_EXTERNAL_HANDLE;
     }
     this->pool_block_metadata = block_metadata;
     this->offset = block_metadata->get_offset();
     this->allocated_size = block_metadata->get_size();
-    Logger::Logger::getInstance().debug("[ev::Buffer::bind_memory] Binding buffer to memory block metadata with offset: " + std::to_string(this->offset) + ", size: " + std::to_string(this->allocated_size));
+    // Logger::ev_log_debug("[ev::Buffer::bind_memory] Binding buffer to memory block metadata with offset: " + std::to_string(this->offset) + ", size: " + std::to_string(this->allocated_size));
     return bind_memory(block_metadata->get_memory(), block_metadata->get_offset(), block_metadata->get_size());
 }
 
@@ -83,29 +79,29 @@ VkResult Buffer::bind_memory(std::shared_ptr<ev::MemoryBlockMetadata> block_meta
 
 VkResult Buffer::map(VkDeviceSize size) {
     // TODO: 추추 Memory Object 구현 후 바인딩 할 때 memory_property_flags 를 확인하여 처리해야한다.
-    Logger::getInstance().debug("[ev::Buffer::map] Mapping buffer memory with size : " + std::to_string(this->allocated_size));
+    // ev_log_debug("[ev::Buffer::map] Mapping buffer memory with size : " + std::to_string(this->allocated_size));
     if (buffer == VK_NULL_HANDLE) {
-        Logger::getInstance().error("[ev::Buffer::map] Buffer is not created yet.");
+        ev_log_error("[ev::Buffer::map] Buffer is not created yet.");
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
     if (is_mapped) {
-        Logger::getInstance().warn("[ev::Buffer::map] Buffer is already mapped.");
+        ev_log_warn("[ev::Buffer::map] Buffer is already mapped.");
         return VK_SUCCESS;
     }
 
     if ( size == VK_WHOLE_SIZE ) {
         size = this->allocated_size;
     } else if ( size > this->allocated_size ) {
-        Logger::getInstance().error("[ev::Buffer::map] Size exceeds buffer size.");
+        ev_log_error("[ev::Buffer::map] Size exceeds buffer size.");
         return VK_ERROR_OUT_OF_DEVICE_MEMORY;
     }
     VkResult result = vkMapMemory(*device, memory, offset, size, 0, &mapped);
     if (result == VK_SUCCESS) {
-        Logger::getInstance().debug("[ev::Buffer::map] Buffer memory mapped successfully.");
+        ev_log_debug("[ev::Buffer::map] Buffer memory mapped successfully.");
         is_mapped = true;
     } else {
-        Logger::getInstance().error("[ev::Buffer::map] Failed to map buffer memory: " + std::to_string(result));
+        ev_log_error("[ev::Buffer::map] Failed to map buffer memory: %s", std::to_string(result).c_str());
     }
     return result;
 }
@@ -116,24 +112,24 @@ VkResult Buffer::map(VkDeviceSize size) {
 */
 VkResult Buffer::unmap() {
     // TODO: 추추 Memory Object 구현 후 바인딩 할 때 memory_property_flags 를 확인하여 처리해야한다.
-    Logger::getInstance().debug("[ev::Buffer::unmap] Unmapping buffer memory...");
+    ev_log_debug("[ev::Buffer::unmap] Unmapping buffer memory...");
     if (!is_mapped) {
-        Logger::getInstance().warn("[ev::Buffer::unmap] Buffer is not mapped, nothing to unmap.");
+        ev_log_warn("[ev::Buffer::unmap] Buffer is not mapped, nothing to unmap.");
         is_mapped = false;
         return VK_ERROR_MEMORY_MAP_FAILED;
     }
     vkUnmapMemory(*device, memory);
     mapped = nullptr;
     is_mapped = false;
-    Logger::getInstance().debug("[ev::Buffer::unmap] Buffer memory unmapped successfully.");
+    ev_log_debug("[ev::Buffer::unmap] Buffer memory unmapped successfully.");
     return VK_SUCCESS;
 }
 
 VkResult Buffer::invalidate(VkDeviceSize offset, VkDeviceSize size) {
     // TODO: 추추 Memory Object 구현 후 바인딩 할 때 memory_property_flags 를 확인하여 처리해야한다.
-    Logger::getInstance().debug("[ev::Buffer::invalidate] Invalidating buffer memory...");
+    ev_log_debug("[ev::Buffer::invalidate] Invalidating buffer memory...");
     if (!is_mapped) {
-        Logger::getInstance().error("[ev::Buffer::invalidate] Buffer is not mapped, cannot invalidate.");
+        ev_log_error("[ev::Buffer::invalidate] Buffer is not mapped, cannot invalidate.");
         return VK_ERROR_MEMORY_MAP_FAILED;
     }
 
@@ -152,7 +148,7 @@ VkResult Buffer::invalidate(VkDeviceSize offset, VkDeviceSize size) {
  */
 VkResult Buffer::flush( VkDeviceSize offset, VkDeviceSize size ) {
     // TODO: 추추 Memory Object 구현 후 바인딩 할 때 memory_property_flags 를 확인하여 처리해야한다.
-    Logger::getInstance().debug("[ev::Buffer::flush] Flushing entire buffer memory...");
+    ev_log_debug("[ev::Buffer::flush] Flushing entire buffer memory...");
     VkMappedMemoryRange range = {};
     range.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
     range.memory = memory;
@@ -163,17 +159,17 @@ VkResult Buffer::flush( VkDeviceSize offset, VkDeviceSize size ) {
     if ( size == VK_WHOLE_SIZE ) {
         size = this->allocated_size; // Use the allocated size of the buffer if not specified
     } else if ( size > this->allocated_size ) {
-        Logger::getInstance().error("[ev::Buffer::flush] Size exceeds buffer size.");
+        ev_log_error("[ev::Buffer::flush] Size exceeds buffer size.");
         return VK_ERROR_OUT_OF_DEVICE_MEMORY;
     } else if ( offset + size % device->get_physical_device()->get_properties().limits.nonCoherentAtomSize != 0) {
-        Logger::getInstance().warn("[ev::Buffer::flush] Offset and size are not aligned to non-coherent atom size, flushing may not be effective.");
+        ev_log_warn("[ev::Buffer::flush] Offset and size are not aligned to non-coherent atom size, flushing may not be effective.");
         auto non_coherent_atom_size = device->get_physical_device()->get_properties().limits.nonCoherentAtomSize;
         range.size = (size + non_coherent_atom_size - 1) / non_coherent_atom_size * non_coherent_atom_size; // Align size to non-coherent atom size
     } else {
         range.size = size; // Use the specified size
     }
 
-    logger::Logger::getInstance().debug("[ev::Buffer::flush] Flushing buffer memory with offset: " + std::to_string(range.offset) + ", size: " + std::to_string(range.size));
+    // logger::ev_log_debug("[ev::Buffer::flush] Flushing buffer memory with offset: " + std::to_string(range.offset) + ", size: " + std::to_string(range.size));
     return vkFlushMappedMemoryRanges(*device, 1, &range);
 }
 
@@ -185,14 +181,14 @@ VkResult Buffer::flush( VkDeviceSize offset, VkDeviceSize size ) {
  */
 VkResult Buffer::write(void* data, VkDeviceSize size) {
     // TODO: 추추 Memory Object 구현 후 바인딩 할 때 memory_property_flags 를 확인하여 처리해야한다.
-    Logger::getInstance().debug("[ev::Buffer::write] Writing data to buffer...");
+    ev_log_debug("[ev::Buffer::write] Writing data to buffer...");
     if (!is_mapped) {
-        Logger::getInstance().error("[ev::Buffer::write] Buffer is not mapped, cannot write data.");
+        ev_log_error("[ev::Buffer::write] Buffer is not mapped, cannot write data.");
         return VK_ERROR_MEMORY_MAP_FAILED;
     }
 
     if (size > this->size) {
-        Logger::getInstance().error("[ev::Buffer::write] Data size exceeds buffer size.");
+        ev_log_error("[ev::Buffer::write] Data size exceeds buffer size.");
         return VK_ERROR_OUT_OF_DEVICE_MEMORY;
     }
 
@@ -208,14 +204,14 @@ VkResult Buffer::write(void* data, VkDeviceSize size) {
  */
 VkResult Buffer::read(void* data, VkDeviceSize size) {
     // TODO: 추추 Memory Object 구현 후 바인딩 할 때 memory_property_flags 를 확인하여 처리해야한다.
-    Logger::getInstance().debug("[ev::Buffer::read] Reading data from buffer...");
+    ev_log_debug("[ev::Buffer::read] Reading data from buffer...");
     if (!is_mapped) {
-        Logger::getInstance().error("[ev::Buffer::read] Buffer is not mapped, cannot read data.");
+        ev_log_error("[ev::Buffer::read] Buffer is not mapped, cannot read data.");
         return VK_ERROR_MEMORY_MAP_FAILED;
     }
 
     if (size > this->size) {
-        Logger::getInstance().error("[ev::Buffer::read] Data size exceeds buffer size.");
+        ev_log_error("[ev::Buffer::read] Data size exceeds buffer size.");
         return VK_ERROR_OUT_OF_DEVICE_MEMORY;
     }
 
@@ -229,7 +225,8 @@ VkResult Buffer::read(void* data, VkDeviceSize size) {
  * 메모리 해제 및 버퍼 파괴를 수행한다.
  */
 void Buffer::destroy() {
-    ev::logger::Logger::getInstance().info("[ev::Buffer::destroy] Destroying buffer with handle: " + std::to_string(reinterpret_cast<uintptr_t>(buffer)));
+    // ev::logger::ev_log_info("[ev::Buffer::destroy] Destroying buffer with handle: " + std::to_string(reinterpret_cast<uintptr_t>(buffer)));
+    ev_log_debug("[ev::Buffer::destroy] Destroying buffer...");
     if ( is_mapped ) {
         // flush();
         // invalidate();
@@ -242,14 +239,13 @@ void Buffer::destroy() {
     }
 
     if (buffer != VK_NULL_HANDLE) {
-        ev::logger::Logger::getInstance().debug("[ev::Buffer::destroy] Destroying buffer with handle: " + std::to_string(reinterpret_cast<uintptr_t>(buffer)));
         vkDestroyBuffer(*device, buffer, nullptr);
         buffer = VK_NULL_HANDLE;
     }
 
     size = 0;
     usage_flags = 0;
-    ev::logger::Logger::getInstance().debug("[ev::Buffer::destroy] Buffer destroyed successfully.");
+    ev_log_debug("[ev::Buffer::destroy] Buffer destroyed.");
 }
 
 Buffer::~Buffer() {

@@ -23,18 +23,18 @@ ev::Queue::Queue(
     }
 
     if ( swapchain_extension_found ) {
-        logger::Logger::getInstance().debug("[Queue::Queue] VK_KHR_swapchain extension is enabled.");
-        logger::Logger::getInstance().debug("[Queue::Queue] Loading vkQueuePresentKHR function pointer. before loading : " + std::to_string((uintptr_t)pfn.vkQueuePresentKHR)   
-);
+        ev_log_debug("[Queue::Queue] VK_KHR_swapchain extension is enabled.");
+        ev_log_debug("[Queue::Queue] Loading vkQueuePresentKHR function pointer. before loading : %llu", static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(pfn.vkQueuePresentKHR)));
+
         pfn.vkQueuePresentKHR = (PFN_vkQueuePresentKHR)vkGetDeviceProcAddr(*device, "vkQueuePresentKHR");
-        logger::Logger::getInstance().debug("[Queue::Queue] Loaded vkQueuePresentKHR function pointer: " + std::to_string((uintptr_t)pfn.vkQueuePresentKHR));
+        ev_log_debug("[Queue::Queue] Loaded vkQueuePresentKHR function pointer: %llu", static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(pfn.vkQueuePresentKHR)));
         if (!pfn.vkQueuePresentKHR) {
             // std::cout << pfn.vkQueuePresentKHR << std::endl;
-            logger::Logger::getInstance().error("[Queue::Queue] Failed to load vkQueuePresentKHR function pointer.");
+            ev_log_error("[Queue::Queue] Failed to load vkQueuePresentKHR function pointer.");
             exit(EXIT_FAILURE);
         }
     } else if (device->is_swapchain_enabled() && !swapchain_extension_found) {
-        logger::Logger::getInstance().error("[Queue::Queue] VK_KHR_swapchain extension is not enabled. Cannot use present functionality.");
+        ev_log_error("[Queue::Queue] VK_KHR_swapchain extension is not enabled. Cannot use present functionality.");
         exit(EXIT_FAILURE);
     }
 }
@@ -140,7 +140,7 @@ VkResult ev::Queue::present(std::shared_ptr<Swapchain> swapchain,
     uint32_t image_index,
     vector<std::shared_ptr<ev::Semaphore>> wait_semaphores
 ) {
-    ev::logger::Logger::getInstance().debug("[Queue::present] : Presenting image index " + std::to_string(image_index) + " to swapchain.");
+    ev_log_debug("[Queue::present] : Presenting image index %u to swapchain.", image_index);
     VkPresentInfoKHR present_info = {};
     const VkSwapchainKHR handle = *swapchain;
 
@@ -150,7 +150,7 @@ VkResult ev::Queue::present(std::shared_ptr<Swapchain> swapchain,
             wait_semaphores_vk.push_back(*semaphore);
         }
     }
-    logger::Logger::getInstance().debug("[Queue::present] : Number of wait semaphores: " + std::to_string(wait_semaphores_vk.size()));
+    ev_log_debug("[Queue::present] : Number of wait semaphores: %zu", wait_semaphores_vk.size());
 
     present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
     present_info.swapchainCount = 1;

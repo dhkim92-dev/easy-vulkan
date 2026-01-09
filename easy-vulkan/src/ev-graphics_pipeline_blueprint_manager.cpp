@@ -9,14 +9,14 @@ GraphicsPipelineBluePrintManager::GraphicsPipelineBluePrintManager(std::shared_p
 )
     : device(std::move(_device)), render_pass(std::move(_render_pass)) {
     if (!device) {
-        logger::Logger::getInstance().error("Invalid device provided for GraphicsPipelineBluePrintManager creation.");
+        ev_log_error("Invalid device provided for GraphicsPipelineBluePrintManager creation.");
         exit(EXIT_FAILURE);
     }
 }
 
 GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::begin_blueprint() {
     if (on_record) {
-        logger::Logger::getInstance().warn("Already recording a blueprint, finishing the previous one.");
+        ev_log_warn("Already recording a blueprint, finishing the previous one.");
         return *this;
     }
     blue_prints.emplace_back(GraphicsPipelineBluePrint());
@@ -26,11 +26,11 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::begin_bluepr
 
 GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_shader_stage(shared_ptr<Shader> shader) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     if (!shader) {
-        logger::Logger::getInstance().error("Invalid shader provided for shader stage.");
+        ev_log_error("Invalid shader provided for shader stage.");
         return *this;
     }
     VkPipelineShaderStageCreateInfo stage_ci = {
@@ -51,7 +51,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_vertex_i
     uint32_t stride,
     VkVertexInputRate input_rate) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
 
@@ -67,7 +67,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_vertex_i
     VkVertexInputBindingDescription& binding_description
 ) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     blue_prints.back().vertex_binding_descriptions.push_back(binding_description);
@@ -81,7 +81,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_vertex_a
     uint32_t offset
 ) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     VkVertexInputAttributeDescription attribute_description = {};
@@ -97,7 +97,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_vertex_a
     VkVertexInputAttributeDescription& attribute_description
 ) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     blue_prints.back().vertex_attribute_descriptions.push_back(attribute_description);
@@ -109,7 +109,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_vertex_i
     void* next
 ) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
 
@@ -122,7 +122,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_vertex_i
     VkPipelineVertexInputStateCreateInfo* info
 ) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     blue_prints.back().vertex_input_state_ci = *info;
@@ -137,7 +137,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_input_as
     void* next
 ) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     auto& info = blue_prints.back().input_assembly_state_ci;
@@ -152,7 +152,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_rasteriz
     VkPipelineRasterizationStateCreateInfo& info
 ) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     blue_prints.back().rasterization_state_ci = info;
@@ -170,7 +170,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_rasteriz
     void* next
 ) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     auto& ci = blue_prints.back().rasterization_state_ci;
@@ -194,7 +194,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_color_bl
     void* next
 ) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     auto& ci = blue_prints.back().color_blend_state_ci;
@@ -217,7 +217,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_color_bl
     VkColorComponentFlags color_write_mask
 ) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     blue_prints.back().color_blend_attachments.push_back({
@@ -237,7 +237,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_color_bl
     const VkPipelineColorBlendAttachmentState& attachment_state
 ) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     blue_prints.back().color_blend_attachments.push_back(attachment_state);
@@ -250,7 +250,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_viewport
     void * next
 ) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     auto& ci = blue_prints.back().viewport_state_ci;
@@ -263,7 +263,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_viewport
     uint32_t width, uint32_t height, float min_depth, float max_depth
 ) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     blue_prints.back().viewports.push_back({
@@ -281,7 +281,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_scissor(
     uint32_t width, uint32_t height, int32_t offsetX, int32_t offsetY
 ) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     blue_prints.back().scissors.push_back({
@@ -302,7 +302,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_multisam
     void* next
 ) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     auto& ci = blue_prints.back().multisample_state_ci;
@@ -322,7 +322,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_multisam
     VkPipelineMultisampleStateCreateInfo& info
 ) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     auto& ci = blue_prints.back().multisample_state_ci;
@@ -344,7 +344,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_depth_st
     void* next
 ) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     auto& info = blue_prints.back().depth_stencil_state_ci;
@@ -367,7 +367,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_depth_st
     VkPipelineDepthStencilStateCreateInfo& info
 ) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     blue_prints.back().depth_stencil_state_ci = info;
@@ -379,7 +379,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_dynamic_
     void* next
 ) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     auto& ci = blue_prints.back().dynamic_state_ci;
@@ -391,7 +391,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_dynamic_
 
 GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_dynamic_state(VkDynamicState state) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     blue_prints.back().dynamic_states.push_back(state);
@@ -400,11 +400,11 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::add_dynamic_
 
 GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_pipeline_layout(std::shared_ptr<PipelineLayout> layout) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     if (!layout) {
-        logger::Logger::getInstance().error("Invalid pipeline layout provided.");
+        ev_log_error("Invalid pipeline layout provided.");
         return *this;
     }
     blue_prints.back().pipeline_layout = layout;
@@ -413,7 +413,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_pipeline
 
 GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_subpass_index(uint32_t subpass) {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     blue_prints.back().subpass = subpass;
@@ -422,7 +422,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::set_subpass_
 
 GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::end_blueprint() {
     if (!on_record) {
-        logger::Logger::getInstance().error("No blueprint is being recorded, call begin_blueprint() first.");
+        ev_log_error("No blueprint is being recorded, call begin_blueprint() first.");
         return *this;
     }
     on_record = false;
@@ -431,7 +431,7 @@ GraphicsPipelineBluePrintManager& GraphicsPipelineBluePrintManager::end_blueprin
 
 vector<shared_ptr<GraphicsPipeline>> GraphicsPipelineBluePrintManager::create_pipelines(shared_ptr<PipelineCache> pipeline_cache) {
     if (on_record) {
-        logger::Logger::getInstance().warn("Blueprint recording is still in progress, finishing it automatically.");
+        ev_log_warn("Blueprint recording is still in progress, finishing it automatically.");
         end_blueprint();
     }
 
@@ -441,7 +441,7 @@ vector<shared_ptr<GraphicsPipeline>> GraphicsPipelineBluePrintManager::create_pi
     vector<VkGraphicsPipelineCreateInfo> pipeline_cis;
     for (auto& blueprint : blue_prints) {
         if (!blueprint.pipeline_layout) {
-            logger::Logger::getInstance().error("Pipeline layout is not set for the blueprint.");
+            ev_log_error("Pipeline layout is not set for the blueprint.");
             continue;
         }
         
@@ -484,8 +484,8 @@ vector<shared_ptr<GraphicsPipeline>> GraphicsPipelineBluePrintManager::create_pi
             blueprint.viewport_state_ci.pViewports = blueprint.viewports.data();
             blueprint.viewport_state_ci.scissorCount = static_cast<uint32_t>(blueprint.scissors.size());
             blueprint.viewport_state_ci.pScissors = blueprint.scissors.data();
-            // logger::Logger::getInstance().debug("Viewport count : " + std::to_string(blueprint.viewport_state_ci.viewportCount));
-            // logger::Logger::getInstance().debug("Scissor count : " + std::to_string(blueprint.viewport_state_ci.scissorCount));
+            // ev_log_debug("Viewport count : " + std::to_string(blueprint.viewport_state_ci.viewportCount));
+            // ev_log_debug("Scissor count : " + std::to_string(blueprint.viewport_state_ci.scissorCount));
             pipeline_ci.pViewportState = &blueprint.viewport_state_ci;
         }
         pipeline_ci.pMultisampleState = &blueprint.multisample_state_ci;

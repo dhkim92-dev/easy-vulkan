@@ -12,11 +12,12 @@ using namespace ev;
  */
 CommandBuffer::CommandBuffer(shared_ptr<Device> _device, VkCommandPool command_pool, VkCommandBufferLevel level)
     : device(std::move(_device)), command_pool(command_pool), level(level) {
-    ev::logger::Logger::getInstance().info("[CommandBuffer::CommandBuffer] : Creating CommandBuffer with device: " + std::to_string(reinterpret_cast<uintptr_t>(device.get())) + ", command pool: " + std::to_string(reinterpret_cast<uintptr_t>(command_pool)));
+    ev_log_info("[CommandBuffer::CommandBuffer] : Creating CommandBuffer with device: %p, command pool: %p", device.get(), reinterpret_cast<void*>(command_pool));
     if (!device) {
-        logger::Logger::getInstance().error("[CommandBuffer::CommandBuffer] : Invalid device provided for CommandBuffer creation.");
+        ev_log_error("[CommandBuffer::CommandBuffer] : Invalid device provided for CommandBuffer creation.");
         exit(EXIT_FAILURE);
     }
+
     
     VkCommandBufferAllocateInfo alloc_info = {};
     alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -25,7 +26,7 @@ CommandBuffer::CommandBuffer(shared_ptr<Device> _device, VkCommandPool command_p
     alloc_info.commandBufferCount = 1;
 
     CHECK_RESULT(vkAllocateCommandBuffers(*device, &alloc_info, &command_buffer));
-    ev::logger::Logger::getInstance().info("[CommandBuffer::CommandBuffer] : CommandBuffer created successfully.");
+    ev_log_info("[CommandBuffer::CommandBuffer] : CommandBuffer created successfully.");
 }
 
 /**
@@ -38,12 +39,12 @@ CommandBuffer::CommandBuffer(shared_ptr<Device> _device, VkCommandPool command_p
 CommandBuffer::CommandBuffer(shared_ptr<Device> _device, VkCommandPool command_pool, VkCommandBuffer command_buffer)
 : device(std::move(_device)), command_pool(command_pool), command_buffer(command_buffer) {
     if (!device) {
-        logger::Logger::getInstance().error("[CommandBuffer::CommandBuffer] : Invalid device provided for CommandBuffer creation.");
+        ev_log_error("[CommandBuffer::CommandBuffer] : Invalid device provided for CommandBuffer creation.");
         exit(EXIT_FAILURE);
     }
     
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::CommandBuffer] : Invalid command buffer handle provided.");
+        ev_log_error("[CommandBuffer::CommandBuffer] : Invalid command buffer handle provided.");
         exit(EXIT_FAILURE);
     }
 }
@@ -54,7 +55,7 @@ void CommandBuffer::begin_render_pass(shared_ptr<RenderPass> render_pass,
     VkSubpassContents contents
 ) {
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::begin_render_pass] : Command buffer is not allocated.");
+        ev_log_error("[CommandBuffer::begin_render_pass] : Command buffer is not allocated.");
         exit(EXIT_FAILURE);
     }
     VkRenderPassBeginInfo begin_info = {};
@@ -78,7 +79,7 @@ void CommandBuffer::blit_image(
     VkFilter filter
 ) {
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::blit_image] : Command buffer is not allocated.");
+        ev_log_error("[CommandBuffer::blit_image] : Command buffer is not allocated.");
         exit(EXIT_FAILURE);
     }
     
@@ -101,7 +102,7 @@ void CommandBuffer::bind_descriptor_sets(
     const vector<uint32_t> dynamic_offsets
 ) {
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::bind_descriptor_sets] : Command buffer is not allocated.");
+        ev_log_error("[CommandBuffer::bind_descriptor_sets] : Command buffer is not allocated.");
         exit(EXIT_FAILURE);
     }
     
@@ -123,9 +124,9 @@ void CommandBuffer::bind_vertex_buffers(
     const vector<shared_ptr<Buffer>> buffers,
     const vector<VkDeviceSize> offsets
 ) {
-    logger::Logger::getInstance().debug("[CommandBuffer::bind_vertex_buffer] : Binding vertex buffers to command buffer with size : " + std::to_string(buffers.size()));
+    ev_log_debug("[CommandBuffer::bind_vertex_buffer] : Binding vertex buffers to command buffer with size : %s", std::to_string(buffers.size()).c_str());
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::bind_vertex_buffer] : Command buffer is not allocated.");
+        ev_log_error("[CommandBuffer::bind_vertex_buffer] : Command buffer is not allocated.");
         exit(EXIT_FAILURE);
     }
 
@@ -134,7 +135,7 @@ void CommandBuffer::bind_vertex_buffers(
         VkBuffer vb = *buffer;
         vk_buffers.push_back(vb);
     }
-    logger::Logger::getInstance().debug("[CommandBuffer::bind_vertex_buffer] : Binding vertex buffers to command buffer with vk size : " + std::to_string(vk_buffers.size()));
+    ev_log_debug("[CommandBuffer::bind_vertex_buffer] : Binding vertex buffers to command buffer with vk size : %d", static_cast<int>(vk_buffers.size()));
 
     vkCmdBindVertexBuffers(command_buffer, first_binding, static_cast<uint32_t>(vk_buffers.size()), vk_buffers.data(), offsets.data());
 }
@@ -144,14 +145,14 @@ void CommandBuffer::bind_index_buffers(
     VkDeviceSize offset, 
     VkIndexType index_type
 ) {
-    ev::logger::Logger::getInstance().debug("[CommandBuffer::bind_index_buffers] : Binding index buffers to command buffer with size : " + std::to_string(buffers.size()));
+    ev_log_debug("[CommandBuffer::bind_index_buffers] : Binding index buffers to command buffer with size : %d", static_cast<int>(buffers.size()));
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::bind_index_buffers] : Command buffer is not allocated.");
+        ev_log_error("[CommandBuffer::bind_index_buffers] : Command buffer is not allocated.");
         exit(EXIT_FAILURE);
     }
 
     if (buffers.empty()) {
-        logger::Logger::getInstance().error("[CommandBuffer::bind_index_buffers] : No buffers provided for binding index buffers.");
+        ev_log_error("[CommandBuffer::bind_index_buffers] : No buffers provided for binding index buffers.");
         return;
     }
 
@@ -160,7 +161,7 @@ void CommandBuffer::bind_index_buffers(
 
 void CommandBuffer::bind_graphics_pipeline(shared_ptr<GraphicsPipeline> pipeline) {
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::bind_graphics_pipeline] : Command buffer is not allocated.");
+        ev_log_error("[CommandBuffer::bind_graphics_pipeline] : Command buffer is not allocated.");
         exit(EXIT_FAILURE);
     }
     vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, *pipeline);
@@ -174,7 +175,7 @@ void CommandBuffer::bind_push_constants(
     size_t size
 ) {
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::bind_push_constants] : Command buffer is not allocated.");
+        ev_log_error("[CommandBuffer::bind_push_constants] : Command buffer is not allocated.");
         exit(EXIT_FAILURE);
     }
     
@@ -189,7 +190,7 @@ void CommandBuffer::copy_buffer(
     VkDeviceSize src_offset
 ) {
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::copy_buffer] : Command buffer is not allocated.");
+        ev_log_error("[CommandBuffer::copy_buffer] : Command buffer is not allocated.");
         exit(EXIT_FAILURE);
     }
     VkBufferCopy copy_region;
@@ -206,7 +207,7 @@ void CommandBuffer::copy_buffer_to_image(
     const vector<VkBufferImageCopy> regions
 ) {
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::copy_buffer_to_image] : Command buffer is not allocated.");
+        ev_log_error("[CommandBuffer::copy_buffer_to_image] : Command buffer is not allocated.");
         exit(EXIT_FAILURE);
     }
     
@@ -227,7 +228,7 @@ void CommandBuffer::copy_image(shared_ptr<Image> dst_image,
         const vector<VkImageCopy> regions
 ) {
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::copy_image] : Command buffer is not allocated.");
+        ev_log_error("[CommandBuffer::copy_image] : Command buffer is not allocated.");
         exit(EXIT_FAILURE);
     }
     
@@ -246,7 +247,7 @@ void CommandBuffer::copy_image_to_buffer(
     const vector<VkBufferImageCopy>& regions
 ) {
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::copy_image_to_buffer] : Command buffer is not allocated.");
+        ev_log_error("[CommandBuffer::copy_image_to_buffer] : Command buffer is not allocated.");
         exit(EXIT_FAILURE);
     }
     
@@ -277,7 +278,7 @@ void CommandBuffer::draw_indexed(uint32_t index_count,
     int32_t vertex_offset, 
     uint32_t first_instance) {
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::draw_indexed] : Command buffer is not allocated.");
+        ev_log_error("[CommandBuffer::draw_indexed] : Command buffer is not allocated.");
         exit(EXIT_FAILURE);
     }
     vkCmdDrawIndexed(command_buffer, index_count, instance_count, first_index, vertex_offset, first_instance);
@@ -292,7 +293,7 @@ void CommandBuffer::set_viewport(
     float max_depth
 ) {
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::set_viewport] : Command buffer is not allocated.");
+        ev_log_error("[CommandBuffer::set_viewport] : Command buffer is not allocated.");
         exit(EXIT_FAILURE);
     }
     VkViewport viewport = {};
@@ -309,7 +310,7 @@ void CommandBuffer::set_viewports(
     const vector<VkViewport> viewports
 ) {
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::set_viewports] : Command buffer is not allocated.");
+        ev_log_error("[CommandBuffer::set_viewports] : Command buffer is not allocated.");
         exit(EXIT_FAILURE);
     }
     vkCmdSetViewport(command_buffer, 0, static_cast<uint32_t>(viewports.size()), viewports.data());
@@ -322,7 +323,7 @@ void CommandBuffer::set_scissor(
     uint32_t height
 ) {
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::set_scissor] : Command buffer is not allocated.");
+        ev_log_error("[CommandBuffer::set_scissor] : Command buffer is not allocated.");
         exit(EXIT_FAILURE);
     }
     VkRect2D scissor = {};
@@ -337,7 +338,7 @@ void CommandBuffer::set_scissors(
     const vector<VkRect2D> scissors
 ) {
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::set_scissors] : Command buffer is not allocated.");
+        ev_log_error("[CommandBuffer::set_scissors] : Command buffer is not allocated.");
         exit(EXIT_FAILURE);
     }
     vkCmdSetScissor(command_buffer, 0, static_cast<uint32_t>(scissors.size()), scissors.data());
@@ -347,7 +348,7 @@ void CommandBuffer::dispatch(uint32_t group_count_x,
     uint32_t group_count_y, 
     uint32_t group_count_z) {
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::dispatch] : Command buffer is not allocated.");
+        ev_log_error("[CommandBuffer::dispatch] : Command buffer is not allocated.");
         exit(EXIT_FAILURE);
     }
     vkCmdDispatch(command_buffer, group_count_x, group_count_y, group_count_z);
@@ -395,7 +396,7 @@ VkResult CommandBuffer::pipeline_barrier(
 
 VkResult CommandBuffer::begin(VkCommandBufferUsageFlags flags) {
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::begin] : Command buffer is not allocated.");
+        ev_log_error("[CommandBuffer::begin] : Command buffer is not allocated.");
         return VK_SUCCESS;
     }
     VkCommandBufferBeginInfo begin_info = {};
@@ -406,12 +407,12 @@ VkResult CommandBuffer::begin(VkCommandBufferUsageFlags flags) {
 
 void CommandBuffer::bind_compute_pipeline(std::shared_ptr<ComputePipeline> &pipeline) {
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::bind_compute_pipeline] : Command buffer is not allocated.");
+        ev_log_error("[CommandBuffer::bind_compute_pipeline] : Command buffer is not allocated.");
         exit(EXIT_FAILURE);
     }
 
     if (!pipeline) {
-        logger::Logger::getInstance().error("[CommandBuffer::bind_compute_pipeline] : Invalid compute pipeline provided.");
+        ev_log_error("[CommandBuffer::bind_compute_pipeline] : Invalid compute pipeline provided.");
         exit(EXIT_FAILURE);
     }
 
@@ -420,7 +421,7 @@ void CommandBuffer::bind_compute_pipeline(std::shared_ptr<ComputePipeline> &pipe
 
 VkResult CommandBuffer::reset(VkCommandBufferResetFlags flags) {
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::reset] : Command buffer is not allocated.");
+        ev_log_error("[CommandBuffer::reset] : Command buffer is not allocated.");
         return VK_SUCCESS;
     }
     return vkResetCommandBuffer(command_buffer, flags);
@@ -428,7 +429,7 @@ VkResult CommandBuffer::reset(VkCommandBufferResetFlags flags) {
 
 VkResult CommandBuffer::end() {
     if (command_buffer == VK_NULL_HANDLE) {
-        logger::Logger::getInstance().error("[CommandBuffer::end] : Command buffer is not allocated.");
+        ev_log_error("[CommandBuffer::end] : Command buffer is not allocated.");
         return VK_SUCCESS;
     }
 
@@ -437,15 +438,15 @@ VkResult CommandBuffer::end() {
 
 void CommandBuffer::destroy() {
     if (command_buffer != VK_NULL_HANDLE) {
-        ev::logger::Logger::getInstance().info("[CommandBuffer::destroy] : Destroying CommandBuffer.");
+        ev_log_info("[CommandBuffer::destroy] : Destroying CommandBuffer.");
         vkFreeCommandBuffers(*device, command_pool, 1, &command_buffer);
         command_buffer = VK_NULL_HANDLE;
-        ev::logger::Logger::getInstance().info("[CommandBuffer::destroy] : CommandBuffer destroyed successfully.");
+        ev_log_info("[CommandBuffer::destroy] : CommandBuffer destroyed successfully.");
     }
 }
 
 CommandBuffer::~CommandBuffer() {
-    ev::logger::Logger::getInstance().info("[CommandBuffer::~CommandBuffer] : Destroying CommandBuffer in destructor.");
+    ev_log_info("[CommandBuffer::~CommandBuffer] : Destroying CommandBuffer in destructor.");
     destroy();
-    ev::logger::Logger::getInstance().info("[CommandBuffer::~CommandBuffer] : CommandBuffer destructor completed.");
+    ev_log_info("[CommandBuffer::~CommandBuffer] : CommandBuffer destructor completed.");
 }

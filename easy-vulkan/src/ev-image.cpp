@@ -4,8 +4,6 @@
 
 using namespace std;
 using namespace ev;
-using namespace ev::logger;
-
 
 Image::Image(
     shared_ptr<Device> _device,
@@ -41,7 +39,7 @@ Image::Image(
     flags(flags),
     p_next(p_next) {
     if( flags & VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT ) {
-        Logger::getInstance().info("[ev::Image] VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT is set, ensure the image format is compatible with the view format.");
+        ev_log_info("[ev::Image] VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT is set, ensure the image format is compatible with the view format.");
     }
     VkImageCreateInfo ci = {};
     ci.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -62,35 +60,32 @@ Image::Image(
     VkResult result = vkCreateImage(*device, &ci, nullptr, &image);
 
     if ( result == VK_SUCCESS ) {
-        Logger::getInstance().debug("[ev::Image] Image created successfully with handle " + std::to_string(reinterpret_cast<uintptr_t>(image)));
         vkGetImageMemoryRequirements(*device, image, &memory_requirements);
     } 
 
     if (result != VK_SUCCESS) {
-        Logger::getInstance().error("[ev::Image] Failed to create image: " + std::to_string(result));
         exit(EXIT_FAILURE);
     }
     std::stringstream ss;
     ss << std::hex << reinterpret_cast<uintptr_t>(image);
-    Logger::getInstance().debug("[ev::Image] Image created, handle: 0x" + ss.str() );
 }
 
 VkResult Image::bind_memory(shared_ptr<Memory> memory, VkDeviceSize offset) {
     if (!memory) {
-        Logger::getInstance().error("[ev::Image] Memory is null.");
+        ev_log_error("[ev::Image] Memory is null.");
         return VK_ERROR_INITIALIZATION_FAILED;
     }
     this->memory = memory;
     VkResult result = vkBindImageMemory(*device, image, *memory, offset);
     if (result != VK_SUCCESS) {
-        Logger::getInstance().error("[ev::Image] Failed to bind image memory: " + std::to_string(result));
+        ev_log_error("[ev::Image] Failed to bind image memory: %d", result);
     }
     return result;
 }
 
 VkResult Image::bind_memory(std::shared_ptr<MemoryBlockMetadata> metadata) {
     if (!metadata || !metadata->get_memory()) {
-        Logger::getInstance().error("[ev::Image] Invalid memory block metadata provided for binding.");
+        ev_log_error("[ev::Image] Invalid memory block metadata provided for binding.");
         return VK_ERROR_INVALID_EXTERNAL_HANDLE;
     }
     this->metadata = metadata;
@@ -99,11 +94,11 @@ VkResult Image::bind_memory(std::shared_ptr<MemoryBlockMetadata> metadata) {
 
 VkResult Image::transient_layout(VkImageLayout new_layout) {
     if (layout == new_layout) {
-        Logger::getInstance().debug("[ev::Image] Image is already in the desired layout.");
+        ev_log_debug("[ev::Image] Image is already in the desired layout.");
         return VK_SUCCESS;
     }
     layout = new_layout; // Update the layout after the transition
-    Logger::getInstance().debug("[ev::Image] Image layout transitioned to " + std::to_string(new_layout));
+    ev_log_debug("[ev::Image] Image layout transitioned to %d", new_layout);
     
     return VK_SUCCESS;
 }
@@ -116,12 +111,12 @@ VkResult Image::transient_layout(VkImageLayout new_layout) {
  */
 VkResult Image::map(VkDeviceSize offset, VkDeviceSize size) {
     if (!memory) {
-        Logger::getInstance().error("[ev::Image] Memory is not bound to the image.");
+        ev_log_error("[ev::Image] Memory is not bound to the image.");
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
     if (mapped_ptr) {
-        Logger::getInstance().warn("[ev::Image] Image is already mapped, unmapping first.");
+        ev_log_warn("[ev::Image] Image is already mapped, unmapping first.");
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
@@ -141,9 +136,9 @@ VkResult Image::map(VkDeviceSize offset, VkDeviceSize size) {
 
     if ( result == VK_SUCCESS ) {
         mapped_offset = global_offset;
-        Logger::getInstance().debug("[ev::Image] Image memory mapped successfully at offset: " + std::to_string(mapped_offset) + ", size: " + std::to_string(size));
+        ev_log_debug("[ev::Image] Image memory mapped successfully at offset: %llu, size: %llu", mapped_offset, size);
     } else {
-        Logger::getInstance().error("[ev::Image] Failed to map image memory: " + std::to_string(result));
+        ev_log_error("[ev::Image] Failed to map image memory: %d", result);
         mapped_ptr = nullptr; // Reset mapped pointer on failure
         mapped_offset = -1;
     }
@@ -156,19 +151,19 @@ VkResult Image::write(
     VkDeviceSize size
 ) {
     if (!mapped_ptr) {
-        Logger::getInstance().error("[ev::Image] Image is not mapped, cannot write data.");
+        ev_log_error("[ev::Image] Image is not mapped, cannot write data.");
         return VK_ERROR_MEMORY_MAP_FAILED;
     }
 
     if ( !metadata ) {
-        Logger::getInstance().error("[ev::Image] Memory block metadata is not set, cannot write data.");
+        ev_log_error("[ev::Image] Memory block metadata is not set, cannot write data.");
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
     if (size == VK_WHOLE_SIZE) {
         size = metadata->get_size() - mapped_offset; // Use the size of the memory block minus the offset
     } else if (size > (metadata->get_size() - mapped_offset)) {
-        Logger::getInstance().error("[ev::Image] Write size exceeds available memory size.");
+        ev_log_error("[ev::Image] Write size exceeds available memory size.");
         return VK_ERROR_OUT_OF_DEVICE_MEMORY;
     }
 
@@ -181,19 +176,19 @@ VkResult Image::read(
     VkDeviceSize size
 ) {
     if (!mapped_ptr) {
-        Logger::getInstance().error("[ev::Image] Image is not mapped, cannot read data.");
+        ev_log_error("[ev::Image] Image is not mapped, cannot read data.");
         return VK_ERROR_MEMORY_MAP_FAILED;
     }
 
     if ( !metadata ) {
-        Logger::getInstance().error("[ev::Image] Memory block metadata is not set, cannot read data.");
+        ev_log_error("[ev::Image] Memory block metadata is not set, cannot read data.");
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
     if (size == VK_WHOLE_SIZE) {
         size = metadata->get_size() - mapped_offset; // Use the size of the memory block minus the offset
     } else if (size > (metadata->get_size() - mapped_offset)) {
-        Logger::getInstance().error("[ev::Image] Read size exceeds available memory size.");
+        ev_log_error("[ev::Image] Read size exceeds available memory size.");
         return VK_ERROR_OUT_OF_DEVICE_MEMORY;
     }
 
@@ -203,7 +198,7 @@ VkResult Image::read(
 
 VkResult Image::flush() {
     if (!mapped_ptr) {
-        Logger::getInstance().error("[ev::Image] Image is not mapped, cannot flush memory.");
+        ev_log_error("[ev::Image] Image is not mapped, cannot flush memory.");
         return VK_ERROR_MEMORY_MAP_FAILED;
     }
     VkMappedMemoryRange range = {};
@@ -211,13 +206,13 @@ VkResult Image::flush() {
     range.memory = *memory;
     range.offset = mapped_offset;
     range.size = metadata ? metadata->get_size() - mapped_offset : memory->get_size() - mapped_offset;
-    Logger::getInstance().debug("[ev::Image] Flushing image memory with offset: " + std::to_string(range.offset) + ", size: " + std::to_string(range.size));
+    ev_log_debug("[ev::Image] Flushing image memory with offset: %llu, size: %llu", range.offset, range.size);
     return vkFlushMappedMemoryRanges(*device, 1, &range);
 }
 
 VkResult Image::unmap() {
     if (!mapped_ptr) {
-        Logger::getInstance().error("[ev::Image] Image is not mapped, cannot unmap.");
+        ev_log_error("[ev::Image] Image is not mapped, cannot unmap.");
         return VK_ERROR_MEMORY_MAP_FAILED;
     }
 
@@ -228,13 +223,13 @@ VkResult Image::unmap() {
 }
 
 void Image::destroy() {
-    Logger::getInstance().info("[ev::Image] Destroying Image...");
+    ev_log_info("[ev::Image] Destroying Image...");
     if (image != VK_NULL_HANDLE) {
         vkDestroyImage(*device, image, nullptr);
         image = VK_NULL_HANDLE;
     }
     usage_flags = 0;
-    Logger::getInstance().info("[ev::Image] Image destroyed successfully.");
+    ev_log_info("[ev::Image] Image destroyed successfully.");
 }
 
 Image::~Image() {

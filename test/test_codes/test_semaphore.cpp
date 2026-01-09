@@ -17,7 +17,7 @@ protected:
 };
 
 TEST_F(SemaphoreTest, CreateAndDestroy) {
-    ev::logger::Logger::getInstance().debug("Creating semaphore...");
+    ev_log_debug("Creating semaphore...");
     Semaphore semaphore(device);
     EXPECT_NE(VkSemaphore(semaphore), VK_NULL_HANDLE) << "Failed to create semaphore";
     // Semaphore 파괴

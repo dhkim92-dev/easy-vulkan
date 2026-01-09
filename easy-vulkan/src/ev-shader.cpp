@@ -6,9 +6,9 @@ using namespace ev;
 
 Shader::Shader(shared_ptr<Device> _device, VkShaderStageFlagBits stage, const vector<uint32_t>& code)
     : device(std::move(_device)), stage(stage), code(code) {
-    ev::logger::Logger::getInstance().info("[ev::Shader] Creating shader module.");
+    ev_log_info("[ev::Shader] Creating shader module.");
     if (code.empty()) {
-        logger::Logger::getInstance().error("Shader code is empty. Cannot create shader module.");
+        ev_log_error("Shader code is empty. Cannot create shader module.");
         exit(EXIT_FAILURE);
     }
 
@@ -18,19 +18,19 @@ Shader::Shader(shared_ptr<Device> _device, VkShaderStageFlagBits stage, const ve
     create_info.pCode = code.data();
 
     if (vkCreateShaderModule(*device, &create_info, nullptr, &shader_module) != VK_SUCCESS) {
-        logger::Logger::getInstance().error("Failed to create shader module.");
+        ev_log_error("Failed to create shader module.");
         exit(EXIT_FAILURE);
     } 
-    logger::Logger::getInstance().info("Shader module created successfully.");
+    ev_log_info("Shader module created successfully.");
 }
 
 void Shader::destroy() {
-    ev::logger::Logger::getInstance().info("[ev::Shader::destroy] Destroying shader module.");
+    ev_log_info("[ev::Shader::destroy] Destroying shader module.");
     if (shader_module != VK_NULL_HANDLE) {
         vkDestroyShaderModule(*device, shader_module, nullptr);
         shader_module = VK_NULL_HANDLE;
     }
-    ev::logger::Logger::getInstance().debug("[ev::Shader::destroy] Shader module destroyed.");
+    ev_log_debug("[ev::Shader::destroy] Shader module destroyed.");
 }
 
 Shader::~Shader() {
