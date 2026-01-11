@@ -14,7 +14,6 @@ protected:
     shared_ptr<Device> device;
 
     void SetUp() override {
-        ev_log_set_log_level(ev::logger::LogLevel::ERROR);
         instance = std::make_shared<ev::Instance>(std::vector<const char*>(), std::vector<const char*>(), false);
         physical_device = std::make_shared<ev::PhysicalDevice>(instance, ev::utility::list_physical_devices(*instance)[0]);
         device = std::make_shared<ev::Device>(instance, physical_device, std::vector<const char*>());

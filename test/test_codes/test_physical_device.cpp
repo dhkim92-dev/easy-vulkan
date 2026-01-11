@@ -5,7 +5,6 @@
 using namespace std;
 
 #define DEBUG_MODE false
-ev::logger::LogLevel log_level = DEBUG_MODE ? ev::logger::LogLevel::DEBUG : ev::logger::LogLevel::INFO;
 
 class PhysicalDeviceTest : public ::testing::Test {
     protected:

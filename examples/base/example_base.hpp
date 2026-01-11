@@ -74,6 +74,8 @@ class ExampleBase {
 
     std::shared_ptr<ev::Queue> queue;
 
+    std::shared_ptr<ev::MemoryAllocator> memory_allocator;
+
     struct DepthStencil {
         std::shared_ptr<ev::Image> image;
         std::shared_ptr<ev::Memory> memory;
@@ -128,10 +130,12 @@ class ExampleBase {
         create_logical_device();
         create_swapchain();
         create_queue();
+        create_memory_pool();
         create_depth_stencil_buffers();
         create_renderpass();
         create_framebuffers();
         create_commandpool();
+        create_commandbuffers();
         setup_sync();
     }
 
@@ -156,19 +160,24 @@ class ExampleBase {
         device = std::make_shared<ev::Device>(instance, physical_device, device_extensions, VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT);
     }
 
-    virtual void init_window() {
+    virtual void init_window(bool fullscreen = true) {
         if (!glfwInit()) {
             ev_log_error("Failed to initialize GLFW");
             exit(EXIT_FAILURE);
         }
 
-        GLFWmonitor *primary_monitor = glfwGetPrimaryMonitor();
-        const GLFWvidmode *vid_mode = glfwGetVideoMode(primary_monitor);
+        if ( fullscreen ) {
+            ev_log_info("Creating fullscreen GLFW window...");
+            GLFWmonitor *primary_monitor = glfwGetPrimaryMonitor();
+            const GLFWvidmode *vid_mode = glfwGetVideoMode(primary_monitor);
+            display.width = vid_mode->width;
+            display.height = vid_mode->height;
+        }  
+
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); 
         glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
-        display.window = glfwCreateWindow(vid_mode->width, vid_mode->height, title.c_str(), nullptr, nullptr);
-
+        display.window = glfwCreateWindow(display.width, display.height, title.c_str(), nullptr, nullptr);
         if (!display.window) {
             ev_log_error("Failed to create GLFW window");
             glfwTerminate();
@@ -193,15 +202,12 @@ class ExampleBase {
     }
 
     virtual vector<const char*> setup_instance_extensions() {
-        
         uint32_t extension_count = 0;
         const char** glfw_required_extensions = glfwGetRequiredInstanceExtensions(&extension_count);
-
         vector<const char *> default_extensions(glfw_required_extensions, glfw_required_extensions + extension_count);
         if (debug) {
             default_extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
         }
-
         return default_extensions;
     }
 
@@ -222,6 +228,8 @@ class ExampleBase {
         queue = std::make_shared<ev::Queue>(device, device->get_queue_index(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT));
         ev_log_debug("[Setup Queue End]");
     }
+
+    virtual void create_memory_pool() = 0;
 
     virtual void on_window_resize() {
         if ( !prepared ) {
@@ -359,6 +367,9 @@ class ExampleBase {
 
     virtual void create_commandpool() {
         command_pool = std::make_shared<ev::CommandPool>(device, device->get_queue_index(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT));
+    }
+
+    virtual void create_commandbuffers() {
         command_buffers.resize(max_frames_in_flight);
         for ( uint32_t i = 0 ; i < max_frames_in_flight ; ++i ) {
             command_buffers[i] = command_pool->allocate(VK_COMMAND_BUFFER_LEVEL_PRIMARY);

@@ -59,12 +59,6 @@ private:
         std::shared_ptr<ev::Shader> fragment;
     } shaders;
 
-    struct {
-        std::shared_ptr<ev::Image> image;
-        std::shared_ptr<ev::Memory> memory;
-        std::shared_ptr<ev::ImageView> view;
-    }depth_stencil;
-
     std::shared_ptr<ev::Fence> copy_complete_fence;
 
     VkPipeline pipeline;
@@ -106,16 +100,13 @@ public:
         ev_log_info("[Setup Synchronization Objects End]");
     }
 
-    void setup_queue() {
-        ev_log_info("[Setup Queue Start]");
-        queue = std::make_shared<ev::Queue>(device, device->get_queue_index(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT));
-        ev_log_info("[Setup Queue End]");
+    void create_memory_pool() override {
+        // 이 예제에서는 메모리 풀을 사용하지 않습니다.
     }
 
     void setup_vertex_buffer() {
         ev_log_info("[Setup Vertex Buffers Start]");
         ev_log_debug("Setting up vertex buffer...");
-        ev_log_debug("Vertex buffer size: %zu bytes", sizeof(vertices));
         copy_complete_fence->reset();
         buffers.vertex.buffer = std::make_shared<ev::Buffer>(
             device, 
@@ -123,15 +114,12 @@ public:
             VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT
         );
 
-        ev_log_debug("[TriangleExample::setup_vertex_buffer] Creating vertex buffer with size: %zu bytes with vk handle : %llu", sizeof(vertices), static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(VkBuffer(*buffers.vertex.buffer))));
-
         buffers.vertex.memory = std::make_shared<ev::Memory>(
             device, 
             buffers.vertex.buffer->get_memory_requirements().size, 
             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 
             buffers.vertex.buffer->get_memory_requirements()
         );
-        ev_log_debug("[TriangleExample::setup_vertex_buffer] Creating vertex buffer memory with size: %llu bytes with vk handle : %llu", static_cast<unsigned long long>(buffers.vertex.memory->get_size()), static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(VkDeviceMemory(*buffers.vertex.memory))));
 
         buffers.vertex.buffer->bind_memory(buffers.vertex.memory, 0);
 
@@ -163,36 +151,27 @@ public:
         staging_memory.reset();
 
         ev_log_debug("Vertex buffer created successfully.");
-        ev_log_debug("Vertex buffer handle: %llu", static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(VkBuffer(*buffers.vertex.buffer))));
         ev_log_info("[Setup Vertex Buffers End]");
     }
 
     void record_command_buffers() {
         // sync_objects.frame_fences[current_frame_index]->reset();
-        command_buffers[current_frame_index]->reset();
-        CHECK_RESULT(command_buffers[current_frame_index]->begin(VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT));
-        command_buffers[current_frame_index]->begin_render_pass(render_pass, 
-            framebuffers[current_frame_index], 
+        command_buffers[current_buffer_index]->reset();
+        CHECK_RESULT(command_buffers[current_buffer_index]->begin(VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT));
+        command_buffers[current_buffer_index]->begin_render_pass(render_pass, 
+            framebuffers[current_buffer_index], 
             { VkClearValue{ .color = { { 0.0f, 0.0f, 0.2f, 1.0f } } }, VkClearValue{ .depthStencil = { 1.0f, 0 } }}, 
             VK_SUBPASS_CONTENTS_INLINE);
-        command_buffers[current_frame_index]->set_viewport(0.0f, 0.0f, static_cast<float>(display.width), static_cast<float>(display.height));
-        command_buffers[current_frame_index]->set_scissor(0, 0, display.width, display.height);
-        command_buffers[current_frame_index]->bind_descriptor_sets(VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layouts[0], {descriptors.sets[current_frame_index]});
+        command_buffers[current_buffer_index]->set_viewport(0.0f, 0.0f, static_cast<float>(display.width), static_cast<float>(display.height));
+        command_buffers[current_buffer_index]->set_scissor(0, 0, display.width, display.height);
+        command_buffers[current_buffer_index]->bind_descriptor_sets(VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layouts[0], {descriptors.sets[current_buffer_index]});
         
-        command_buffers[current_frame_index]->bind_graphics_pipeline(graphics_pipeline);
-        command_buffers[current_frame_index]->bind_vertex_buffers(0, {buffers.vertex.buffer}, {0});
-        command_buffers[current_frame_index]->draw(3, 1, 0, 0);
-        // vkCmdDraw(VkCommandBuffer(*command_buffers[current_frame_index]), 3, 1, 0, 0);
-        command_buffers[current_frame_index]->end_render_pass();
-        CHECK_RESULT(command_buffers[current_frame_index]->end());
-    }
-
-    void setup_command_buffers() {
-        command_pool = std::make_shared<ev::CommandPool>(device, VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT);
-        command_buffers.resize(swapchain->get_images().size());
-        for (size_t i = 0; i < command_buffers.size(); ++i){
-            command_buffers[i] = command_pool->allocate(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-        }
+        command_buffers[current_buffer_index]->bind_graphics_pipeline(graphics_pipeline);
+        command_buffers[current_buffer_index]->bind_vertex_buffers(0, {buffers.vertex.buffer}, {0});
+        command_buffers[current_buffer_index]->draw(3, 1, 0, 0);
+        // vkCmdDraw(VkCommandBuffer(*command_buffers[current_buffer_index]), 3, 1, 0, 0);
+        command_buffers[current_buffer_index]->end_render_pass();
+        CHECK_RESULT(command_buffers[current_buffer_index]->end());
     }
 
     void setup_descriptor_sets() {
@@ -214,41 +193,6 @@ public:
             );
             CHECK_RESULT(descriptors.sets.back()->update());
         }
-        ev_log_debug("Descriptor sets created: %zu", descriptors.sets.size());
-    }
-
-    void setup_depth_stencil() {
-        depth_stencil.image = std::make_shared<ev::Image>(
-            device, 
-            VK_IMAGE_TYPE_2D,
-            VK_FORMAT_D32_SFLOAT_S8_UINT,
-            display.width, 
-            display.height, 
-            1,1,1,
-            VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
-            VK_IMAGE_LAYOUT_UNDEFINED,
-            VK_SAMPLE_COUNT_1_BIT,
-            VK_IMAGE_TILING_OPTIMAL
-        );
-        depth_stencil.memory = std::make_shared<ev::Memory>(
-            device,
-            depth_stencil.image->get_memory_requirements().size,
-            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-            depth_stencil.image->get_memory_requirements()
-        );
-        depth_stencil.image->bind_memory(depth_stencil.memory);
-
-        VkComponentMapping component_mapping = {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY};
-        VkImageSubresourceRange subresource_ranges = {VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT, 0, 1, 0, 1};
-        
-        depth_stencil.view = std::make_shared<ev::ImageView>(
-            device,
-            depth_stencil.image,
-            VK_IMAGE_VIEW_TYPE_2D,
-            VK_FORMAT_D32_SFLOAT_S8_UINT,
-            component_mapping,
-            subresource_ranges
-        );
     }
 
     void setup_shaders() {
@@ -330,26 +274,6 @@ public:
         );
     }
 
-    void setup_framebuffers() {
-        framebuffers.clear();
-        // sync_objects.frame_fences.clear();
-        ev_log_debug("Creating framebuffers for swapchain images... with size : %zu", swapchain->get_image_views().size());
-        for (const auto& image_view : swapchain->get_image_views()) {
-            vector<VkImageView> attachments = {image_view, *depth_stencil.view};
-            std::shared_ptr<ev::Framebuffer> framebuffer = std::make_shared<ev::Framebuffer>(
-                device, 
-                render_pass, 
-                attachments,
-                display.width,
-                display.height,
-                1
-            );
-            framebuffers.push_back(framebuffer);
-            // sync_objects.frame_fences.push_back(make_shared<ev::Fence>(device));
-        }
-        ev_log_debug("Framebuffers created successfully with size : %zu", framebuffers.size());
-
-    }
 
     void setup_graphics_pipeline() {
         pipeline_cache = std::make_shared<ev::PipelineCache>(device);

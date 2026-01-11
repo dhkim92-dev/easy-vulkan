@@ -11,7 +11,6 @@ class BufferTest : public ::testing::Test {
     std::shared_ptr<ev::Device> device;
 
     void SetUp() override {
-        ev_log_set_log_level(ev::logger::LogLevel::ERROR);
         vector<const char*> required_instance_extensions = {
             VK_KHR_SURFACE_EXTENSION_NAME,
             VK_EXT_DEBUG_UTILS_EXTENSION_NAME,

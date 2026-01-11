@@ -8,6 +8,21 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Add subdirectories for the easy-vulkan library and the test projec
 
 option(BUILD_TESTS "Build tests" OFF) # 기본값 OFF
+
+# EV_DEBUG_LEVEL: allow numeric values from command line like `-DEV_DEBUG_LEVEL=2`
+# Use a cache string so users can pass `-D` on the cmake command line and subdirs
+# will see the value. Default is 1.
+if(NOT DEFINED EV_LOG_LEVEL)
+    set(EV_LOG_LEVEL "1" CACHE STRING "Debug level for easy-vulkan")
+else()
+    set(EV_LOG_LEVEL "${EV_LOG_LEVEL}" CACHE STRING "Debug level for easy-vulkan" FORCE)
+endif()
+
+# Propagate as a compile definition so sources can use `#if EV_DEBUG_LEVEL >= 2` etc.
+add_compile_definitions(
+    EV_LOG_LEVEL=${EV_LOG_LEVEL}
+)
+
 add_subdirectory(external) # 외부 라이브러리 의존성 빌드용
 add_subdirectory(easy-vulkan)
 add_subdirectory(examples)

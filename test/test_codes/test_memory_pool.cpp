@@ -75,7 +75,7 @@ TEST_F(MemoryPoolTest, AllocateWithAlignment) {
 
     auto block_info_512_32 = memory_pool->allocate(512, 32);// 512bytes
     ev_log_debug(
-        "blkinfo_512_32 " + block_info_512_32->to_string()
+        "blkinfo_512_32 %s", block_info_512_32->to_string().c_str()
     );
     ASSERT_NE(block_info_512_32, nullptr);
     EXPECT_EQ(block_info_512_32->get_size(), 512);
@@ -84,7 +84,7 @@ TEST_F(MemoryPoolTest, AllocateWithAlignment) {
 
     auto block_info_27_32 = dynamic_pointer_cast<BitmapBuddyMemoryBlockMetadata>(memory_pool->allocate(27, 32)); // 32 bytes with 32 bytes alignment
     ev_log_debug(
-        "blkinfo_27_32 " + block_info_27_32->to_string()
+        "blkinfo_27_32 %s", block_info_27_32->to_string().c_str()
     );
     ASSERT_NE(block_info_27_32, nullptr);
     EXPECT_EQ(block_info_27_32->get_size(), 64);
@@ -94,7 +94,7 @@ TEST_F(MemoryPoolTest, AllocateWithAlignment) {
 
     auto block_info_127_128 = memory_pool->allocate(127, 128); // 1024 bytes with 64 bytes alignment
     ev_log_debug(
-        "Allocated block info: " + block_info_127_128->to_string()
+        "Allocated block info:  %s", block_info_127_128->to_string().c_str()
     );      
     ASSERT_NE(block_info_127_128, nullptr);
     EXPECT_EQ(block_info_127_128->get_size(), 128);
@@ -200,7 +200,7 @@ TEST_F(MemoryPoolTest, AllocateNextNodeForAlignment) {
     // 256 정렬로 64바이트 할당
     auto block_info_64_256 = dynamic_pointer_cast<BitmapBuddyMemoryBlockMetadata>(memory_pool->allocate(64, 256));
     ev_log_debug(
-        "blkinfo_64_256 " + block_info_64_256->to_string()
+        "blkinfo_64_256 %s", block_info_64_256->to_string().c_str()
     );
     ASSERT_NE(block_info_64_256, nullptr);
     EXPECT_EQ(block_info_64_256->get_size(), 64);

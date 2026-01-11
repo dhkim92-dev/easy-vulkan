@@ -446,7 +446,5 @@ void CommandBuffer::destroy() {
 }
 
 CommandBuffer::~CommandBuffer() {
-    ev_log_info("[CommandBuffer::~CommandBuffer] : Destroying CommandBuffer in destructor.");
     destroy();
-    ev_log_info("[CommandBuffer::~CommandBuffer] : CommandBuffer destructor completed.");
 }

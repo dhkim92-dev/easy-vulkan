@@ -15,10 +15,9 @@ protected:
     shared_ptr<ImageView> attachment;
 
     void SetUp() override {
-        ev_log_set_log_level(ev::logger::LogLevel::DEBUG);
-	vector<const char*> instance_extension = {VK_KHR_SURFACE_EXTENSION_NAME, VK_EXT_DEBUG_UTILS_EXTENSION_NAME };
-	vector<const char*> layers = {"VK_LAYER_KHRONOS_validation"};
-	vector<const char*> device_extension = {"VK_KHR_swapchain"};
+        vector<const char*> instance_extension = {VK_KHR_SURFACE_EXTENSION_NAME, VK_EXT_DEBUG_UTILS_EXTENSION_NAME };
+        vector<const char*> layers = {"VK_LAYER_KHRONOS_validation"};
+        vector<const char*> device_extension = {"VK_KHR_swapchain"};
         instance = make_shared<ev::Instance>(instance_extension, layers, true);
         physical_device = make_shared<ev::PhysicalDevice>(instance, ev::utility::list_physical_devices(instance->get_instance())[0]);
         device = make_shared<ev::Device>(instance, physical_device, device_extension, VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT);

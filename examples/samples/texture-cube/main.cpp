@@ -2,21 +2,21 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <memory>
 #include <vector>
+// #define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 #include "base/example_base.hpp"
 
 class ExampleImpl : public ExampleBase {
 
 private:
 
-    // vector<std::shared_ptr<ev::Shader>> shaders;
-
-    std::vector<std::shared_ptr<ev::PipelineLayout>> pipeline_layouts;
+    vector<std::shared_ptr<ev::PipelineLayout>> pipeline_layouts;
 
     std::shared_ptr<ev::GraphicsPipeline> graphics_pipeline;
 
     std::shared_ptr<ev::PipelineCache> pipeline_cache;
 
-    std::shared_ptr<ev::DescriptorPool> descriptor_pool;
+    shared_ptr<ev::DescriptorPool> descriptor_pool;
 
     struct UniformBufferObject {
         glm::mat4 model;
@@ -25,22 +25,23 @@ private:
     } ubo;
 
     struct {
-        std::shared_ptr<ev::DescriptorSetLayout> layout;
-        std::vector<std::shared_ptr<ev::DescriptorSet>> sets;
+        shared_ptr<ev::DescriptorSetLayout> layout;
+        vector<shared_ptr<ev::DescriptorSet>> sets;
     } descriptors;
 
 
     struct {
         std::shared_ptr<ev::Buffer> cube_vertices;
         std::shared_ptr<ev::Buffer> cube_indices;
+        std::shared_ptr<ev::Texture> texture;
         std::shared_ptr<ev::Buffer> uniform;
     } buffers;
 
     struct Vertex {
         glm::vec3 pos;
-        glm::vec3 normal;
-        Vertex(glm::vec3 position, glm::vec3 normal_vector)
-            : pos(position), normal(normal_vector) {}
+        glm::vec2 tex_coord;
+        Vertex(glm::vec3 position, glm::vec2 tex_coord)
+            : pos(position), tex_coord(tex_coord) {}
     };
 
     // Cube의 8개 꼭지점 좌표, Normal 값은 해당 좌표에서 0,0,0으로 향하는 벡터의 역방향, 즉 좌표값과 동일
@@ -53,43 +54,57 @@ private:
     // | /       |  /
     // |         | /
     // v3-------v2
+    
     std::vector<Vertex> cube_vertices = {
-        {glm::vec3(-0.5f, -0.5f, 0.5f), glm::normalize(glm::vec3(-0.5f, -0.5f, 0.5f))}, // v0 전면 좌측 상단 꼭지점
-        {glm::vec3(0.5f, -0.5f, 0.5f), glm::normalize(glm::vec3(0.5f, -0.5f, 0.5f))}, // v1 전면 우측 상단 꼭지점
-        {glm::vec3(0.5f, 0.5f, 0.5f), glm::normalize(glm::vec3(0.5f, 0.5f, 0.5f))}, // v2 전면 우측 하단 꼭지점
-        {glm::vec3(-0.5f, 0.5f, 0.5f), glm::normalize(glm::vec3(-0.5f, 0.5f, 0.5f))}, // v3 전면 좌측 하단 꼭지점
-        {glm::vec3(-0.5f, -0.5f, -0.5f), glm::normalize(glm::vec3(-0.5f, -0.5f, -0.5f))}, // v4 후면 좌측 상단 꼭지점
-        {glm::vec3(0.5f, -0.5f, -0.5f), glm::normalize(glm::vec3(0.5f, -0.5f, -0.5f))}, // v5 후면 우측 상단 꼭지점
-        {glm::vec3(0.5f, 0.5f, -0.5f), glm::normalize(glm::vec3(0.5f, 0.5f, -0.5f))}, // v6 후면 우측 하단 꼭지점
-        {glm::vec3(-0.5f, 0.5f, -0.5f), glm::normalize(glm::vec3(-0.5f, 0.5f, -0.5f))} // v7 후면 좌측 하단 꼭지점
+        // 각 면의 정점 위치에 맞게 UV 좌표를 (0,0) ~ (1,1) 사이로 매핑합니다.
+        // Y축이 위쪽인 오른손 좌표계를 기준으로 합니다.
+
+        // 앞면 (z=0.5)
+        {glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec2(0.0f, 0.0f)}, // 0 좌하
+        {glm::vec3(0.5f, -0.5f, 0.5f), glm::vec2(1.0f, 0.0f)},  // 1 우하
+        {glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)},   // 2 우상
+        {glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(0.0f, 1.0f)},  // 3 좌상
+
+        // 뒷면 (z=-0.5)
+        {glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(1.0f, 0.0f)}, // 4 
+        {glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f)}, // 5
+        {glm::vec3(0.5f, 0.5f, -0.5f), glm::vec2(0.0f, 1.0f)}, // 6
+        {glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 1.0f)}, // 7
+
+        // 왼쪽 (x=-0.5)
+        {glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f)}, // 8
+        {glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec2(1.0f, 0.0f)}, // 9
+        {glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)}, // 10
+        {glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(0.0f, 1.0f)}, // 11
+
+        // 오른쪽 (x=0.5)
+        {glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(1.0f, 0.0f)}, // 12
+        {glm::vec3(0.5f, -0.5f, 0.5f), glm::vec2(0.0f, 0.0f)},  // 13
+        {glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(0.0f, 1.0f)},   // 14
+        {glm::vec3(0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 1.0f)},  // 15
+
+        // 아래쪽 (y=-0.5)
+        {glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f)}, // 16
+        {glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(1.0f, 1.0f)},  // 17
+        {glm::vec3(0.5f, -0.5f, 0.5f), glm::vec2(1.0f, 0.0f)},   // 18
+        {glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec2(0.0f, 0.0f)},  // 19
+
+        // 위쪽 (y=0.5)
+        {glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(0.0f, 0.0f)}, // 20
+        {glm::vec3(0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 0.0f)},  // 21
+        {glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)},   // 22
+        {glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(0.0f, 1.0f)}   // 23
     };
 
-    // CCW 순서로 Cube의 12개의 삼각형을 구성하는 인덱스
-std::vector<uint32_t> cube_indices = {
-    // 앞면 (+Z) — Vulkan에서 정면 바라볼 때 CCW: v0, v3, v2,  v2, v1, v0
-    0, 3, 2,
-    2, 1, 0,
-
-    // 오른쪽 면 (+X) — CCW: v1, v2, v6,  v6, v5, v1
-    1, 2, 6,
-    6, 5, 1,
-
-    // 뒷면 (-Z) — CCW: v5, v6, v7,  v7, v4, v5
-    5, 6, 7,
-    7, 4, 5,
-
-    // 왼쪽 면 (-X) — CCW: v4, v7, v3,  v3, v0, v4
-    4, 7, 3,
-    3, 0, 4,
-
-    // 윗면 (+Y) — Vulkan에선 아래가 +Y라서 윗면은 시각적으로 아래쪽. CCW: v3, v7, v6,  v6, v2, v3
-    3, 7, 6,
-    6, 2, 3,
-
-    // 아랫면 (-Y) — 시각적으로 위쪽. CCW: v4, v0, v1,  v1, v5, v4
-    4, 0, 1,
-    1, 5, 4
-};
+    // 인덱스는 각 면의 4개 정점을 사용하여 2개의 삼각형을 만듭니다.
+    std::vector<uint32_t> cube_indices = {
+        1, 0, 2,   3, 2, 0,       // 앞면
+        4, 5, 6,   7, 4, 6,       // 뒷면
+        9, 8, 10,  11, 10, 8,      // 왼쪽
+        13, 14, 12, 15, 12, 14,     // 오른쪽
+        17, 16, 18, 19, 18, 16,     // 아래쪽
+        20, 21, 22, 22, 23, 20      // 위쪽
+    };
 
     struct {
         std::shared_ptr<ev::Shader> vertex;
@@ -106,30 +121,156 @@ std::vector<uint32_t> cube_indices = {
 
 public:
 
-    explicit ExampleImpl(std::string example_name, std::string executable_path, bool debug = false)
+    explicit ExampleImpl(std::string example_name, std::string executable_path, bool debug = true)
     : ExampleBase(example_name, executable_path, debug) {
         this->title = example_name;
         setup_default_context();
+        setup_synchronize_objects();
+        setup_vertex_buffer();
+        setup_texture();
         setup_uniform_buffer();
         setup_descriptor_sets();
         setup_pipeline_layouts();
         setup_shaders();
-        setup_synchronize_objects();
         setup_graphics_pipeline();
-        setup_vertex_buffer();
     }
 
-    ~ExampleImpl() override {
-        device->wait_idle();
-        // 동기화 오브젝트 삭제
-        copy_complete_fence.reset();
+    void setup_texture() {
+
+        uint8_t* texture_data = nullptr;
+        int width = 0,height = 0, channels = 0, comp_req=0;
+        std::string texture_path = resource_path / "textures" / "cube" / "wood.png";
+
+        texture_data = stbi_load(texture_path.c_str(), &width, &height, &channels, comp_req);
+
+        fprintf(stdout, "[std_image.h] Texture loaded: %s, Width: %d, Height: %d, Channels: %d\n", 
+                texture_path.c_str(), width, height, channels);
+
+        if (!texture_data) {
+            throw std::runtime_error("Failed to load texture image");
+        }
+
+        std::shared_ptr<ev::Image> image = std::make_shared<ev::Image>(
+            device,
+            VK_IMAGE_TYPE_2D,
+            VK_FORMAT_R8G8B8A8_SRGB,
+            500, 500, 1
+        );
+
+        memory_allocator->allocate_image(image, ev::memory_type::GPU_ONLY);
+
+        std::shared_ptr<ev::ImageView> image_view = std::make_shared<ev::ImageView>(
+            device, 
+            image, 
+            VK_IMAGE_VIEW_TYPE_2D, 
+            VK_FORMAT_R8G8B8A8_SRGB
+        );
+
+        std::shared_ptr<ev::Sampler> sampler = std::make_shared<ev::Sampler>(
+            device, 
+            VK_FILTER_LINEAR, 
+            VK_FILTER_LINEAR, 
+            VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE, 
+            VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE, 
+            VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE
+        );
+
+        buffers.texture = std::make_shared<ev::Texture>(
+            image, 
+            image_view, 
+            sampler
+        );
+
+        std::shared_ptr<ev::Buffer> staging_buffer = std::make_shared<ev::Buffer>(
+            device, 
+            width * height * 4, 
+            ev::buffer_type::STAGING_BUFFER
+        );
+        memory_allocator->allocate_buffer(staging_buffer, ev::memory_type::HOST_READABLE);
+
+        staging_buffer->map();
+        staging_buffer->write(texture_data, width * height * 4);
+        // staging_buffer->flush();
+        staging_buffer->unmap();
+
+        shared_ptr<ev::CommandBuffer> staging_command = command_pool->allocate(VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+        staging_command->begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+
+
+        VkImageSubresourceRange subresource_range = {};
+        subresource_range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        subresource_range.baseMipLevel = 0;
+        subresource_range.levelCount = 1;
+        subresource_range.baseArrayLayer = 0;
+        subresource_range.layerCount = 1;
+
+        std::vector<ev::ImageMemoryBarrier> image_barriers;
+        image_barriers.emplace_back( ev::ImageMemoryBarrier(
+            buffers.texture->image,
+            VK_ACCESS_NONE_KHR, 
+            VK_ACCESS_TRANSFER_WRITE_BIT, 
+            VK_IMAGE_LAYOUT_UNDEFINED,
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED, 
+            subresource_range
+        ));
+
+        staging_command->pipeline_barrier(
+            VK_PIPELINE_STAGE_HOST_BIT, 
+            VK_PIPELINE_STAGE_TRANSFER_BIT, 
+            image_barriers,
+            {}, 
+            {}
+        );
+
+
+        VkBufferImageCopy region = {};
+        region.bufferOffset = 0;
+        region.imageOffset = {0, 0, 0};
+        region.imageExtent = {static_cast<uint32_t>(width), static_cast<uint32_t>(height), 1};
+        region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        region.imageSubresource.mipLevel = 0;
+        region.imageSubresource.layerCount = 1;
+        region.imageSubresource.baseArrayLayer = 0;
+
+        staging_command->copy_buffer_to_image(buffers.texture->image, 
+            staging_buffer,
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            {region}
+        );
+
+        std::vector<ev::ImageMemoryBarrier> post_copy_barriers;
+        post_copy_barriers.reserve(1);
+        post_copy_barriers.emplace_back( ev::ImageMemoryBarrier(
+            buffers.texture->image,
+            VK_ACCESS_TRANSFER_WRITE_BIT,
+            VK_ACCESS_SHADER_READ_BIT,
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            0, 0, {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1}
+        ));
+        staging_command->pipeline_barrier(
+            VK_PIPELINE_STAGE_TRANSFER_BIT, 
+            VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 
+            post_copy_barriers,
+            {}, 
+            {}
+        );
+        staging_command->end();
+        copy_complete_fence->reset();
+        CHECK_RESULT(queue->submit(staging_command, {}, {}, nullptr, copy_complete_fence, nullptr));
+        copy_complete_fence->wait(UINT64_MAX);
+        queue->wait_idle(UINT64_MAX);
+        staging_buffer.reset();
+        buffers.texture->image->transient_layout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        stbi_image_free(texture_data);
     }
 
     void create_memory_pool() override {
         ev_log_info("[Setup Memory Pool Start]");
         memory_allocator = std::make_shared<ev::BitmapBuddyMemoryAllocator>(device);
         memory_allocator->add_pool(ev::memory_type::GPU_ONLY, 64*MB); 
-        memory_allocator->add_pool(ev::memory_type::HOST_READABLE, 1*MB);
+        memory_allocator->add_pool(ev::memory_type::HOST_READABLE, 8*MB);
         CHECK_RESULT(memory_allocator->build());
         ev_log_info("[Setup Memory Pool End]");
     }
@@ -157,8 +298,6 @@ public:
 
     void setup_vertex_buffer() {
         ev_log_info("[Setup Vertex Buffers Start]");
-        ev_log_debug("Setting up vertex buffer...");
-        // ev_log_debug("Vertex buffer size: " + std::to_string(sizeof(vertices)) + " bytes");
         copy_complete_fence->reset();
         buffers.cube_vertices= std::make_shared<ev::Buffer>(
             device, 
@@ -210,7 +349,6 @@ public:
     }
 
     void record_command_buffers() {
-        // sync_objects.frame_fences[current_frame_index]->reset();
         command_buffers[current_buffer_index]->reset();
         CHECK_RESULT(command_buffers[current_buffer_index]->begin(VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT));
         command_buffers[current_buffer_index]->begin_render_pass(render_pass, 
@@ -220,7 +358,6 @@ public:
         command_buffers[current_buffer_index]->set_viewport(0.0f, 0.0f, static_cast<float>(display.width), static_cast<float>(display.height));
         command_buffers[current_buffer_index]->set_scissor(0, 0, display.width, display.height);
         command_buffers[current_buffer_index]->bind_descriptor_sets(VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layouts[0], {descriptors.sets[current_buffer_index]});
-        
         command_buffers[current_buffer_index]->bind_graphics_pipeline(graphics_pipeline);
         command_buffers[current_buffer_index]->bind_vertex_buffers(0, {buffers.cube_vertices}, {0});
         command_buffers[current_buffer_index]->bind_index_buffers({buffers.cube_indices}, 0, VK_INDEX_TYPE_UINT32);
@@ -230,15 +367,15 @@ public:
     }
 
     void setup_descriptor_sets() {
-        ev_log_debug("[Setup Descriptor Sets Start]");
+        ev_log_info("[Setup Descriptor Sets Start]");
         descriptor_pool = std::make_shared<ev::DescriptorPool>(device);
         descriptor_pool->add(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3);
+        descriptor_pool->add(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 3);
         CHECK_RESULT(descriptor_pool->create_pool(3, VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT));
-        ev_log_debug("Descriptor pool created");
         descriptors.layout = std::make_shared<ev::DescriptorSetLayout>(device);
         descriptors.layout->add_binding(VK_SHADER_STAGE_VERTEX_BIT, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, 1);
+        descriptors.layout->add_binding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, 1);
         CHECK_RESULT(descriptors.layout->create_layout());
-        ev_log_debug("Descriptor set layout created");
 
         for (uint32_t i = 0 ; i < swapchain->get_images().size(); ++i) {
             descriptors.sets.push_back(descriptor_pool->allocate(descriptors.layout));
@@ -246,31 +383,35 @@ public:
                 0, 
                 buffers.uniform
             );
+            descriptors.sets.back()->write_texture(
+                1, 
+                buffers.texture
+            );
             CHECK_RESULT(descriptors.sets.back()->update());
         }
-        ev_log_debug("Descriptor sets created: %zu", descriptors.sets.size());
+        ev_log_info("[Setup Descriptor Sets End]");
     }
-
     void setup_shaders() {
+        ev_log_info("[Setup Shaders Start]");
         vector<uint32_t> vertex_shader_code;
-        ev::utility::read_spirv_shader_file( (shader_path / this->title / "cube.vert.spv").c_str(), vertex_shader_code);
+        ev::utility::read_spirv_shader_file( (shader_path / this->title / "texture-cube.vert.spv").c_str(), vertex_shader_code);
         shaders.vertex = std::make_shared<ev::Shader>(device, VK_SHADER_STAGE_VERTEX_BIT, vertex_shader_code);
         vector<uint32_t> fragment_shader_code;
-        ev::utility::read_spirv_shader_file( (shader_path / this->title / "cube.frag.spv").c_str(), fragment_shader_code);
+        ev::utility::read_spirv_shader_file( (shader_path / this->title / "texture-cube.frag.spv").c_str(), fragment_shader_code);
         shaders.fragment = std::make_shared<ev::Shader>(device, VK_SHADER_STAGE_FRAGMENT_BIT, fragment_shader_code);
+        ev_log_info("[Setup Shaders End]");
     }
 
     void setup_pipeline_layouts() {
-        // vector<std::shared_ptr<ev::DescriptorSetLayout>> descriptor_set_layouts;
+        ev_log_info("[Setup Pipeline Layouts Start]");
         std::vector<shared_ptr<ev::DescriptorSetLayout>> descriptor_set_layouts = {descriptors.layout};
         std::shared_ptr<ev::PipelineLayout> pipeline_layout 
             = std::make_shared<ev::PipelineLayout>(device, descriptor_set_layouts);
         pipeline_layouts.push_back(pipeline_layout);
+        ev_log_info("[Setup Pipeline Layouts End]");
     }
 
-
-    void create_renderpass() override {
-        std::printf("Creating render pass...\n");
+    void create_renderpass() {
         VkAttachmentDescription color_attachment = {};
         color_attachment.format = swapchain->get_image_format();
         color_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -330,8 +471,6 @@ public:
             subpasses,
             dependencies
         );
-
-        std::printf("Renderpass handler : %llu\n", static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(VkRenderPass(*render_pass))));
     }
 
     void setup_graphics_pipeline() {
@@ -343,9 +482,9 @@ public:
             .set_vertex_input_state()
             .add_vertex_input_binding_description(0, sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX)
             .add_vertex_attribute_description(0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0)
-            .add_vertex_attribute_description(0, 1, VK_FORMAT_R32G32B32_SFLOAT, sizeof(float) * 3)
+            .add_vertex_attribute_description(0, 1, VK_FORMAT_R32G32_SFLOAT, sizeof(float) * 3)
             .set_input_assembly_state(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
-            .set_rasterization_state(VK_POLYGON_MODE_LINE, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_COUNTER_CLOCKWISE)
+            .set_rasterization_state(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_COUNTER_CLOCKWISE)
             .set_dynamic_state()
             .add_dynamic_state(VK_DYNAMIC_STATE_VIEWPORT)
             .add_dynamic_state(VK_DYNAMIC_STATE_SCISSOR)
@@ -392,11 +531,6 @@ public:
     }
 
     void render() override {
-        // sync_objects.frame_fences[current_frame_index]->wait();
-        // CHECK_RESULT(sync_objects.frame_fences[current_frame_index]->reset());
-        if (!prepared ) {
-            return;
-        }
         prepare_frame(true);
         record_command_buffers();
         uniform_update();
@@ -404,4 +538,4 @@ public:
     }
 };
 
-RUN_EXAMPLE_MAIN(ExampleImpl, "cube", false)
+RUN_EXAMPLE_MAIN(ExampleImpl, "texture-cube", false)

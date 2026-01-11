@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "testPresets": [
+    {
+      "name": "test",
+      "displayName": "Run tests for test build",
+      "description": "Run ctest against the test configure preset build output",
+      "configurePreset": "test",
+      "binaryDir": "${sourceDir}/build/test",
+      "extraCTestOptions": ["--output-on-failure"]
+    }
+  ]
+}

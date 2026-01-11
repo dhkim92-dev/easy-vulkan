@@ -5,7 +5,6 @@ class InstanceTest : public ::testing::Test {
 protected:
     static ev::Instance* instance;
     static void SetUpTestSuite() {
-        ev_log_set_log_level(ev::logger::LogLevel::ERROR);
         std::vector<const char*> required_extensions = {
             VK_KHR_SURFACE_EXTENSION_NAME,
             VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
