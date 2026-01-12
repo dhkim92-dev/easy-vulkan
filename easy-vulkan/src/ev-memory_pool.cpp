@@ -39,8 +39,8 @@ VkResult MemoryPool::create(VkDeviceSize size, int32_t min_order) {
 
     this->mbt.min_order = min_order;
     this->mbt.max_order = get_max_order(size);
-    this->mbt.min_blk_size = 1UL << mbt.min_order; 
-    this->size = 1UL << mbt.max_order; // 메모리 풀의 최대 크기
+    this->mbt.min_blk_size = 1ULL << mbt.min_order;
+    this->size = 1ULL << mbt.max_order; // 메모리 풀의 maximum block size (power-of-two)
 
     if ( size < mbt.min_blk_size ) {
         ev_log_error("[ev::MemoryPool] MemoryPool size must be at least %llu bytes.", static_cast<unsigned long long>(mbt.min_blk_size));
@@ -55,13 +55,8 @@ VkResult MemoryPool::create(VkDeviceSize size, int32_t min_order) {
     );
 
     // this->mbt.level = mbt.max_order - mbt.min_order + 1; // 트리의 레벨 수
-    this->size = this->mbt.max_blk_size;
-    // this->size = 1UL << mbt.max_order; // 메모리 풀의 최대 크기 
-    memory = std::make_shared<ev::Memory>(
-        device,
-        memory_type_index,
-        this->size
-    );
+    // use the previously computed size (next power-of-two >= requested pool size)
+    memory = std::make_shared<ev::Memory>(device, memory_type_index, this->size);
     // VkResult result = memory->allocate();
     VkResult result = memory->allocate();
 
@@ -104,12 +99,21 @@ void MemoryPool::init_memory_block_tree() {
         return;
     }
     // 트리의 최대 높이 계산, 전체 크기는 2^max_order, 최소 블록의 크기는 2^min_order,
-    mbt.level = mbt.max_order - mbt.min_order + 1; // 트리의 레벨 수
-    mbt.bitmap_size = ((1UL << (mbt.level)) - 1 ) / 8 + 1; // 비트맵 크기 계산 uint8_t 단위
-    mbt.bitmap.resize(mbt.bitmap_size, 0x00); // 비트맵 초기화, 모든 비트가 1로 설정 (free 상태)
+    mbt.level = static_cast<uint32_t>(mbt.max_order - mbt.min_order + 1);
+    if (mbt.level >= 63) {
+        ev_log_error("[ev::MemoryPool] Computed mbt.level is too large: %u", mbt.level);
+        return;
+    }
+    uint64_t nodes = (1ULL << mbt.level) - 1ULL;
+    mbt.bitmap_size = static_cast<size_t>((nodes + 7ULL) / 8ULL);
+    if (mbt.bitmap_size == 0) {
+        ev_log_error("[ev::MemoryPool] Computed bitmap_size is zero");
+        return;
+    }
+    mbt.bitmap.resize(mbt.bitmap_size, 0x00);
     mbt.bitmap[0] = 0x01;
-    mbt.max_blk_size = 1UL << mbt.max_order; // 최대 블록 크기, 2^max_order 바이트
-    mbt.node_count = (1UL << mbt.level) - 1; // 트리의 노드 수, 2^level - 1
+    mbt.max_blk_size = 1ULL << mbt.max_order;
+    mbt.node_count = static_cast<size_t>(nodes);
 
     // ev_log_debug("MemoryBlockTree height : " + std::to_string(mbt.level) + 
     //     ", bitmap size: " + std::to_string(mbt.bitmap_size) 

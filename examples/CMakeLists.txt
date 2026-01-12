@@ -12,7 +12,8 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/easy-vulkan/include
     ${CMAKE_SOURCE_DIR}/external/stb
     ${CMAKE_SOURCE_DIR}/externals/tiny_gltf)
-find_package(glfw3 REQUIRED)
+find_package(glm CONFIG REQUIRED)
+find_package(glfw3 CONFIG REQUIRED)
 find_package(Vulkan REQUIRED)
 
 foreach(SAMPLE_MAIN ${SAMPLE_MAIN_FILES})
@@ -27,8 +28,19 @@ foreach(SAMPLE_MAIN ${SAMPLE_MAIN_FILES})
     # 실행 파일 생성
     add_executable(${EXAMPLE_NAME}_example ${SAMPLE_MAIN})
 
-    # easy-vulkan 동적 라이브러리, glfw, vulkan
-    target_link_libraries(${EXAMPLE_NAME}_example PRIVATE easy-vulkan glfw vulkan stb_headers stb_impl tiny_gltf_headers tiny_gltf_impl)
+        # easy-vulkan: on Windows use the static target; otherwise use the shared alias
+        if(WIN32)
+            set(EASY_VULKAN_TARGET easy-vulkan_static)
+        else()
+            set(EASY_VULKAN_TARGET easy-vulkan)
+        endif()
+
+        target_link_libraries(${EXAMPLE_NAME}_example PRIVATE ${EASY_VULKAN_TARGET} glfw Vulkan::Vulkan stb_headers stb_impl tiny_gltf_headers tiny_gltf_impl glm::glm)
+
+    if(WIN32) 
+    else()
+    endif()
+
 
     # include 디렉터리 추가
     target_include_directories(${EXAMPLE_NAME}_example PRIVATE

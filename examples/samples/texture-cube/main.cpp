@@ -139,7 +139,7 @@ public:
 
         uint8_t* texture_data = nullptr;
         int width = 0,height = 0, channels = 0, comp_req=0;
-        std::string texture_path = resource_path / "textures" / "cube" / "wood.png";
+        std::string texture_path = (resource_path / "textures" / "cube" / "wood.png").string();
 
         texture_data = stbi_load(texture_path.c_str(), &width, &height, &channels, comp_req);
 
@@ -394,10 +394,10 @@ public:
     void setup_shaders() {
         ev_log_info("[Setup Shaders Start]");
         vector<uint32_t> vertex_shader_code;
-        ev::utility::read_spirv_shader_file( (shader_path / this->title / "texture-cube.vert.spv").c_str(), vertex_shader_code);
+        ev::utility::read_spirv_shader_file( (shader_path / this->title / "texture-cube.vert.spv").string().c_str(), vertex_shader_code);
         shaders.vertex = std::make_shared<ev::Shader>(device, VK_SHADER_STAGE_VERTEX_BIT, vertex_shader_code);
         vector<uint32_t> fragment_shader_code;
-        ev::utility::read_spirv_shader_file( (shader_path / this->title / "texture-cube.frag.spv").c_str(), fragment_shader_code);
+        ev::utility::read_spirv_shader_file( (shader_path / this->title / "texture-cube.frag.spv").string().c_str(), fragment_shader_code);
         shaders.fragment = std::make_shared<ev::Shader>(device, VK_SHADER_STAGE_FRAGMENT_BIT, fragment_shader_code);
         ev_log_info("[Setup Shaders End]");
     }

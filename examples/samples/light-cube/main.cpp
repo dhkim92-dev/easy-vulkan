@@ -171,7 +171,7 @@ public:
         ev_log_info("[Setup Texture Start]");
         uint8_t* texture_data = nullptr;
         int width = 0,height = 0, channels = 0, comp_req=0;
-        std::string texture_path = resource_path / "textures" / "cube" / "wood.png";
+        std::string texture_path = (resource_path / "textures" / "cube" / "wood.png").string();
 
         texture_data = stbi_load(texture_path.c_str(), &width, &height, &channels, comp_req);
 
@@ -542,21 +542,17 @@ public:
 
     void setup_shaders() {
         vector<uint32_t> vertex_shader_code;
-        ev::utility::read_spirv_shader_file( (shader_path / this->title / "cube.vert.spv").c_str(), vertex_shader_code);
+        ev::utility::read_spirv_shader_file( (shader_path / this->title / "cube.vert.spv").string().c_str(), vertex_shader_code);
         shaders.vertex = std::make_shared<ev::Shader>(device, VK_SHADER_STAGE_VERTEX_BIT, vertex_shader_code);
         vector<uint32_t> fragment_shader_code;
-        ev::utility::read_spirv_shader_file( (shader_path / this->title / "cube.frag.spv").c_str(), fragment_shader_code);
+        ev::utility::read_spirv_shader_file( (shader_path / this->title / "cube.frag.spv").string().c_str(), fragment_shader_code);
         shaders.fragment = std::make_shared<ev::Shader>(device, VK_SHADER_STAGE_FRAGMENT_BIT, fragment_shader_code);
         vector<uint32_t> light_vertex_shader_code;
-        ev::utility::read_spirv_shader_file( (shader_path / this->title / "light-cube.vert.spv").c_str(), light_vertex_shader_code);
+        ev::utility::read_spirv_shader_file( (shader_path / this->title / "light-cube.vert.spv").string().c_str(), light_vertex_shader_code);
         shaders.light_vertex = std::make_shared<ev::Shader>(device, VK_SHADER_STAGE_VERTEX_BIT, light_vertex_shader_code);
         vector<uint32_t> light_fragment_shader_code;
-        ev::utility::read_spirv_shader_file( (shader_path / this->title / "light-cube.frag.spv").c_str(), light_fragment_shader_code);
+        ev::utility::read_spirv_shader_file( (shader_path / this->title / "light-cube.frag.spv").string().c_str(), light_fragment_shader_code);
         shaders.light_fragment = std::make_shared<ev::Shader>(device, VK_SHADER_STAGE_FRAGMENT_BIT, light_fragment_shader_code);
-        ev_log_debug("Vertex shader loaded: %s", std::to_string(reinterpret_cast<uintptr_t>(VkShaderModule(*shaders.vertex))).c_str());
-        ev_log_debug("Fragment shader loaded: %s", std::to_string(reinterpret_cast<uintptr_t>(VkShaderModule(*shaders.fragment))).c_str());
-        ev_log_debug("Light Vertex shader loaded: %s", std::to_string(reinterpret_cast<uintptr_t>(VkShaderModule(*shaders.light_vertex))).c_str());
-        ev_log_debug("Light Fragment shader loaded: %s", std::to_string(reinterpret_cast<uintptr_t>(VkShaderModule(*shaders.light_fragment))).c_str());
     }
 
     void setup_pipeline_layouts() {

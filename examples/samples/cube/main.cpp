@@ -253,10 +253,10 @@ public:
 
     void setup_shaders() {
         vector<uint32_t> vertex_shader_code;
-        ev::utility::read_spirv_shader_file( (shader_path / this->title / "cube.vert.spv").c_str(), vertex_shader_code);
+        ev::utility::read_spirv_shader_file( (shader_path / this->title / "cube.vert.spv").string().c_str(), vertex_shader_code);
         shaders.vertex = std::make_shared<ev::Shader>(device, VK_SHADER_STAGE_VERTEX_BIT, vertex_shader_code);
         vector<uint32_t> fragment_shader_code;
-        ev::utility::read_spirv_shader_file( (shader_path / this->title / "cube.frag.spv").c_str(), fragment_shader_code);
+        ev::utility::read_spirv_shader_file( (shader_path / this->title / "cube.frag.spv").string().c_str(), fragment_shader_code);
         shaders.fragment = std::make_shared<ev::Shader>(device, VK_SHADER_STAGE_FRAGMENT_BIT, fragment_shader_code);
     }
 

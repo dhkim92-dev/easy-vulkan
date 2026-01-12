@@ -733,7 +733,7 @@ void GLTFModelManager::load_textures(tinygltf::Model& gltf_model,
             continue;
         }
 
-        std::string file_path = resource_path / gltf_image.uri;
+        std::string file_path = (resource_path / gltf_image.uri).string();
         std::shared_ptr<ev::Texture> texture = load_texture(gltf_image, file_path);
         // model->get_textures().emplace_back(texture);
         texture->index = static_cast<uint32_t>(model->get_textures().size());

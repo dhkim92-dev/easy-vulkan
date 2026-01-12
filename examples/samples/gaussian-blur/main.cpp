@@ -244,9 +244,9 @@ public:
         std::vector<uint32_t> base_vert_code;
         std::vector<uint32_t> base_frag_code;
 
-        ev::utility::read_spirv_shader_file(blur_comp_path.c_str(), blur_comp_code);
-        ev::utility::read_spirv_shader_file(base_vert_path.c_str(), base_vert_code);
-        ev::utility::read_spirv_shader_file(base_frag_path.c_str(), base_frag_code);
+        ev::utility::read_spirv_shader_file(blur_comp_path.string().c_str(), blur_comp_code);
+        ev::utility::read_spirv_shader_file(base_vert_path.string().c_str(), base_vert_code);
+        ev::utility::read_spirv_shader_file(base_frag_path.string().c_str(), base_frag_code);
 
         shaders.base_vert = std::make_shared<ev::Shader>(device, VK_SHADER_STAGE_VERTEX_BIT, base_vert_code);
         shaders.base_frag = std::make_shared<ev::Shader>(device, VK_SHADER_STAGE_FRAGMENT_BIT, base_frag_code);
@@ -310,7 +310,7 @@ public:
     void setup_texture() {
         uint8_t* texture_data = nullptr;
         int width = 0,height = 0, channels = 0, comp_req=0;
-        std::string texture_path = resource_path / "photos" / "cat-330x330.png";
+        std::string texture_path = (resource_path / "photos" / "cat-330x330.png").string();
 
         texture_data = stbi_load(texture_path.c_str(), &width, &height, &channels, comp_req);
 

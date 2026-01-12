@@ -31,11 +31,11 @@ struct MemoryBlockTree {
 
     int32_t max_order = 29; // 최대 블록 크기, 2^31 바이트, 512MB
 
-    int32_t bitmap_size = 0; // 비트맵 크기, 8비트가 각각 하나의 블록을 나타냄
+        size_t bitmap_size = 0; // 비트맵 크기, 8비트가 각각 하나의 블록을 나타냄
 
-    int32_t node_count = 0;
+        size_t node_count = 0;
 
-    int32_t level = 0; // 트리의 최대 레벨
+        uint32_t level = 0; // 트리의 최대 레벨
 
     size_t min_blk_size = 64; // 최소 블록 크기, 64바이트, 4x4 float matrix 최소 크기
 
@@ -75,7 +75,7 @@ private :
      * @brief 메모리 블록 트리의 레벨에서 첫번째 노드의 오프셋을 반환합니다.
      */
     inline static size_t level_offset(uint32_t level) {
-        return (1UL << level) - 1;
+        return (1ULL << level) - 1;
     }
 
     /**

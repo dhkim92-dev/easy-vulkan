@@ -199,8 +199,8 @@ public:
     void create_memory_pool() override {
         ev_log_info("[Setup Memory Pool]");
         memory_allocator = std::make_shared<ev::BitmapBuddyMemoryAllocator>(device);
-        memory_allocator->add_pool(ev::memory_type::GPU_ONLY, 1024 * 1024 * 1024); // 1GB GPU 전용 메모리 풀
-        memory_allocator->add_pool(ev::memory_type::HOST_READABLE, 256 * 1024 * 1024); // 256MB 호스트 읽기 가능한 메모리
+        memory_allocator->add_pool(ev::memory_type::GPU_ONLY, 1*GB); // 1GB GPU 전용 메모리 풀
+        memory_allocator->add_pool(ev::memory_type::HOST_READABLE, 64*MB); // 64MB 호스트 읽기 가능한 메모리
         CHECK_RESULT(memory_allocator->build());
         ev_log_info("[Setup Memory Pool Complete]");
     }
@@ -628,17 +628,17 @@ public:
         auto blur_comp_path = shader_path / title / "blur.comp.spv";
 
         std::vector<uint32_t> scene_vert_code;
-        ev::utility::read_spirv_shader_file(scene_vert_path.c_str(), scene_vert_code);
+        ev::utility::read_spirv_shader_file(scene_vert_path.string().c_str(), scene_vert_code);
         std::vector<uint32_t> scene_frag_code;
-        ev::utility::read_spirv_shader_file(scene_frag_path.c_str(), scene_frag_code);
+        ev::utility::read_spirv_shader_file(scene_frag_path.string().c_str(), scene_frag_code);
         std::vector<uint32_t> outline_vert_code;
-        ev::utility::read_spirv_shader_file(outline_vert_path.c_str(), outline_vert_code);
+        ev::utility::read_spirv_shader_file(outline_vert_path.string().c_str(), outline_vert_code);
         std::vector<uint32_t> outline_frag_code;
-        ev::utility::read_spirv_shader_file(outline_frag_path.c_str(), outline_frag_code);
+        ev::utility::read_spirv_shader_file(outline_frag_path.string().c_str(), outline_frag_code);
         std::vector<uint32_t> composite_vert_code;
-        ev::utility::read_spirv_shader_file(composite_vert_path.c_str(), composite_vert_code);
+        ev::utility::read_spirv_shader_file(composite_vert_path.string().c_str(), composite_vert_code);
         std::vector<uint32_t> composite_frag_code;
-        ev::utility::read_spirv_shader_file(composite_frag_path.c_str(), composite_frag_code);
+        ev::utility::read_spirv_shader_file(composite_frag_path.string().c_str(), composite_frag_code);
 
         shaders.scene_vert = std::make_shared<ev::Shader>(device, VK_SHADER_STAGE_VERTEX_BIT, scene_vert_code);
         shaders.scene_frag = std::make_shared<ev::Shader>(device, VK_SHADER_STAGE_FRAGMENT_BIT, scene_frag_code);
@@ -789,7 +789,7 @@ public:
     void setup_texture() {
         uint8_t* texture_data = nullptr;
         int width = 0,height = 0, channels = 0, comp_req=0;
-        std::string texture_path = resource_path / "textures" / "cube" / "wood.png";
+        std::string texture_path = (resource_path / "textures" / "cube" / "wood.png").string();
 
         texture_data = stbi_load(texture_path.c_str(), &width, &height, &channels, comp_req);
 

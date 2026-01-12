@@ -114,7 +114,7 @@ public:
     }
 
     void setup_model() {
-        std::string model_path = resource_path / "glTF-Sample-Models" / "2.0" / "Cube" / "glTF" / "Cube.gltf";
+        std::string model_path = (resource_path / "glTF-Sample-Models" / "2.0" / "Cube" / "glTF" / "Cube.gltf").string();
         ev::tools::gltf::GLTFModelManager model_manager(
             device, 
             memory_allocator, 
@@ -211,10 +211,10 @@ public:
 
     void setup_shaders() {
         vector<uint32_t> vertex_shader_code;
-        ev::utility::read_spirv_shader_file( (shader_path / this->title / "mesh.vert.spv").c_str(), vertex_shader_code);
+        ev::utility::read_spirv_shader_file( (shader_path / this->title / "mesh.vert.spv").string().c_str(), vertex_shader_code);
         shaders.vertex = std::make_shared<ev::Shader>(device, VK_SHADER_STAGE_VERTEX_BIT, vertex_shader_code);
         vector<uint32_t> fragment_shader_code;
-        ev::utility::read_spirv_shader_file( (shader_path / this->title / "mesh.frag.spv").c_str(), fragment_shader_code);
+        ev::utility::read_spirv_shader_file( (shader_path / this->title / "mesh.frag.spv").string().c_str(), fragment_shader_code);
         shaders.fragment = std::make_shared<ev::Shader>(device, VK_SHADER_STAGE_FRAGMENT_BIT, fragment_shader_code);
     }
 

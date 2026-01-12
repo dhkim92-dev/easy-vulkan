@@ -260,10 +260,10 @@ public:
     void setup_shaders() {
         ev_log_info("[Setup Shaders Start]");
         vector<uint32_t> vertex_shader_code;
-        ev::utility::read_spirv_shader_file( (shader_path / this->title / "sphere.vert.spv").c_str(), vertex_shader_code);
+        ev::utility::read_spirv_shader_file( (shader_path / this->title / "sphere.vert.spv").string().c_str(), vertex_shader_code);
         shaders.vertex = std::make_shared<ev::Shader>(device, VK_SHADER_STAGE_VERTEX_BIT, vertex_shader_code);
         vector<uint32_t> fragment_shader_code;
-        ev::utility::read_spirv_shader_file( (shader_path / this->title / "sphere.frag.spv").c_str(), fragment_shader_code);
+        ev::utility::read_spirv_shader_file( (shader_path / this->title / "sphere.frag.spv").string().c_str(), fragment_shader_code);
         shaders.fragment = std::make_shared<ev::Shader>(device, VK_SHADER_STAGE_FRAGMENT_BIT, fragment_shader_code);
         ev_log_info("[Setup Shaders End]");
     }

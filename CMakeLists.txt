@@ -18,6 +18,10 @@ else()
     set(EV_LOG_LEVEL "${EV_LOG_LEVEL}" CACHE STRING "Debug level for easy-vulkan" FORCE)
 endif()
 
+if (MSVC)
+    add_compile_options(/utf-8)
+endif()
+
 # Propagate as a compile definition so sources can use `#if EV_DEBUG_LEVEL >= 2` etc.
 add_compile_definitions(
     EV_LOG_LEVEL=${EV_LOG_LEVEL}
