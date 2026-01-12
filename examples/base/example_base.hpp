@@ -193,6 +193,13 @@ class ExampleBase {
             ExampleBase* app = reinterpret_cast<ExampleBase*>(glfwGetWindowUserPointer(window));
             app->resized = true;
         });
+
+        glfwSetWindowSizeCallback(display.window, [](GLFWwindow* window, int width, int height) {
+            // std::printf("Window resize detected: width=%d, height=%d\n", width, height);
+            ev_log_debug("Window resize detected: width=%d, height=%d", width, height);
+            ExampleBase* app = reinterpret_cast<ExampleBase*>(glfwGetWindowUserPointer(window));
+            app->on_window_resize();
+        });
     }
 
     virtual void create_surface() {
