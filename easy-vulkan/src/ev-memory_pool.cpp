@@ -83,7 +83,7 @@ VkResult MemoryPool::create(VkDeviceSize size, int32_t min_order) {
 
 int32_t MemoryPool::get_max_order(VkDeviceSize size) {
     int32_t order = mbt.min_order;
-    VkDeviceSize block_size = 1UL << mbt.min_order; // 최소 블록 크기
+    VkDeviceSize block_size = 1ULL << mbt.min_order; // 최소 블록 크기
 
     while (block_size < size ) {
         order++;
@@ -136,7 +136,7 @@ size_t MemoryPool::translate_addr_offset_from_node(
     return local_offset * level_blk_size;
 }
 
-int32_t MemoryPool::find_free_node(int32_t level, size_t node_idx, int32_t target_level, uint32_t alignment) {
+int64_t MemoryPool::find_free_node(int32_t level, int64_t node_idx, int32_t target_level, uint32_t alignment) {
     // ev_log_debug(
     //     "Searching for free node at level: " + std::to_string(level) + 
     //     ", node_idx: " + std::to_string(node_idx) + 
@@ -144,7 +144,7 @@ int32_t MemoryPool::find_free_node(int32_t level, size_t node_idx, int32_t targe
     //     ", block size : " + std::to_string(mbt.max_blk_size >> level)
     // );
 
-    if ( node_idx >= mbt.node_count ) {
+    if ( static_cast<size_t>(node_idx) >= mbt.node_count ) {
         ev_log_error("[ev::MemoryPool] Node index out of bounds: %zu", node_idx);
         return -1; // 노드 인덱스가 비트맵 범위를 벗어남
     }
@@ -244,8 +244,8 @@ std::shared_ptr<ev::MemoryBlockMetadata> MemoryPool::allocate_internal(
 
     // 이 과정까지 왔다면, 탐색의 대상 되는 노드들은  기본적으로 크기를 만족한다.
     // 따라서 alignment 만 고려하면 된다.
-    int32_t node = find_free_node(0, 0, target_level, alignment);
-    if ( node < 0 ) {
+    size_t node = find_free_node(0, 0, target_level, alignment);
+    if ( node == static_cast<size_t>(-1) ) {
         ev_log_error("[ev::MemoryPool] No free memory block found for the requested size.");
         return nullptr; // 할당할 수 있는 블록이 없음
     }
@@ -337,7 +337,7 @@ void MemoryPool::merge(size_t node_idx) {
 
 std::shared_ptr<ev::MemoryBlockMetadata> MemoryPool::standalone_allocate(
     VkDeviceSize size, 
-    uint32_t alignment
+    VkDeviceSize alignment
 ) {
     if (size < alignment) {
         size = alignment;

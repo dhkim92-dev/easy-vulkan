@@ -308,9 +308,9 @@ public:
 
     void uniform_update() {
         if ( last_frame_time == 0.0f ) {
-            last_frame_time = current_frame_time = glfwGetTime();
+            last_frame_time = current_frame_time = static_cast<float>(glfwGetTime());
         } else {
-            current_frame_time = glfwGetTime();
+            current_frame_time = static_cast<float>(glfwGetTime());
         }
         last_frame_time = current_frame_time;
     }

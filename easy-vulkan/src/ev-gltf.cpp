@@ -452,7 +452,7 @@ std::shared_ptr<ev::Texture> GLTFModelManager::load_texture(tinygltf::Image &ima
         }
         delete_buffer = true;
     } else {
-        buffer_size = image.image.size();
+        buffer_size = static_cast<uint32_t>(image.image.size());
         buffer = &image.image[0];
     }
 
@@ -979,9 +979,9 @@ void GLTFModelManager::load_node_meshes(
         glm::vec3 min_pos(0.0f);
         glm::vec3 max_pos(0.0f);
 
-        uint32_t vertex_start = h_vertices.size();
+        uint32_t vertex_start = static_cast<uint32_t>(h_vertices.size());
         uint32_t vertex_count = 0;
-        uint32_t index_start = h_indices.size();
+        uint32_t index_start = static_cast<uint32_t>(h_indices.size());
         uint32_t index_count = 0;
 
         add_mesh_vertices(gltf_model, mesh, primitive, h_vertices, min_pos, max_pos, vertex_start, vertex_count);
@@ -1291,7 +1291,7 @@ void GLTFModelManager::prepare_material_descriptor_sets(
         texture_layout->add_binding(
             VK_SHADER_STAGE_FRAGMENT_BIT,
             VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-            texture_layout->get_bindings().size(),
+            static_cast<uint32_t>(texture_layout->get_bindings().size())    ,
             1
         );
     }
@@ -1301,7 +1301,7 @@ void GLTFModelManager::prepare_material_descriptor_sets(
         texture_layout->add_binding(
             VK_SHADER_STAGE_FRAGMENT_BIT,
             VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-            texture_layout->get_bindings().size(),
+            static_cast<uint32_t>(texture_layout->get_bindings().size()),
             1
         );
     }
@@ -1319,14 +1319,14 @@ void GLTFModelManager::prepare_material_descriptor_sets(
         if ( descriptor_binding_flags & DescriptorBindingFlags::ImageBaseColor ) {
             ev_log_debug("[ev::tools::gltf::GLTFModelManager::prepare_material_descriptor_sets] Writing base color texture to descriptor set.");
             material->get_descriptor_set()->write_texture(
-                material->get_descriptor_set()->registry_size(),
+                static_cast<uint32_t>(material->get_descriptor_set()->registry_size()),
                 material->get_base_color_texture(),
                 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
             );
         } else if ( material->get_normal_texture() != nullptr && descriptor_binding_flags & DescriptorBindingFlags::ImageNormalMap ) {
             ev_log_debug("[ev::tools::gltf::GLTFModelManager::prepare_material_descriptor_sets] Writing normal map texture to descriptor set.");
             material->get_descriptor_set()->write_texture(
-                material->get_descriptor_set()->registry_size(),
+                static_cast<uint32_t>(material->get_descriptor_set()->registry_size()),
                 material->get_normal_texture(),
                 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
             );

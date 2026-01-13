@@ -320,10 +320,10 @@ public:
     void uniform_update() {
         if ( last_frame_time == 0.0f ) {
             // last_frame_time = current_frame_time = std::chrono::duration<float>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
-            last_frame_time = current_frame_time = glfwGetTime();
+            last_frame_time = current_frame_time = static_cast<float>(glfwGetTime());
         } else {
             // current_frame_time = std::chrono::duration<float>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
-            current_frame_time = glfwGetTime();
+            current_frame_time = static_cast<float>(glfwGetTime());
         }
 
         model_matrix = glm::scale( glm::rotate(glm::mat4(1.0f), glm::radians(current_frame_time * 90.0f), glm::vec3(0.0f, 1.0f, 0.0f)), glm::vec3(0.5f, 0.5f, 0.5f));

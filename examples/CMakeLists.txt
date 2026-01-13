@@ -28,18 +28,14 @@ foreach(SAMPLE_MAIN ${SAMPLE_MAIN_FILES})
     # 실행 파일 생성
     add_executable(${EXAMPLE_NAME}_example ${SAMPLE_MAIN})
 
-        # easy-vulkan: on Windows use the static target; otherwise use the shared alias
-        if(WIN32)
-            set(EASY_VULKAN_TARGET easy-vulkan_static)
-        else()
-            set(EASY_VULKAN_TARGET easy-vulkan)
-        endif()
-
-        target_link_libraries(${EXAMPLE_NAME}_example PRIVATE ${EASY_VULKAN_TARGET} glfw Vulkan::Vulkan stb_headers stb_impl tiny_gltf_headers tiny_gltf_impl glm::glm)
-
-    if(WIN32) 
+    # 윈도우에서는 정적 라이브러리 사용  
+    if(WIN32)
+        set(EASY_VULKAN_TARGET easy-vulkan_static)
     else()
+        set(EASY_VULKAN_TARGET easy-vulkan)
     endif()
+
+    target_link_libraries(${EXAMPLE_NAME}_example PRIVATE ${EASY_VULKAN_TARGET} glfw Vulkan::Vulkan stb_headers stb_impl tiny_gltf_headers tiny_gltf_impl glm::glm)
 
 
     # include 디렉터리 추가

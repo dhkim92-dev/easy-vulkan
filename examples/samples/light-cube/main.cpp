@@ -453,15 +453,14 @@ public:
         command_buffers[current_buffer_index]->bind_graphics_pipeline(pipelines.cube_pipelines[0]);
         command_buffers[current_buffer_index]->bind_vertex_buffers(0, {d_buffers.vertices, d_buffers.instance_buffer}, {0, 0});
         command_buffers[current_buffer_index]->bind_index_buffers({d_buffers.indices}, 0, VK_INDEX_TYPE_UINT32);
-        command_buffers[current_buffer_index]->draw_indexed(h_indices.size(), cubes.size(), 0, 0, 0);
-
+        command_buffers[current_buffer_index]->draw_indexed(static_cast<uint32_t>(h_indices.size()), static_cast<uint32_t>(cubes.size()), 0, 0, 0);
         command_buffers[current_buffer_index]->bind_descriptor_sets(VK_PIPELINE_BIND_POINT_GRAPHICS, 
             pipelines.light_layouts[0], 
             {descriptors.light_sets[current_buffer_index]});
         command_buffers[current_buffer_index]->bind_graphics_pipeline(pipelines.light_pipelines[0]);
         command_buffers[current_buffer_index]->bind_vertex_buffers(0, {d_buffers.vertices}, {0});
         command_buffers[current_buffer_index]->bind_index_buffers({d_buffers.indices}, 0, VK_INDEX_TYPE_UINT32);
-        command_buffers[current_buffer_index]->draw_indexed(h_indices.size(), 1, 0, 0, 0);
+        command_buffers[current_buffer_index]->draw_indexed(static_cast<uint32_t>(h_indices.size()), 1, 0, 0, 0);
         command_buffers[current_buffer_index]->end_render_pass();
         CHECK_RESULT(command_buffers[current_buffer_index]->end());
     }
@@ -479,7 +478,7 @@ public:
         descriptors.pool = std::make_shared<ev::DescriptorPool>(device);
         auto& descriptor_pool = descriptors.pool;
         descriptor_pool->add(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 
-            swapchain->get_images().size() * 2); // 1 for camera pv matrix, 2 for light cube model, 3 for light position
+            static_cast<uint32_t>(swapchain->get_images().size()) * 2); // 1 for camera pv matrix, 2 for light cube model, 3 for light position
         descriptor_pool->add(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 3);
         CHECK_RESULT(descriptor_pool->create_pool(10, VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT));
         ev_log_debug("Descriptor pool created");
@@ -740,9 +739,9 @@ public:
 
     void uniform_update() {
         if ( last_frame_time == 0.0f ) {
-            last_frame_time = current_frame_time = glfwGetTime();
+            last_frame_time = current_frame_time = static_cast<float>(glfwGetTime());
         } else {
-            current_frame_time = glfwGetTime();
+            current_frame_time = static_cast<float>(glfwGetTime());
         }
 
         float delta_time = current_frame_time - last_frame_time;

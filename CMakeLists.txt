@@ -5,6 +5,10 @@ project(easy-vulkan-project VERSION 1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Export compile commands for tools like clangd / cpptools
+# This makes CMake generate `compile_commands.json` in the build directory.
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Add subdirectories for the easy-vulkan library and the test projec
 
 option(BUILD_TESTS "Build tests" OFF) # 기본값 OFF

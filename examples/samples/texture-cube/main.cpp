@@ -361,7 +361,7 @@ public:
         command_buffers[current_buffer_index]->bind_graphics_pipeline(graphics_pipeline);
         command_buffers[current_buffer_index]->bind_vertex_buffers(0, {buffers.cube_vertices}, {0});
         command_buffers[current_buffer_index]->bind_index_buffers({buffers.cube_indices}, 0, VK_INDEX_TYPE_UINT32);
-        command_buffers[current_buffer_index]->draw_indexed(cube_indices.size(), 1, 0, 0, 0);
+        command_buffers[current_buffer_index]->draw_indexed(static_cast<uint32_t>(cube_indices.size()), 1, 0, 0, 0);
         command_buffers[current_buffer_index]->end_render_pass();
         CHECK_RESULT(command_buffers[current_buffer_index]->end());
     }
@@ -503,10 +503,10 @@ public:
     void uniform_update() {
         if ( last_frame_time == 0.0f ) {
             // last_frame_time = current_frame_time = std::chrono::duration<float>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
-            last_frame_time = current_frame_time = glfwGetTime();
+            last_frame_time = current_frame_time = static_cast<float>(glfwGetTime());
         } else {
             // current_frame_time = std::chrono::duration<float>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
-            current_frame_time = glfwGetTime();
+            current_frame_time = static_cast<float>(glfwGetTime());
         }
         // 사각형이 매 프레임마다 회전하도록 설정
         ubo.model = glm::scale( glm::rotate(glm::mat4(1.0f), glm::radians(current_frame_time * 90.0f), glm::vec3(0.0f, 1.0f, 0.0f)), glm::vec3(0.5f, 0.5f, 0.5f));

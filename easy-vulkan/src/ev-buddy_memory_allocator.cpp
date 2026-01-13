@@ -91,13 +91,7 @@ VkResult BitmapBuddyMemoryAllocator::allocate_buffer(
     }
     VkMemoryRequirements requirements = buffer->get_memory_requirements();
 
-    // if ( buffer->get_usage_flags() & VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT ) {
-        // ev_log_debug("[ev::BitmapBuddyMemoryAllocator] Minimum uniform buffer offset alignment: " + to_string(device->get_properties().limits.minUniformBufferOffsetAlignment));
-    // }
-
-    // ev::ev_log_debug("[ev::BitmapBuddyMemoryAllocator] Allocating buffer with size: " + std::to_string(requirements.size) + 
-        // ", alignment: " + std::to_string(requirements.alignment) + ", memory type index: " + std::to_string(memory_type_index));
-    std::shared_ptr<ev::MemoryBlockMetadata> metadata = it->second->allocate(requirements.size, requirements.alignment);
+    std::shared_ptr<ev::MemoryBlockMetadata> metadata = it->second->allocate(requirements.size, static_cast<uint32_t>(requirements.alignment));
     if (!metadata) {
         ev_log_error("[ev::BitmapBuddyMemoryAllocator] Failed to allocate memory for the buffer.");
         return VK_ERROR_OUT_OF_DEVICE_MEMORY;  
@@ -127,7 +121,8 @@ VkResult BitmapBuddyMemoryAllocator::allocate_image(
     }
 
     std::shared_ptr<ev::MemoryBlockMetadata> metadata = it->second->allocate(image->get_memory_requirements().size, 
-        image->get_memory_requirements().alignment);
+        static_cast<uint32_t>(image->get_memory_requirements().alignment)
+    );
 
     if (!metadata) {
         ev_log_error("[ev::BitmapBuddyMemoryAllocator] Failed to allocate memory for the image.");

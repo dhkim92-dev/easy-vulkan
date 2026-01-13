@@ -24,7 +24,7 @@ TEST_F(ShaderTest, CreateShaderModule) {
     //vector<uint32_t> shader_code = {0x07230203, 0x00010000, 0x0008000a, 0x00000000}; // Minimal SPIR-V code
     vector<uint32_t> shader_code;
     std::filesystem::path base_path = get_executable_dir();
-    auto vertex_shader_path = base_path / "shaders" / "vert.spv";
+    auto vertex_shader_path = (base_path / "shaders" / "vert.spv").string();
     ev::utility::read_spirv_shader_file(vertex_shader_path.c_str(), shader_code);
     Shader shader(device, VK_SHADER_STAGE_VERTEX_BIT, shader_code);
     EXPECT_NE(VkShaderModule(shader), VK_NULL_HANDLE);

@@ -179,7 +179,8 @@ void CommandBuffer::bind_push_constants(
         exit(EXIT_FAILURE);
     }
     
-    vkCmdPushConstants(command_buffer, *layout, stage_flags, offset, size, data);
+    vkCmdPushConstants(command_buffer, *layout, stage_flags, offset, 
+        static_cast<uint32_t>(size), data);
 }
 
 void CommandBuffer::copy_buffer(

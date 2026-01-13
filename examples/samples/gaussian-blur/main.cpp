@@ -582,7 +582,7 @@ public:
 
         command_buffers[current_buffer_index]->bind_graphics_pipeline(pipelines.base);
         auto region = d_buffers.input_texture->image->get_extent();
-        command_buffers[current_buffer_index]->set_viewport(0, 0, region.width, region.height);
+        command_buffers[current_buffer_index]->set_viewport(0, 0, static_cast<float>(region.width), static_cast<float>(region.height));
         command_buffers[current_buffer_index]->set_scissor(0, 0, region.width, region.height);
         command_buffers[current_buffer_index]->draw(3, 1, 0, 0);
         command_buffers[current_buffer_index]->bind_descriptor_sets(
@@ -590,7 +590,7 @@ public:
             pipelines.base_layout,
             {descriptors.base_blurred[current_buffer_index]}
         );
-        command_buffers[current_buffer_index]->set_viewport(region.width, 0, region.width, region.height);
+        command_buffers[current_buffer_index]->set_viewport(static_cast<float>(region.width), 0, static_cast<float>(region.width), static_cast<float>(region.height));
         command_buffers[current_buffer_index]->set_scissor(region.width, 0, region.width, region.height);
         command_buffers[current_buffer_index]->draw(3, 1, 0, 0);
         command_buffers[current_buffer_index]->end_render_pass();

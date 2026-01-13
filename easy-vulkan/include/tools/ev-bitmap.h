@@ -9,15 +9,15 @@
 
 namespace ev::tools {
 
-static inline void bitmap_set(std::vector<uint8_t>& bitmap, size_t index) {
+static inline void bitmap_set(std::vector<uint8_t>& bitmap, int64_t index) {
     bitmap[index >> 0x03] |= (1 << (index & 0x07));
 }
 
-static inline void bitmap_clear(std::vector<uint8_t>& bitmap, size_t index) {
+static inline void bitmap_clear(std::vector<uint8_t>& bitmap, int64_t index) {
     bitmap[index >> 0x03] &= ~(1 << (index & 0x07));
 }
 
-static inline uint32_t bitmap_read(const std::vector<uint8_t>& bitmap, size_t index) {
+static inline uint8_t bitmap_read(const std::vector<uint8_t>& bitmap, int64_t index) {
     return (bitmap[index >> 0x03] & (1 << (index & 0x07))) != 0 ? 1 : 0;
 }
 

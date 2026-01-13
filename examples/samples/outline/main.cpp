@@ -1007,7 +1007,7 @@ public:
         commands_buffers.scene[current_buffer_index]->bind_push_constants( pipelines.scene_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, &ubo, sizeof(UniformBuffer) );
         commands_buffers.scene[current_buffer_index]->bind_vertex_buffers(0, {d_buffers.cube_vertices}, {0});
         commands_buffers.scene[current_buffer_index]->bind_index_buffers({d_buffers.cube_indices}, 0, VK_INDEX_TYPE_UINT32);
-        commands_buffers.scene[current_buffer_index]->draw_indexed(cube_indices.size(), 1, 0, 0, 0);
+        commands_buffers.scene[current_buffer_index]->draw_indexed(static_cast<uint32_t>(cube_indices.size()), 1, 0, 0, 0);
         commands_buffers.scene[current_buffer_index]->end_render_pass();
 
         CHECK_RESULT(commands_buffers.scene[current_buffer_index]->end());
@@ -1026,7 +1026,7 @@ public:
         commands_buffers.outline[current_buffer_index]->bind_push_constants( pipelines.outline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, &ubo, sizeof(UniformBuffer) );
         commands_buffers.outline[current_buffer_index]->bind_vertex_buffers(0, {d_buffers.cube_vertices}, {0});
         commands_buffers.outline[current_buffer_index]->bind_index_buffers({d_buffers.cube_indices}, 0, VK_INDEX_TYPE_UINT32);
-        commands_buffers.outline[current_buffer_index]->draw_indexed(cube_indices.size(), 1, 0, 0, 0);
+        commands_buffers.outline[current_buffer_index]->draw_indexed(static_cast<uint32_t>(cube_indices.size()), 1, 0, 0, 0);
         commands_buffers.outline[current_buffer_index]->end_render_pass();
         CHECK_RESULT(commands_buffers.outline[current_buffer_index]->end());
         ev_log_debug("Outline command buffer recorded successfully.");
@@ -1072,7 +1072,7 @@ public:
         command_buffers[current_buffer_index]->bind_graphics_pipeline(pipelines.composite);
         command_buffers[current_buffer_index]->bind_vertex_buffers(0, {d_buffers.cube_vertices}, {0});
         command_buffers[current_buffer_index]->bind_index_buffers({d_buffers.cube_indices}, 0, VK_INDEX_TYPE_UINT32);
-        command_buffers[current_buffer_index]->draw_indexed(cube_indices.size(), 1, 0, 0, 0);
+        command_buffers[current_buffer_index]->draw_indexed(static_cast<uint32_t>(cube_indices.size()), 1, 0, 0, 0);
         command_buffers[current_buffer_index]->end_render_pass();
         CHECK_RESULT(command_buffers[current_buffer_index]->end());
     }
@@ -1089,9 +1089,9 @@ public:
 
     void uniform_update() {
         if ( last_frame_time == 0.0f ) {
-            last_frame_time = current_frame_time = glfwGetTime();
+            last_frame_time = current_frame_time = static_cast<float>(glfwGetTime());
         } else {
-            current_frame_time = glfwGetTime();
+            current_frame_time = static_cast<float>(glfwGetTime());
         }
         ubo.model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         ubo.model = glm::rotate(ubo.model, glm::radians(current_frame_time * 50.0f), glm::vec3(0.0f, 1.0f, 0.0f));

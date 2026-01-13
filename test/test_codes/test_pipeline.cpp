@@ -100,8 +100,8 @@ TEST_F(PipelineTest, GraphicsPipelineBlueprintManagerCreateTest) {
 
     // Create a basic graphics pipeline blueprint
     std::filesystem::path base_path = get_executable_dir();
-    auto vertex_shader_path =  base_path / "shaders" / "vert.spv";
-    auto fragment_shader_path = base_path / "shaders" / "frag.spv";
+    auto vertex_shader_path =  (base_path / "shaders" / "vert.spv").string();
+    auto fragment_shader_path = (base_path / "shaders" / "frag.spv").string();
     printf("Vertex Shader Path: %s\n", vertex_shader_path.c_str());
     printf("Fragment Shader Path: %s\n", fragment_shader_path.c_str());
     vector<uint32_t> vertex_shader_code;

@@ -414,7 +414,7 @@ public:
         command_buffers[current_buffer_index]->bind_graphics_pipeline(graphics_pipeline);
         command_buffers[current_buffer_index]->bind_vertex_buffers(0, {d_buffers.vertices, d_buffers.instance_buffer}, {0, 0});
         command_buffers[current_buffer_index]->bind_index_buffers({d_buffers.indices}, 0, VK_INDEX_TYPE_UINT32);
-        command_buffers[current_buffer_index]->draw_indexed(h_indices.size(), cubes.size(), 0, 0, 0);
+        command_buffers[current_buffer_index]->draw_indexed(static_cast<uint32_t>(h_indices.size()), static_cast<uint32_t>(cubes.size()), 0, 0, 0);
         command_buffers[current_buffer_index]->end_render_pass();
         CHECK_RESULT(command_buffers[current_frame_index]->end());
     }
@@ -423,7 +423,7 @@ public:
         ev_log_info("[Setup Descriptor Sets Start]");
         descriptors.pool = std::make_shared<ev::DescriptorPool>(device);
         auto& descriptor_pool = descriptors.pool;
-        descriptor_pool->add(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3 * cubes.size());
+        descriptor_pool->add(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3 * static_cast<uint32_t>(cubes.size()));
         descriptor_pool->add(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 3);
         CHECK_RESULT(descriptor_pool->create_pool(3, VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT));
         descriptors.layout = std::make_shared<ev::DescriptorSetLayout>(device);
@@ -599,9 +599,9 @@ public:
 
     void uniform_update() {
         if ( last_frame_time == 0.0f ) {
-            last_frame_time = current_frame_time = glfwGetTime();
+            last_frame_time = current_frame_time = static_cast<float>(glfwGetTime());
         } else {
-            current_frame_time = glfwGetTime();
+            current_frame_time = static_cast<float>(glfwGetTime());
         }
 
         last_frame_time = current_frame_time;

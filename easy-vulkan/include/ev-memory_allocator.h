@@ -31,15 +31,15 @@ struct MemoryBlockTree {
 
     int32_t max_order = 29; // 최대 블록 크기, 2^31 바이트, 512MB
 
-        size_t bitmap_size = 0; // 비트맵 크기, 8비트가 각각 하나의 블록을 나타냄
+    size_t bitmap_size = 0; // 비트맵 크기, 8비트가 각각 하나의 블록을 나타냄
 
-        size_t node_count = 0;
+    size_t node_count = 0;
 
-        uint32_t level = 0; // 트리의 최대 레벨
+    int32_t level = 0; // 트리의 최대 레벨
 
     size_t min_blk_size = 64; // 최소 블록 크기, 64바이트, 4x4 float matrix 최소 크기
 
-    size_t max_blk_size = 1UL << max_order; // 최대 블록 크기, 2^29 바이트, 512MB
+    size_t max_blk_size = static_cast<size_t>(1ULL << max_order); // 최대 블록 크기, 2^29 바이트, 512MB
 };
 
 class BitmapBuddyMemoryBlockDeleter {
@@ -81,7 +81,7 @@ private :
     /**
      * @brief 주어진 노드 인덱스에 해당하는 레벨을 반환합니다.
      */
-    inline static uint32_t node_to_level(uint32_t node) {
+    inline static uint32_t node_to_level(size_t node) {
         uint32_t level = 0;
         while ( level_offset(level + 1) <= node ) {
             level++;
@@ -118,7 +118,7 @@ private :
     /**
      * @brief 재귀적으로 노드를 탐색, 블록을 분할하며 원하는 레벨의 free node를 찾는다.
      */
-    int32_t find_free_node(int32_t level, size_t node_idx, int32_t target_level, uint32_t alignment);
+    int64_t find_free_node(int32_t level, int64_t node_idx, int32_t target_level, uint32_t alignment);
 
     /**
      * @brief 메모리 블록을 할당합니다.
@@ -195,7 +195,7 @@ public :
      */
     std::shared_ptr<ev::MemoryBlockMetadata> standalone_allocate(
         VkDeviceSize size, 
-        uint32_t alignment
+        VkDeviceSize alignment
     ); 
 
     bool is_support(uint32_t mem_type_index) const {
