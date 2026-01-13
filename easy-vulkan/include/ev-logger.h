@@ -37,15 +37,7 @@ namespace ev::log {
         }
     }
 
-    // 실제 출력 구현 (여기만 함수 스택 탐)
-    template <typename... Args>
-    inline void log_impl(LogLevel level, const char* file, int line, const char* fmt, Args&&... args) {
-        std::lock_guard<std::mutex> lock(log_mutex());
-        std::fprintf(stderr, "[%s][%s:%d] : ", level_to_string(level), file, line);
-        std::fprintf(stderr, fmt, std::forward<Args>(args)...);
-        std::fprintf(stderr, "\n");
-        std::fflush(stderr);
-    }
+    inline void log_impl_noop() {}
 
 } // namespace ev::log
 
@@ -54,7 +46,11 @@ namespace ev::log {
 #define EV_LOG_IMPL(level_enum, fmt, ...)                                     \
     do {                                                                      \
         if constexpr (EV_LOG_LEVEL <= ev::log::to_int(level_enum)) {         \
-            ev::log::log_impl(level_enum, __FILE__, __LINE__, fmt, ##__VA_ARGS__); \
+            std::lock_guard<std::mutex> __ev_log_lock(ev::log::log_mutex()); \
+            std::fprintf(stderr, "[%s][%s:%d] : ", ev::log::level_to_string(level_enum), __FILE__, __LINE__); \
+            std::fprintf(stderr, fmt, ##__VA_ARGS__);                        \
+            std::fprintf(stderr, "\n");                                    \
+            std::fflush(stderr);                                              \
         }                                                                     \
     } while (0)
 

@@ -568,7 +568,7 @@ public:
         pipelines.light_layouts.push_back(light_pipeline_layout);
     }
 
-    void create_renderpass() {
+    void create_renderpass() override {
         VkAttachmentDescription color_attachment = {};
         color_attachment.format = swapchain->get_image_format();
         color_attachment.samples = VK_SAMPLE_COUNT_1_BIT;

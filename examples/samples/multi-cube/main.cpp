@@ -279,7 +279,7 @@ public:
         ev_log_info("[Setup Texture End]");
     }
 
-    void create_memory_pool() {
+    void create_memory_pool() override {
         ev_log_info("[Setup Memory Pool Start]");
         memory_allocator = std::make_shared<ev::BitmapBuddyMemoryAllocator>(device);
         memory_allocator->add_pool(ev::memory_type::GPU_ONLY, 64*MB); 
@@ -466,7 +466,7 @@ public:
         pipeline_layouts.push_back(pipeline_layout);
     }
 
-    void create_renderpass() {
+    void create_renderpass() override {
         VkAttachmentDescription color_attachment = {};
         color_attachment.format = swapchain->get_image_format();
         color_attachment.samples = VK_SAMPLE_COUNT_1_BIT;

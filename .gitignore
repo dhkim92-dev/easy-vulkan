@@ -11,3 +11,4 @@ resources/models
 .vscode/**
 .cache/**
 .cache
+compile_commands.json

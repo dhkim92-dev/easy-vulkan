@@ -145,7 +145,7 @@ int64_t MemoryPool::find_free_node(int32_t level, int64_t node_idx, int32_t targ
     // );
 
     if ( static_cast<size_t>(node_idx) >= mbt.node_count ) {
-        ev_log_error("[ev::MemoryPool] Node index out of bounds: %zu", node_idx);
+        ev_log_error("[ev::MemoryPool] Node index out of bounds: %zu", static_cast<size_t>(node_idx));
         return -1; // 노드 인덱스가 비트맵 범위를 벗어남
     }
 
