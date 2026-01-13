@@ -11,7 +11,7 @@
       "displayName": "Default configure (EV_DEBUG_LEVEL=1)",
       "description": "Configure with EV_DEBUG_LEVEL=1",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/default",
+      "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "EV_DEBUG_LEVEL": "1",
         "BUILD_TESTS": "OFF",
@@ -26,7 +26,7 @@
       "displayName": "Configure with EV_LOG_LEVEL=0",
       "description": "Configure with EV_LOG_LEVEL=0",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/debug",
+      "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "EV_LOG_LEVEL": "0",
         "BUILD_TESTS": "ON",
@@ -38,7 +38,7 @@
         "displayName": "Test configure (EV_LOG_LEVEL=0, BUILD_TESTS=ON)",
         "description": "Configure for testing with EV_LOG_LEVEL=0 and BUILD_TESTS=ON",
         "generator": "Ninja",
-        "binaryDir": "${sourceDir}/build/test",
+        "binaryDir": "${sourceDir}/build",
         "cacheVariables": {
             "EV_LOG_LEVEL": "1",
             "BUILD_TESTS": "ON",
@@ -50,7 +50,7 @@
         "displayName": "Release build",
         "description": "Configure for a release build",
         "generator": "Ninja",
-        "binaryDir": "${sourceDir}/build/release",
+        "binaryDir": "${sourceDir}/build",
         "cacheVariables": {
             "CMAKE_BUILD_TYPE": "Release",
             "EV_LOG_LEVEL": "2",
