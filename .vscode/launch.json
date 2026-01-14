@@ -1,0 +1,37 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug example (pick)",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/examples/bin/${input:example}_example",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "lldb",
+      "preLaunchTask": "build-examples"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "example",
+      "type": "pickString",
+      "description": "Choose example to debug (executable path relative to build/examples/bin)",
+      "options": [
+        "cube/cube",
+        "gaussian-blur/gaussian-blur",
+        "gltf-model-loading/gltf-model-loading",
+        "light-cube/light-cube",
+        "multi-cube/multi-cube",
+        "outline/outline",
+        "phong-shading/phong-shading",
+        "texture-cube/texture-cube",
+        "triangle/triangle"
+      ],
+      "default": "texture-cube/texture-cube"
+    }
+  ]
+}

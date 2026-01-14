@@ -423,8 +423,8 @@ public:
         ev_log_info("[Setup Descriptor Sets Start]");
         descriptors.pool = std::make_shared<ev::DescriptorPool>(device);
         auto& descriptor_pool = descriptors.pool;
-        descriptor_pool->add(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3 * static_cast<uint32_t>(cubes.size()));
-        descriptor_pool->add(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 3);
+        descriptor_pool->add(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, static_cast<uint32_t>(cubes.size() * swapchain->get_images().size()));
+        descriptor_pool->add(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, static_cast<uint32_t>(swapchain->get_images().size()));
         CHECK_RESULT(descriptor_pool->create_pool(3, VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT));
         descriptors.layout = std::make_shared<ev::DescriptorSetLayout>(device);
         descriptors.layout->add_binding(VK_SHADER_STAGE_VERTEX_BIT, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, 1); // Camera uniform buffer

@@ -333,8 +333,8 @@ public:
 
     void render() override {
         prepare_frame();
-        record_command_buffers();
         uniform_update();
+        record_command_buffers();
         submit_frame();
     }
 };

@@ -33,7 +33,7 @@ private:
     struct {
         std::shared_ptr<ev::Buffer> cube_vertices;
         std::shared_ptr<ev::Buffer> cube_indices;
-        std::shared_ptr<ev::Buffer> uniform;
+        std::vector<std::shared_ptr<ev::Buffer>> uniforms;
     } buffers;
 
     struct Vertex {
@@ -136,16 +136,19 @@ public:
 
     void setup_uniform_buffer() {
         ev_log_info("[Setup Uniform Buffer Start]");
-        buffers.uniform= std::make_shared<ev::Buffer>(
-            device, 
-            sizeof(UniformBufferObject), 
-            ev::buffer_type::UNIFORM_BUFFER
-        );
-        memory_allocator->allocate_buffer(buffers.uniform, ev::memory_type::HOST_READABLE);
-        buffers.uniform->map();
-        buffers.uniform->write(&ubo, sizeof(ubo));
-        buffers.uniform->flush();
-        buffers.uniform->unmap();
+
+        for (size_t i = 0 ; i < swapchain->get_images().size() ; i++) {
+            buffers.uniforms.push_back(std::make_shared<ev::Buffer>(
+                device, 
+                sizeof(UniformBufferObject), 
+                ev::buffer_type::UNIFORM_BUFFER
+            ));
+            memory_allocator->allocate_buffer(buffers.uniforms[i], ev::memory_type::HOST_READABLE);
+            buffers.uniforms[i]->map();
+            buffers.uniforms[i]->write(&ubo, sizeof(ubo));
+            buffers.uniforms[i]->flush();
+            buffers.uniforms[i]->unmap();
+        }
         ev_log_info("[Setup Uniform Buffer End]");
     }
 
@@ -232,19 +235,19 @@ public:
     void setup_descriptor_sets() {
         ev_log_debug("[Setup Descriptor Sets Start]");
         descriptor_pool = std::make_shared<ev::DescriptorPool>(device);
-        descriptor_pool->add(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3);
-        CHECK_RESULT(descriptor_pool->create_pool(3, VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT));
+        descriptor_pool->add(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, static_cast<uint32_t>(max_frames_in_flight));
+        CHECK_RESULT(descriptor_pool->create_pool(static_cast<uint32_t>(max_frames_in_flight), VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT));
         ev_log_debug("Descriptor pool created");
         descriptors.layout = std::make_shared<ev::DescriptorSetLayout>(device);
         descriptors.layout->add_binding(VK_SHADER_STAGE_VERTEX_BIT, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, 1);
         CHECK_RESULT(descriptors.layout->create_layout());
         ev_log_debug("Descriptor set layout created");
 
-        for (uint32_t i = 0 ; i < swapchain->get_images().size(); ++i) {
+        for (uint32_t i = 0 ; i < static_cast<uint32_t>(max_frames_in_flight); ++i) {
             descriptors.sets.push_back(descriptor_pool->allocate(descriptors.layout));
             descriptors.sets.back()->write_buffer(
                 0, 
-                buffers.uniform
+                buffers.uniforms[i]
             );
             CHECK_RESULT(descriptors.sets.back()->update());
         }
@@ -384,10 +387,10 @@ public:
             0.1f, 10.0f
         );
         // ubo.proj[1][1] *= -1; // Vulkan NDC 보정
-        buffers.uniform->map();
-        buffers.uniform->write(&ubo, sizeof(ubo));
+        buffers.uniforms[current_frame_index]->map();
+        buffers.uniforms[current_frame_index]->write(&ubo, sizeof(ubo));
         // buffers.uniform.buffer->flush();
-        buffers.uniform->unmap();
+        buffers.uniforms[current_frame_index]->unmap();
         last_frame_time = current_frame_time;
     }
 
@@ -398,8 +401,8 @@ public:
             return;
         }
         prepare_frame(true);
-        record_command_buffers();
         uniform_update();
+        record_command_buffers();
         submit_frame();
     }
 };

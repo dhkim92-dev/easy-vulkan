@@ -43,7 +43,7 @@ private:
         // uniforms
         std::shared_ptr<ev::Buffer> camera_uniform;
         std::shared_ptr<ev::Texture> texture;
-        std::shared_ptr<ev::Buffer> light_uniform;
+        std::vector<std::shared_ptr<ev::Buffer>> light_uniforms;
     } d_buffers;
 
     struct Cube {
@@ -321,20 +321,21 @@ public:
         d_buffers.camera_uniform->write(&camera, sizeof(Camera));
         d_buffers.camera_uniform->flush();
         d_buffers.camera_uniform->unmap();
-        VkBuffer uniform_buffer_handle = *d_buffers.camera_uniform;
+        VkBuffer uniform_buffer_handle = *d_buffers.camera_uniform; // 카메라는 고정이라서 유니폼 버퍼 1개만 생성
 
         //  Light Uniform Buffer set
-        d_buffers.light_uniform = std::make_shared<ev::Buffer>(
-            device, 
-            sizeof(Light),
-            ev::buffer_type::UNIFORM_BUFFER
-        );
-        memory_allocator->allocate_buffer(d_buffers.light_uniform, ev::memory_type::HOST_READABLE);
-        d_buffers.light_uniform->map();
-        d_buffers.light_uniform->write(&light, sizeof(Light));
-        d_buffers.light_uniform->flush();
-        d_buffers.light_uniform->unmap();
-        VkBuffer light_uniform_buffer_handle = *d_buffers.light_uniform;
+        for ( size_t i = 0 ; i < static_cast<size_t>(max_frames_in_flight); ++i ) {
+            d_buffers.light_uniforms.push_back( std::make_shared<ev::Buffer>(
+                device, 
+                sizeof(Light),
+                ev::buffer_type::UNIFORM_BUFFER
+            ));
+            memory_allocator->allocate_buffer(d_buffers.light_uniforms.back(), ev::memory_type::HOST_READABLE);
+            d_buffers.light_uniforms.back()->map();
+            d_buffers.light_uniforms.back()->write(&light, sizeof(Light));
+            d_buffers.light_uniforms.back()->flush();
+            d_buffers.light_uniforms.back()->unmap();
+        }
         ev_log_info("[Setup Uniform Buffer End]");
     }
 
@@ -478,8 +479,9 @@ public:
         descriptors.pool = std::make_shared<ev::DescriptorPool>(device);
         auto& descriptor_pool = descriptors.pool;
         descriptor_pool->add(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 
-            static_cast<uint32_t>(swapchain->get_images().size()) * 2); // 1 for camera pv matrix, 2 for light cube model, 3 for light position
-        descriptor_pool->add(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 3);
+            static_cast<uint32_t>(max_frames_in_flight * 2)); // 1 for camera pv matrix, 2 for light position
+        descriptor_pool->add(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 
+            static_cast<uint32_t>(max_frames_in_flight * 1)); // 1 for cube texture sampler
         CHECK_RESULT(descriptor_pool->create_pool(10, VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT));
         ev_log_debug("Descriptor pool created");
         descriptors.cube_layout = std::make_shared<ev::DescriptorSetLayout>(device);
@@ -506,7 +508,7 @@ public:
 
             descriptors.cube_sets.back()->write_buffer(
                 2,
-                d_buffers.light_uniform,
+                d_buffers.light_uniforms[i],
                 VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
             );
             ev_log_debug("Cube Descriptor set %d Light position uniform buffer written", i);
@@ -530,7 +532,7 @@ public:
             );
             descriptors.light_sets.back()->write_buffer(
                 1,
-                d_buffers.light_uniform,
+                d_buffers.light_uniforms[i],
                 VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
             );
             ev_log_debug("Light descriptor set %d Light position uniform buffer written", i);
@@ -753,11 +755,10 @@ public:
         );
         light.model = glm::translate(glm::mat4(1.0f), glm::vec3(light.pos));
         light.model = glm::scale(light.model, glm::vec3(0.2f, 0.2f, 0.2f)); // Scale the light cube
-        d_buffers.light_uniform->map();
-        d_buffers.light_uniform->write(&light, sizeof(Light));
-        d_buffers.light_uniform->flush();
-        d_buffers.light_uniform->unmap();
-
+        d_buffers.light_uniforms[current_frame_index]->map();
+        d_buffers.light_uniforms[current_frame_index]->write(&light, sizeof(Light));
+        d_buffers.light_uniforms[current_frame_index]->flush();
+        d_buffers.light_uniforms[current_frame_index]->unmap();
         last_frame_time = current_frame_time;
     }
 

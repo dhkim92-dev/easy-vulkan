@@ -1,0 +1,14 @@
+{
+    "C_Cpp.default.compileCommands": [
+        "${workspaceFolder}/compile_commands.json"
+    ],
+    "C_Cpp.intelliSenseEngine": "Default",
+    "C_Cpp.autocomplete": "Default",
+    "C_Cpp.errorSquiggles": "Enabled",
+    "C_Cpp.default.cppStandard": "c++23",
+    "C_Cpp.default.cppLanguageStandard": "c++23",
+    "files.associations": {
+        "*.hpp": "cpp",
+        "*.ipp": "cpp"
+    }
+}

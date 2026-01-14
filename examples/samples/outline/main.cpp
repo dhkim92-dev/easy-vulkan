@@ -22,6 +22,7 @@ private:
     } render_passes;
 
     std::vector<std::shared_ptr<ev::Framebuffer>> scene_fb;
+
     std::vector<std::shared_ptr<ev::Framebuffer>> outline_fb;
 
     struct FramebufferAttachment {
@@ -344,6 +345,18 @@ public:
                 .dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
                 .dependencyFlags = 0
             };
+            subpass_dependencies.push_back(dependency);
+
+            VkSubpassDependency dependency_depth = {
+                .srcSubpass = VK_SUBPASS_EXTERNAL,
+                .dstSubpass = 0,
+                .srcStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+                .dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+                .srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+                .dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT,
+                .dependencyFlags = 0
+            };
+            subpass_dependencies.push_back(dependency_depth);
 
             render_passes.outline = std::make_shared<ev::RenderPass>(
                 device, 
@@ -747,7 +760,7 @@ public:
                 .set_multisample_state(VK_SAMPLE_COUNT_1_BIT)
                 .set_color_blend_state()
                 .add_color_blend_attachment_state(VK_FALSE)
-                .set_depth_stencil_state(VK_TRUE, VK_TRUE, VK_COMPARE_OP_LESS_OR_EQUAL, VK_FALSE,
+                .set_depth_stencil_state(VK_TRUE, VK_FALSE, VK_COMPARE_OP_LESS_OR_EQUAL, VK_FALSE,
                     VK_TRUE, 
                     stencil_op_state, // Stencil Op State
                     stencil_op_state  // Stencil Op State
@@ -1084,7 +1097,7 @@ public:
         };
 
         queue->submits(_command_buffers);
-        frame_fences[current_buffer_index]->wait(UINT64_MAX);
+        // frame_fences[current_buffer_index]->wait(UINT64_MAX);
     }
 
     void uniform_update() {
