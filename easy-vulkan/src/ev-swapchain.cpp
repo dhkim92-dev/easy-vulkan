@@ -3,6 +3,7 @@
 #include "ev-swapchain.h"
 #include "ev-logger.h"
 #include <iostream>
+#include <limits>
 
 using namespace std;
 using namespace ev;
@@ -155,14 +156,29 @@ void Swapchain::create(
     // auto vkGetPhysicalDeviceSurfaceCapabilitiesKHR = (PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR)vkGetInstanceProcAddr(*instance, "vkGetPhysicalDeviceSurfaceCapabilitiesKHR");
     CHECK_RESULT(pfn.vkGetPhysicalDeviceSurfaceCapabilitiesKHR(*pdevice, surface, &surface_capabilities));
     VkExtent2D resolution = {width, height};
-    if ( surface_capabilities.currentExtent.width == 0xFFFFFFFF ) {
-        resolution.height = width;
-        resolution.width = height;
+    if (surface_capabilities.currentExtent.width == std::numeric_limits<uint32_t>::max()) {
+        // Wayland (and some other window systems) reports an undefined
+        // currentExtent. In that case the application must choose the
+        // swapchain extent in framebuffer pixels. Keep width and height in
+        // their original order and constrain them to the surface limits.
+        resolution.width = std::clamp(
+            width,
+            surface_capabilities.minImageExtent.width,
+            surface_capabilities.maxImageExtent.width
+        );
+        resolution.height = std::clamp(
+            height,
+            surface_capabilities.minImageExtent.height,
+            surface_capabilities.maxImageExtent.height
+        );
     } else {
         resolution = surface_capabilities.currentExtent;
-        width = resolution.width;
-        height = resolution.height;
     }
+
+    // The rest of the example code uses these values for framebuffers,
+    // render areas, viewports, scissors, and projection matrices.
+    width = resolution.width;
+    height = resolution.height;
 
     uint32_t present_mode_count = 0;
     // auto vkGetPhysicalDeviceSurfacePresentModesKHR = (PFN_vkGetPhysicalDeviceSurfacePresentModesKHR)vkGetInstanceProcAddr(*instance, "vkGetPhysicalDeviceSurfacePresentModesKHR");
